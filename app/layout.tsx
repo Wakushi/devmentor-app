@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 import ShaderGradientBackground from "@/components/ui/shader-gradient"
 import LoadingScreen from "@/components/ui/loading-screen"
+import Header from "@/components/header"
 
 export const metadata: Metadata = {
   title: "Devmentor",
@@ -17,6 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <Header />
         {children}
         <ShaderGradientBackground />
         <LoadingScreen />

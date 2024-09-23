@@ -1,3 +1,4 @@
+import TypingAnimation from "@/components/magicui/typing-animation"
 import { Button } from "@/components/ui/button"
 import GridBackground from "@/components/ui/grid-background"
 import Image from "next/image"
@@ -14,10 +15,12 @@ export default function Hero() {
             <span className="text-primary">development challenges</span>,
             accelerate your <span className="text-primary">growth</span>
           </h1>
-          <p className="max-w-2xl drop-shadow-lg mb-6 font-light lg:mb-8 md:text-lg lg:text-xl">
-            Connect with mentors who make learning seamless and stress-free for
-            budding Web3 enthusiasts!
-          </p>
+          <TypingAnimation
+            className="max-w-2xl text-start drop-shadow-lg mb-6 font-light lg:mb-8 md:text-lg lg:text-xl"
+            text="Connect with mentors who make learning seamless and stress-free for
+            budding Web3 enthusiasts!"
+            duration={30}
+          />
           <div className="flex items-center gap-2">
             <Button className="text-lg px-8 py-6" variant="outline-white">
               Learn more

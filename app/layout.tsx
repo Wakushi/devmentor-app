@@ -18,7 +18,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Header />
-        {children}
+        <main className="min-h-screen flex flex-col gap-8">{children}</main>
         <LoadingScreen />
       </body>
     </html>

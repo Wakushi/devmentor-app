@@ -1,7 +1,6 @@
 import TypingAnimation from "@/components/magicui/typing-animation"
+import AnimatedBackground from "@/components/ui/animated-background"
 import { Button } from "@/components/ui/button"
-import GridBackground from "@/components/ui/grid-background"
-import ShaderGradientBackground from "@/components/ui/shader-gradient"
 import Image from "next/image"
 import { FaLongArrowAltRight } from "react-icons/fa"
 
@@ -40,8 +39,7 @@ export default function Hero() {
           />
         </div>
       </div>
-      <GridBackground />
-      <ShaderGradientBackground />
+      <AnimatedBackground />
     </section>
   )
 }

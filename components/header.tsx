@@ -10,10 +10,10 @@ export default function Header() {
       <nav className="flex items-center gap-4">
         <NavLinkButton href="/">Home</NavLinkButton>
         <div className="flex items-center gap-2">
-          <NavLinkButton href="/signup" variant="outline">
+          <NavLinkButton href="/auth/signup" variant="outline">
             Signup
           </NavLinkButton>
-          <NavLinkButton href="/login" variant="filled">
+          <NavLinkButton href="/auth/login" variant="filled">
             Login
           </NavLinkButton>
         </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 import LoadingScreen from "@/components/ui/loading-screen"
 import Header from "@/components/header"
+import Providers from "@/providers"
 
 export const metadata: Metadata = {
   title: "Devmentor",
@@ -18,7 +19,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Header />
-        <main className="min-h-screen flex flex-col gap-8">{children}</main>
+        <Providers>
+          <main className="min-h-screen flex flex-col gap-8">{children}</main>
+        </Providers>
         <LoadingScreen />
       </body>
     </html>

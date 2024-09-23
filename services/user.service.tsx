@@ -16,14 +16,14 @@ interface UserContextProviderProps {
 interface UserContextProps {
   user: User | null
   setUser: (user: User | ((prevUser: User | null) => User | null)) => void
-  loading: boolean
+  isConnected: boolean
   disconnectWallet: () => void
 }
 
 const UserContext = createContext<UserContextProps>({
   user: null,
   setUser: () => {},
-  loading: false,
+  isConnected: false,
   disconnectWallet: () => {},
 })
 
@@ -33,8 +33,6 @@ export default function UserContextProvider(props: UserContextProviderProps) {
   const router = useRouter()
 
   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -42,7 +40,6 @@ export default function UserContextProvider(props: UserContextProviderProps) {
         if (isConnected && connector?.name !== "Web3Auth" && address) {
           const registeredUser = await getRegisteredUser(address)
           setUser(registeredUser ? registeredUser : { address })
-          setLoading(false)
           return
         }
 
@@ -64,13 +61,12 @@ export default function UserContextProvider(props: UserContextProviderProps) {
           )
         }
       } catch (err) {
-        setError("Failed to fetch user data")
+        console.log(err)
       } finally {
-        setLoading(false)
+        routeUser()
       }
 
       if (!isConnected) {
-        setLoading(false)
         setUser(null)
         return
       }
@@ -79,7 +75,15 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     fetchUserData()
   }, [isConnected, connector, address, web3AuthInstance])
 
-  function disconnectWallet() {
+  function routeUser(): void {
+    if (!isConnected) return
+
+    if (!user?.registered) {
+      router.push("/auth/signup/profile")
+    }
+  }
+
+  function disconnectWallet(): void {
     disconnect()
     setUser(null)
     router.push("/")
@@ -87,7 +91,6 @@ export default function UserContextProvider(props: UserContextProviderProps) {
 
   async function getUserAddress(): Promise<`0x${string}` | null> {
     if (!web3AuthInstance?.provider) {
-      console.log("No provider")
       return null
     }
 
@@ -119,7 +122,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
   const context: UserContextProps = {
     user,
     setUser,
-    loading,
+    isConnected,
     disconnectWallet,
   }
 

@@ -3,21 +3,42 @@ import Link from "next/link"
 import { MdOutlineHandshake } from "react-icons/md"
 import { ReactNode } from "react"
 import clsx from "clsx"
+import { useUser } from "@/services/user.service"
+import { Button } from "./ui/button"
 
 export default function Header() {
+  const { user, isConnected, disconnectWallet } = useUser()
+
+  function Navigation() {
+    if (isConnected) {
+      return (
+        <>
+          <Button onClick={() => disconnectWallet()}>Logout</Button>
+        </>
+      )
+    }
+
+    return (
+      <div className="flex items-center gap-2">
+        <NavLinkButton href="/auth/signup" variant="outline">
+          Signup
+        </NavLinkButton>
+        <NavLinkButton href="/auth/login" variant="filled">
+          Login
+        </NavLinkButton>
+        <Button variant="outline-white" onClick={() => disconnectWallet()}>
+          Logout
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <header className="fixed top-5 left-1/2 -translate-x-1/2 rounded-xl w-[95%] flex items-center justify-between px-8 py-4 bg-white bg-opacity-[0.03] shadow-sm backdrop-blur-sm z-[10]">
       <Logo />
       <nav className="flex items-center gap-4">
         <NavLinkButton href="/">Home</NavLinkButton>
-        <div className="flex items-center gap-2">
-          <NavLinkButton href="/auth/signup" variant="outline">
-            Signup
-          </NavLinkButton>
-          <NavLinkButton href="/auth/login" variant="filled">
-            Login
-          </NavLinkButton>
-        </div>
+        <Navigation />
       </nav>
     </header>
   )

@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { FaLongArrowAltRight } from "react-icons/fa"
+import Loader from "@/components/ui/loader"
 
 export default function Home() {
   return (
@@ -133,6 +134,18 @@ export default function Home() {
         <div className="flex gap-2">
           <Badge>New</Badge>
           <Badge variant="secondary">Featured</Badge>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="mb-4">Loaders</h2>
+        <div className="flex gap-2">
+          <Loader fill="black" color="primary" />
+          <Loader fill="black" />
+          <Button>
+            <Loader size="4" />
+            Loader button
+          </Button>
         </div>
       </section>
     </div>

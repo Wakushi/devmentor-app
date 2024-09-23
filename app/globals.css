@@ -17,6 +17,9 @@
     --text: #e0e0e0;
     --text-dim: #9e9e9e;
 
+    --dm-l1: #eff0f6;
+    --dm-d1: #6f6c90;
+
     --accent: #f6ae55;
 
     --error: #e53e3e;
@@ -111,6 +114,11 @@ h6 {
   animation: fade-in 500ms 500ms forwards;
 }
 
+.fade-in-bottom {
+  opacity: 0;
+  animation: fade-in-bottom 500ms forwards ease-in-out;
+}
+
 .loader {
   display: inline-flex;
   gap: 5px;
@@ -158,5 +166,16 @@ h6 {
   }
   100% {
     opacity: 1;
+  }
+}
+
+@keyframes fade-in-bottom {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
   }
 }

@@ -5,9 +5,20 @@ import { ReactNode } from "react"
 import clsx from "clsx"
 import { useUser } from "@/services/user.service"
 import { Button } from "./ui/button"
+import { web3AuthInstance } from "@/lib/Web3AuthConnectorInstance"
+import { getBalance } from "@/lib/actions/web3/helpers"
+import { shortenAddress } from "@/lib/utils"
+import { IoMdLogOut } from "react-icons/io"
+import TooltipWrapper from "./ui/custom-tooltip"
 
 export default function Header() {
   const { user, isConnected, disconnectWallet } = useUser()
+
+  async function getUserBalance() {
+    if (!web3AuthInstance.provider) return
+    const balance = await getBalance(web3AuthInstance.provider, user?.address)
+    console.log("Balance: ", balance)
+  }
 
   function Navigation() {
     if (isConnected) {
@@ -29,6 +40,24 @@ export default function Header() {
         <Button variant="outline-white" onClick={() => disconnectWallet()}>
           Logout
         </Button>
+        {user && (
+          <>
+            <div
+              onClick={() => {
+                getUserBalance()
+              }}
+              className="text-white bg-brand px-4 py-2 rounded-md shadow hover:text-brand hover:bg-white cursor-pointer"
+            >
+              {shortenAddress(user.address)}
+            </div>
+            <TooltipWrapper message="Disconnect wallet">
+              <IoMdLogOut
+                className="text-2xl text-brand cursor-pointer hover:opacity-80"
+                onClick={() => disconnectWallet()}
+              />
+            </TooltipWrapper>
+          </>
+        )}
       </div>
     )
   }

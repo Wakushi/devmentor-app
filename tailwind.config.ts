@@ -28,6 +28,8 @@ const config = {
         success: "var(--success)",
         background: "var(--background)",
         dim: "var(--text-dim)",
+        l1: "var(--dm-l1)",
+        d1: "var(--dm-d1)",
         foreground: "hsl(var(--foreground))",
         card: {
           DEFAULT: "hsl(var(--card))",

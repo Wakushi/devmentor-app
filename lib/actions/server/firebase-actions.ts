@@ -12,7 +12,7 @@ export const createUser = async (user: User): Promise<User | null> => {
       address: user.address.toLowerCase() as Address,
     }
     const docRef = await adminDb.collection(USER_COLLECTION).add(newUser)
-    const createdUser = { ...newUser, firebaseId: docRef.id }
+    const createdUser: User = { ...newUser, id: docRef.id }
 
     return createdUser
   } catch (error) {

@@ -6,7 +6,7 @@ import ShaderGradientBackground from "./shader-gradient"
 export default function AnimatedBackground({
   shader = true,
 }: {
-  shader: boolean
+  shader?: boolean
 }) {
   return (
     <>

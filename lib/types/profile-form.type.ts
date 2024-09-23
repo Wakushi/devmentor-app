@@ -11,6 +11,15 @@ export enum Experience {
   ADEPT = "ADEPT",
 }
 
+export enum ContactType {
+  DISCORD = "DISCORD",
+  EMAIL = "EMAIL",
+  TWITTER = "TWITTER",
+  LINKEDIN = "LINKEDIN",
+  GITHUB = "GITHUB",
+  TELEGRAM = "TELEGRAM",
+}
+
 export interface ExperienceInfo {
   label: string
   description: string
@@ -39,26 +48,56 @@ export const experienceDescriptions: Record<Experience, ExperienceInfo> = {
   },
 }
 
+export enum LearningField {
+  BLOCKCHAIN = "BLOCKCHAIN",
+  SMART_CONTRACTS = "SMART_CONTRACTS",
+  DEFI = "DEFI",
+  NFT = "NFT",
+  WEB3_DEVELOPMENT = "WEB3_DEVELOPMENT",
+  CRYPTOCURRENCY = "CRYPTOCURRENCY",
+  TOKENOMICS = "TOKENOMICS",
+  DAO = "DAO",
+}
+
 export const learningFieldOptions = [
-  { value: "blockchain", label: "Blockchain" },
-  { value: "smart_contracts", label: "Smart Contracts" },
-  { value: "defi", label: "DeFi" },
-  { value: "nft", label: "NFTs" },
-  { value: "web3_development", label: "Web3 Development" },
-  { value: "cryptocurrency", label: "Cryptocurrency" },
-  { value: "tokenomics", label: "Tokenomics" },
-  { value: "dao", label: "DAOs" },
+  { value: LearningField.BLOCKCHAIN, label: "Blockchain" },
+  { value: LearningField.SMART_CONTRACTS, label: "Smart Contracts" },
+  { value: LearningField.DEFI, label: "DeFi" },
+  { value: LearningField.NFT, label: "NFTs" },
+  { value: LearningField.WEB3_DEVELOPMENT, label: "Web3 Development" },
+  { value: LearningField.CRYPTOCURRENCY, label: "Cryptocurrency" },
+  { value: LearningField.TOKENOMICS, label: "Tokenomics" },
+  { value: LearningField.DAO, label: "DAOs" },
 ]
 
-export const languageOptions = [
-  { value: "en", label: "English", code: "GB" },
-  { value: "fr", label: "French", code: "FR" },
-  { value: "de", label: "German", code: "DE" },
-  { value: "es", label: "Spanish", code: "ES" },
-  { value: "it", label: "Italian", code: "IT" },
-  { value: "nl", label: "Dutch", code: "NL" },
-  { value: "pt", label: "Portuguese", code: "PT" },
-  { value: "ru", label: "Russian", code: "RU" },
-  { value: "zh", label: "Chinese", code: "CN" },
-  { value: "ja", label: "Japanese", code: "JP" },
+export enum Language {
+  ENGLISH = "en",
+  FRENCH = "fr",
+  GERMAN = "de",
+  SPANISH = "es",
+  ITALIAN = "it",
+  DUTCH = "nl",
+  PORTUGUESE = "pt",
+  RUSSIAN = "ru",
+  CHINESE = "zh",
+  JAPANESE = "ja",
+}
+
+interface LanguageOption {
+  value: Language
+  label: string
+  code: string
+}
+
+export const languageOptions: LanguageOption[] = [
+  { value: Language.ENGLISH, label: "English", code: "GB" },
+  { value: Language.FRENCH, label: "French", code: "FR" },
+  { value: Language.GERMAN, label: "German", code: "DE" },
+  { value: Language.SPANISH, label: "Spanish", code: "ES" },
+  { value: Language.ITALIAN, label: "Italian", code: "IT" },
+  { value: Language.DUTCH, label: "Dutch", code: "NL" },
+  { value: Language.PORTUGUESE, label: "Portuguese", code: "PT" },
+  { value: Language.RUSSIAN, label: "Russian", code: "RU" },
+  { value: Language.CHINESE, label: "Chinese", code: "CN" },
+  { value: Language.JAPANESE, label: "Japanese", code: "JP" },
 ]

@@ -106,17 +106,8 @@ h6 {
   @apply font-heading font-bold text-title;
 }
 
-.disappear {
-  animation: disappear 500ms 1s forwards ease-in-out;
-}
-
-.fade-in {
-  animation: fade-in 500ms 500ms forwards;
-}
-
-.fade-in-bottom {
-  opacity: 0;
-  animation: fade-in-bottom 500ms forwards ease-in-out;
+.glass {
+  @apply bg-white bg-opacity-[0.03] shadow-sm backdrop-blur-sm;
 }
 
 .loader {
@@ -136,6 +127,23 @@ h6 {
 .loader:after {
   --s: -1;
   animation-delay: 0.75s;
+}
+
+.disappear {
+  animation: disappear 500ms 1s forwards ease-in-out;
+}
+
+.fade-in {
+  animation: fade-in 500ms 500ms forwards;
+}
+
+.fade-in-bottom {
+  opacity: 0;
+  animation: fade-in-bottom 500ms forwards ease-in-out;
+}
+
+.fade-out-card {
+  animation: fade-out-card 500ms forwards ease-in-out;
 }
 
 @keyframes l4 {
@@ -166,6 +174,13 @@ h6 {
   }
   100% {
     opacity: 1;
+  }
+}
+
+@keyframes fade-out-card {
+  100% {
+    border-color: transparent;
+    background-color: transparent;
   }
 }
 

@@ -3,7 +3,7 @@ import { createContext, ReactNode, useContext } from "react"
 import { useState, useEffect } from "react"
 import { useAccount, useDisconnect } from "wagmi"
 import { web3AuthInstance } from "@/lib/Web3AuthConnectorInstance"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { User } from "@/lib/types/user.type"
 import { IProvider } from "@web3auth/base"
 import { createWalletClient, custom } from "viem"
@@ -31,14 +31,17 @@ export default function UserContextProvider(props: UserContextProviderProps) {
   const { address, connector, isConnected } = useAccount()
   const { disconnect } = useDisconnect()
   const router = useRouter()
+  const pathname = usePathname()
 
   const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
     const fetchUserData = async () => {
+      let registeredUser = null
+
       try {
         if (isConnected && connector?.name !== "Web3Auth" && address) {
-          const registeredUser = await getRegisteredUser(address)
+          registeredUser = await getRegisteredUser(address)
           setUser(registeredUser ? registeredUser : { address })
           return
         }
@@ -49,7 +52,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
 
           if (!web3AuthAddress) return
 
-          const registeredUser = await getRegisteredUser(web3AuthAddress)
+          registeredUser = await getRegisteredUser(web3AuthAddress)
 
           setUser(
             registeredUser
@@ -63,7 +66,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
       } catch (err) {
         console.log(err)
       } finally {
-        routeUser()
+        routeUser(registeredUser)
       }
 
       if (!isConnected) {
@@ -75,10 +78,15 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     fetchUserData()
   }, [isConnected, connector, address, web3AuthInstance])
 
-  function routeUser(): void {
+  function routeUser(registeredUser: User | null): void {
+    console.log("Routing user :", registeredUser)
+
     if (!isConnected) return
 
-    if (!user?.registered) {
+    if (
+      (!registeredUser || !registeredUser?.registered) &&
+      pathname === "/auth/signup"
+    ) {
       router.push("/auth/signup/profile")
     }
   }

@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button"
+import GridBackground from "@/components/ui/grid-background"
 import Image from "next/image"
 import { FaLongArrowAltRight } from "react-icons/fa"
 
 export default function Hero() {
   return (
     <section>
+      <GridBackground />
       <div className="min-h-screen flex justify-center items-center">
         <div>
           <h1 className="max-w-2xl mb-4 drop-shadow-lg text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl">

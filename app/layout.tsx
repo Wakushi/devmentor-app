@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import "./globals.css"
 import ShaderGradientBackground from "@/components/ui/shader-gradient"
+import LoadingScreen from "@/components/ui/loading-screen"
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body>
         {children}
         <ShaderGradientBackground />
+        <LoadingScreen />
       </body>
     </html>
   )

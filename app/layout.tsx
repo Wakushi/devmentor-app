@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 import "./globals.css"
-import ShaderGradientBackground from "@/components/ui/shader-gradient"
 import LoadingScreen from "@/components/ui/loading-screen"
 import Header from "@/components/header"
 
@@ -20,7 +19,6 @@ export default function RootLayout({
       <body>
         <Header />
         {children}
-        <ShaderGradientBackground />
         <LoadingScreen />
       </body>
     </html>

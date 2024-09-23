@@ -8,7 +8,7 @@ export default function Hero() {
   return (
     <section>
       <GridBackground />
-      <div className="min-h-screen flex justify-center items-center">
+      <div className="min-h-screen flex gap-4 justify-center items-center">
         <div>
           <h1 className="max-w-2xl mb-4 drop-shadow-lg text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl">
             Overcome{" "}
@@ -16,7 +16,7 @@ export default function Hero() {
             accelerate your <span className="text-primary">growth</span>
           </h1>
           <TypingAnimation
-            className="max-w-2xl text-start drop-shadow-lg mb-6 font-light lg:mb-8 md:text-lg lg:text-xl"
+            className="max-w-2xl h-[56px] text-start drop-shadow-lg mb-6 font-light lg:mb-8 md:text-lg lg:text-xl"
             text="Connect with mentors who make learning seamless and stress-free for
             budding Web3 enthusiasts!"
             duration={30}

@@ -107,10 +107,15 @@ h6 {
   animation: disappear 500ms 1s forwards ease-in-out;
 }
 
+.fade-in {
+  animation: fade-in 500ms 500ms forwards;
+}
+
 .loader {
   display: inline-flex;
   gap: 5px;
 }
+
 .loader:before,
 .loader:after {
   content: "";
@@ -119,6 +124,7 @@ h6 {
   box-shadow: 0 0 0 3px inset #fff;
   animation: l4 1.5s infinite;
 }
+
 .loader:after {
   --s: -1;
   animation-delay: 0.75s;
@@ -143,5 +149,14 @@ h6 {
 @keyframes disappear {
   100% {
     display: none;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
   }
 }

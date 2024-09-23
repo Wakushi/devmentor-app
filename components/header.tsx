@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link"
 import { MdOutlineHandshake } from "react-icons/md"
 import { ReactNode } from "react"

@@ -37,9 +37,6 @@ export default function Header() {
         <NavLinkButton href="/auth/login" variant="filled">
           Login
         </NavLinkButton>
-        <Button variant="outline-white" onClick={() => disconnectWallet()}>
-          Logout
-        </Button>
         {user && (
           <>
             <div

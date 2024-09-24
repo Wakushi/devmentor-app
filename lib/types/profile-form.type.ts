@@ -83,7 +83,7 @@ export enum Language {
   JAPANESE = "ja",
 }
 
-interface LanguageOption {
+export interface LanguageOption {
   value: Language
   label: string
   code: string
@@ -101,3 +101,10 @@ export const languageOptions: LanguageOption[] = [
   { value: Language.CHINESE, label: "Chinese", code: "CN" },
   { value: Language.JAPANESE, label: "Japanese", code: "JP" },
 ]
+
+export function getLanguageOption(code: string): LanguageOption | null {
+  const lang = languageOptions.find(
+    (l) => l.value.toLowerCase() === code.toLowerCase()
+  )
+  return lang || null
+}

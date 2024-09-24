@@ -24,7 +24,7 @@ export default function Hero() {
               className="max-w-2xl h-[56px] text-start drop-shadow-lg mb-6 font-light lg:mb-8 md:text-lg lg:text-xl"
               text="Connect with mentors who make learning seamless and stress-free for
             budding Web3 enthusiasts!"
-              duration={30}
+              duration={20}
             />
           </div>
           <div className="flex items-center gap-2">
@@ -37,9 +37,7 @@ export default function Hero() {
               <NavLinkButton
                 variant="filled"
                 href={
-                  user && user.registered
-                    ? "/dashboard/student"
-                    : "/auth/signup"
+                  user && user.registered ? "/mentor-search" : "/auth/signup"
                 }
               >
                 Find a mentor <FaLongArrowAltRight />

@@ -54,6 +54,7 @@ import Loader from "@/components/ui/loader"
 import { CiCircleCheck } from "react-icons/ci"
 import NavLinkButton from "@/components/ui/nav-link"
 import { Role } from "@/lib/types/role.type"
+import Flag from "@/components/ui/flag"
 
 const learningFormSchema = z.object({
   learningFields: z
@@ -403,11 +404,7 @@ export default function ProfileCreationPage() {
                                     field.onChange(updatedLanguages)
                                   }}
                                 >
-                                  <img
-                                    src={`https://flagsapi.com/${lang.code}/flat/64.png`}
-                                    alt={`${lang.label} flag`}
-                                    className="w-12 h-12 object-cover rounded"
-                                  />
+                                  <Flag lang={lang} />
                                   <span className="mt-2 text-sm">
                                     {lang.label}
                                   </span>

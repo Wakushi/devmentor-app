@@ -12,3 +12,7 @@ export function shortenAddress(address: Address): string {
   }
   return `${address.slice(0, 6)}...${address.slice(-4)}`
 }
+
+export function capitalizeFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}

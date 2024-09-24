@@ -22,7 +22,7 @@ export default function NavLinkButton({
       className={clsx(
         "inline-flex w-full h-full items-center gap-2 justify-center whitespace-nowrap rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50  text-white hover:opacity-80 px-4 py-2",
         {
-          "bg-primary border-primary hover:bg-primary-shade hover:text-slate-50 active:bg-slate-50 active:text-primary shadow-sm ":
+          "bg-primary border border-primary hover:bg-primary-shade hover:text-slate-50 active:bg-slate-50 active:text-primary shadow-sm ":
             variant === "filled",
           "bg-secondary border-secondary hover:bg-secondary-shade hover:text-slate-50 active:bg-slate-50 active:text-secondary shadow-sm ":
             variant === "filled-secondary",

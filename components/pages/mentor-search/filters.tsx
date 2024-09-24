@@ -47,7 +47,7 @@ export default function Filters({
   }
 
   return (
-    <Card className="w-full flex-1 glass text-white">
+    <Card className="w-full flex-1 glass text-white rounded-xl">
       <CardHeader>
         <CardTitle>Filters</CardTitle>
       </CardHeader>

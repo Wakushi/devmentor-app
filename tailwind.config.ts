@@ -30,6 +30,7 @@ const config = {
         dim: "var(--text-dim)",
         l1: "var(--dm-l1)",
         d1: "var(--dm-d1)",
+        "primary-faded": "var(--primary-faded)",
         foreground: "hsl(var(--foreground))",
         card: {
           DEFAULT: "hsl(var(--card))",

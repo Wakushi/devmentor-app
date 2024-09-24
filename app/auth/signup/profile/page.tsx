@@ -51,7 +51,6 @@ import { Separator } from "@/components/ui/separator"
 import { User } from "@/lib/types/user.type"
 import { useUser } from "@/services/user.service"
 import Loader from "@/components/ui/loader"
-import { useRouter } from "next/navigation"
 import { CiCircleCheck } from "react-icons/ci"
 import NavLinkButton from "@/components/ui/nav-link"
 
@@ -192,7 +191,7 @@ export default function ProfileCreationPage() {
       }
 
       const userPayload: User = {
-        address: user.address,
+        ...user,
         name: getUsername(),
         learningFields,
         experience,

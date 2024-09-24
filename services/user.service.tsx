@@ -65,6 +65,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
         }
       } catch (err) {
         console.log(err)
+        localStorage.clear()
       } finally {
         routeUser(registeredUser)
       }
@@ -76,11 +77,9 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     }
 
     fetchUserData()
-  }, [isConnected, connector, address, web3AuthInstance])
+  }, [isConnected])
 
   function routeUser(registeredUser: User | null): void {
-    console.log("Routing user :", registeredUser)
-
     if (!isConnected) return
 
     if (
@@ -88,6 +87,10 @@ export default function UserContextProvider(props: UserContextProviderProps) {
       pathname === "/auth/signup"
     ) {
       router.push("/auth/signup/profile")
+    }
+
+    if (registeredUser?.registered) {
+      router.push("/dashboard")
     }
   }
 

@@ -1,10 +1,16 @@
+"use client"
+
 import TypingAnimation from "@/components/magicui/typing-animation"
 import AnimatedBackground from "@/components/ui/animated-background"
 import { Button } from "@/components/ui/button"
+import NavLinkButton from "@/components/ui/nav-link"
+import { useUser } from "@/services/user.service"
 import Image from "next/image"
 import { FaLongArrowAltRight } from "react-icons/fa"
 
 export default function Hero() {
+  const { user } = useUser()
+
   return (
     <section>
       <div className="min-h-screen flex gap-4 justify-center items-center">
@@ -21,12 +27,19 @@ export default function Hero() {
             duration={30}
           />
           <div className="flex items-center gap-2">
-            <Button className="text-lg px-8 py-6" variant="outline-white">
-              Learn more
-            </Button>
-            <Button className="text-lg px-8 py-6">
-              Find a mentor <FaLongArrowAltRight />
-            </Button>
+            <div className="h-[40px] w-[180px]">
+              <NavLinkButton variant="outline" href="/">
+                Learn more
+              </NavLinkButton>
+            </div>
+            <div className="h-[40px] w-[180px]">
+              <NavLinkButton
+                variant="filled"
+                href={user && user.registered ? "/dashboard" : "/auth/signup"}
+              >
+                Find a mentor <FaLongArrowAltRight />
+              </NavLinkButton>
+            </div>
           </div>
         </div>
         <div>

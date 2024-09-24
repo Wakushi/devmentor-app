@@ -65,6 +65,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
         }
       } catch (err) {
         console.log(err)
+        disconnect()
         localStorage.clear()
       } finally {
         routeUser(registeredUser)

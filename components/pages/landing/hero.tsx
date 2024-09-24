@@ -36,7 +36,7 @@ export default function Hero() {
             </div>
             <div className="h-[40px] w-[180px]">
               <NavLinkButton
-                variant="filled-secondary"
+                variant="filled"
                 href={user && user.registered ? "/dashboard" : "/auth/signup"}
               >
                 Find a mentor <FaLongArrowAltRight />

@@ -35,7 +35,7 @@ export default function SignUpPage() {
           Already have an account? <span className="font-bold">Log in</span>
         </p>
       </section>
-      <AnimatedBackground />
+      <AnimatedBackground shader={false} />
     </>
   )
 }

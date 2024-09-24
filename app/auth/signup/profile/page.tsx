@@ -53,6 +53,7 @@ import { useUser } from "@/services/user.service"
 import Loader from "@/components/ui/loader"
 import { CiCircleCheck } from "react-icons/ci"
 import NavLinkButton from "@/components/ui/nav-link"
+import { Role } from "@/lib/types/role.type"
 
 const learningFormSchema = z.object({
   learningFields: z
@@ -192,6 +193,7 @@ export default function ProfileCreationPage() {
       const userPayload: User = {
         ...user,
         name: getUsername(),
+        role: Role.STUDENT,
         learningFields,
         experience,
         languages,
@@ -253,7 +255,7 @@ export default function ProfileCreationPage() {
             </p>
           </div>
           <div className="max-w-[300px]">
-            <NavLinkButton href="/dashboard" variant="filled">
+            <NavLinkButton href="/dashboard/student" variant="filled">
               Go to dashboard <FaLongArrowAltRight />
             </NavLinkButton>
           </div>

@@ -36,7 +36,11 @@ export default function Hero() {
             <div className="h-[40px] w-[180px]">
               <NavLinkButton
                 variant="filled"
-                href={user && user.registered ? "/dashboard" : "/auth/signup"}
+                href={
+                  user && user.registered
+                    ? "/dashboard/student"
+                    : "/auth/signup"
+                }
               >
                 Find a mentor <FaLongArrowAltRight />
               </NavLinkButton>

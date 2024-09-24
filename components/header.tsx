@@ -10,7 +10,7 @@ import NavLinkButton from "./ui/nav-link"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 
 export default function Header() {
-  const { user, isConnected, disconnectWallet, loadingUser } = useUser()
+  const { user, isConnected, logOut, loadingUser } = useUser()
 
   const getUserBalance = async () => {
     if (!web3AuthInstance.provider || !user?.address) return
@@ -36,7 +36,7 @@ export default function Header() {
     if (isConnected && user?.registered) {
       const navLinks = [
         { href: "/", label: "Home" },
-        { href: "/dashboard", label: "Dashboard" },
+        { href: "/dashboard/student", label: "Dashboard" },
       ]
 
       return (
@@ -53,7 +53,7 @@ export default function Header() {
             <TooltipWrapper message="Disconnect wallet">
               <IoMdLogOut
                 className="text-2xl text-brand cursor-pointer hover:opacity-80"
-                onClick={disconnectWallet}
+                onClick={logOut}
               />
             </TooltipWrapper>
           </div>
@@ -74,7 +74,7 @@ export default function Header() {
           <TooltipWrapper message="Disconnect wallet">
             <IoMdLogOut
               className="text-2xl text-brand cursor-pointer hover:opacity-80"
-              onClick={disconnectWallet}
+              onClick={logOut}
             />
           </TooltipWrapper>
         )}

@@ -19,7 +19,7 @@ interface UserContextProps {
   setUser: (user: User | ((prevUser: User | null) => User | null)) => void
   isConnected: boolean
   loadingUser: boolean
-  disconnectWallet: () => void
+  logOut: () => void
 }
 
 enum Connectors {
@@ -32,7 +32,7 @@ const UserContext = createContext<UserContextProps>({
   setUser: () => {},
   isConnected: false,
   loadingUser: true,
-  disconnectWallet: () => {},
+  logOut: () => {},
 })
 
 export default function UserContextProvider(props: UserContextProviderProps) {
@@ -106,15 +106,11 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     switch (pathname) {
       case "/auth/signup":
       case "/auth/login":
-        router.push(registeredUser ? "/dashboard" : "/auth/signup/profile")
+        router.push(
+          registeredUser ? "/dashboard/student" : "/auth/signup/profile"
+        )
         break
     }
-  }
-
-  function disconnectWallet(): void {
-    disconnect()
-    setUser(null)
-    router.push("/")
   }
 
   async function getUserAddress(): Promise<`0x${string}` | null> {
@@ -147,12 +143,37 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     }
   }
 
+  async function logOut(): Promise<void> {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_API_URL}/auth/logout`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error("Failed to log out")
+      }
+
+      disconnect()
+      setUser(null)
+      router.push("/")
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   const context: UserContextProps = {
     user,
     setUser,
     isConnected,
     loadingUser,
-    disconnectWallet,
+    logOut,
   }
 
   return (

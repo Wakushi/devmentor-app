@@ -2,6 +2,7 @@ import {
   createUser,
   getUserByAddress,
 } from "@/lib/actions/server/firebase-actions"
+import { createUserJwtToken } from "@/lib/jwt"
 import { User } from "@/lib/types/user.type"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -34,7 +35,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ registeredUser: null }, { status: 404 })
     }
 
+    const token = await createUserJwtToken(user)
+
     const response = NextResponse.json({ registeredUser: user })
+    response.cookies.set({
+      name: process.env.NEXT_PUBLIC_TOKEN_COOKIE as string,
+      value: token,
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 7, // 1 week
+      path: "/",
+    })
 
     return response
   } catch (error) {

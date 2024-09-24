@@ -21,18 +21,16 @@ import {
 } from "@/components/ui/alert-dialog"
 import AnimatedBackground from "@/components/ui/animated-background"
 import { useUser } from "@/services/user.service"
-import { useRouter } from "next/navigation"
+import LoadingScreen from "@/components/ui/loading-screen"
 
 export default function DashboardPage() {
-  const { user } = useUser()
-  const router = useRouter()
+  const { user, loadingUser } = useUser()
   const [showPreSessionModal, setShowPreSessionModal] = useState(false)
   const [showPostSessionModal, setShowPostSessionModal] = useState(false)
   const [rating, setRating] = useState(0)
 
-  if (!user) {
-    router.push("/auth/signup")
-    return
+  if (loadingUser || !user) {
+    return <LoadingScreen />
   }
 
   const PreSessionModal = () => (

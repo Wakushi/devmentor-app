@@ -59,7 +59,7 @@ export default function MentorSearch() {
     }))
   }
   return (
-    <div className="relative flex gap-4 p-4 pt-40 min-h-screen m-auto w-[90%]">
+    <div className="relative flex gap-4 p-4 pt-40 min-h-screen m-auto w-[95%]">
       <Filters
         filters={filters}
         onFilterChange={handleFilterChange}
@@ -67,11 +67,11 @@ export default function MentorSearch() {
       />
       <div className="flex flex-col gap-4 ml-auto w-[80%]">
         <QuickMatchButton />
-
-        {currentMentors.map((mentor: Mentor) => (
-          <MentorCard key={mentor.id} mentor={mentor} />
-        ))}
-
+        <div className="flex flex-col gap-4">
+          {currentMentors.map((mentor: Mentor) => (
+            <MentorCard key={mentor.id} mentor={mentor} />
+          ))}
+        </div>
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

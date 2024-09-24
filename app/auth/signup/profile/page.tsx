@@ -102,7 +102,6 @@ const contactOptions = [
 
 export default function ProfileCreationPage() {
   const { user, setUser } = useUser()
-
   const [loading, setLoading] = useState<boolean>(false)
   const [success, setSuccess] = useState<boolean>(false)
   const [step, setStep] = useState<ProfileSteps>(ProfileSteps.LEARNING)
@@ -253,9 +252,11 @@ export default function ProfileCreationPage() {
               Let's find a mentor to help you for your first session
             </p>
           </div>
-          <NavLinkButton href="/dashboard" variant="filled">
-            Go to dashboard <FaLongArrowAltRight />
-          </NavLinkButton>
+          <div className="max-w-[300px]">
+            <NavLinkButton href="/dashboard" variant="filled">
+              Go to dashboard <FaLongArrowAltRight />
+            </NavLinkButton>
+          </div>
         </div>
       )
     }

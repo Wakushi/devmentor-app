@@ -142,6 +142,11 @@ h6 {
   animation: fade-in-bottom 500ms forwards ease-in-out;
 }
 
+.fade-in-bottom-delay {
+  opacity: 0;
+  animation: fade-in-bottom 300ms 200ms forwards ease-in-out;
+}
+
 .fade-out-card {
   animation: fade-out-card 500ms forwards ease-in-out;
 }

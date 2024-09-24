@@ -8,9 +8,11 @@ import { config } from "@/providers"
 import { useState } from "react"
 import { FaGoogle } from "react-icons/fa"
 import Loader from "@/components/ui/loader"
+import { usePathname } from "next/navigation"
 
 export default function Connectors() {
   const { connectors } = useConnect()
+  const pathName = usePathname()
   const [loading, setLoading] = useState<boolean>(false)
 
   async function handleConnect(connector: Connector) {
@@ -45,7 +47,7 @@ export default function Connectors() {
               <FaGoogle className="text-lg drop-shadow-lg" />
             )}
             {icon && <ConnectorIcon url={icon} name={name} />}
-            Signup with {name}
+            {pathName === "/auth/login" ? "Connect" : "Signup"} with {name}
           </Button>
         )
       })}

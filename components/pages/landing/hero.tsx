@@ -2,7 +2,6 @@
 
 import TypingAnimation from "@/components/magicui/typing-animation"
 import AnimatedBackground from "@/components/ui/animated-background"
-import { Button } from "@/components/ui/button"
 import NavLinkButton from "@/components/ui/nav-link"
 import { useUser } from "@/services/user.service"
 import Image from "next/image"
@@ -19,7 +18,7 @@ export default function Hero() {
             <h1 className="max-w-2xl mb-4 drop-shadow-lg text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl">
               Overcome{" "}
               <span className="text-primary">development challenges</span>,
-              accelerate your <span className="text-primary">growth</span>
+              learn from the <span className="text-primary">best</span>
             </h1>
             <TypingAnimation
               className="max-w-2xl h-[56px] text-start drop-shadow-lg mb-6 font-light lg:mb-8 md:text-lg lg:text-xl"

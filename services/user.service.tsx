@@ -6,8 +6,9 @@ import { web3AuthInstance } from "@/lib/Web3AuthConnectorInstance"
 import { usePathname, useRouter } from "next/navigation"
 import { User } from "@/lib/types/user.type"
 import { IProvider } from "@web3auth/base"
-import { createWalletClient, custom } from "viem"
+import { Address, createWalletClient, custom } from "viem"
 import { baseSepolia } from "viem/chains"
+import { OpenloginUserInfo } from "@web3auth/openlogin-adapter"
 
 interface UserContextProviderProps {
   children: ReactNode
@@ -17,13 +18,20 @@ interface UserContextProps {
   user: User | null
   setUser: (user: User | ((prevUser: User | null) => User | null)) => void
   isConnected: boolean
+  loadingUser: boolean
   disconnectWallet: () => void
+}
+
+enum Connectors {
+  METAMASK = "MetaMask",
+  WEB3AUTH = "Web3Auth",
 }
 
 const UserContext = createContext<UserContextProps>({
   user: null,
   setUser: () => {},
   isConnected: false,
+  loadingUser: true,
   disconnectWallet: () => {},
 })
 
@@ -34,64 +42,72 @@ export default function UserContextProvider(props: UserContextProviderProps) {
   const pathname = usePathname()
 
   const [user, setUser] = useState<User | null>(null)
+  const [loadingUser, setLoadingUser] = useState<boolean>(true)
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      let registeredUser = null
+    handleUserConnect()
+  }, [address, web3AuthInstance.connected])
 
-      try {
-        if (isConnected && connector?.name !== "Web3Auth" && address) {
-          registeredUser = await getRegisteredUser(address)
-          setUser(registeredUser ? registeredUser : { address })
-          return
-        }
-
-        if (isConnected && web3AuthInstance) {
-          const userInfo = await web3AuthInstance.getUserInfo()
-          const web3AuthAddress = await getUserAddress()
-
-          if (!web3AuthAddress) return
-
-          registeredUser = await getRegisteredUser(web3AuthAddress)
-
-          setUser(
-            registeredUser
-              ? registeredUser
-              : {
-                  address: web3AuthAddress,
-                  web3AuthData: userInfo,
-                }
-          )
-        }
-      } catch (err) {
-        console.log(err)
-        disconnect()
-        localStorage.clear()
-      } finally {
-        routeUser(registeredUser)
-      }
-
-      if (!isConnected) {
-        setUser(null)
-        return
-      }
+  async function handleUserConnect(): Promise<void> {
+    if (!isConnected) {
+      setLoadingUser(false)
+      return
     }
 
-    fetchUserData()
-  }, [isConnected])
+    setLoadingUser(true)
+
+    try {
+      let registeredUser: User | null = null
+      let userInfo: Partial<OpenloginUserInfo> | null = null
+      let userAddress: Address | null = null
+
+      switch (connector?.name) {
+        case Connectors.WEB3AUTH:
+          if (!web3AuthInstance.connected) return
+
+          userInfo = await web3AuthInstance.getUserInfo()
+          userAddress = await getUserAddress()
+
+          if (!userAddress) return
+
+          registeredUser = await getRegisteredUser(userAddress)
+
+          break
+
+        default:
+          if (!address) return
+
+          userAddress = address
+          registeredUser = await getRegisteredUser(address)
+
+          break
+      }
+
+      if (registeredUser) {
+        setUser(registeredUser)
+      } else {
+        const newUser = {
+          address: userAddress,
+          userInfo,
+        }
+
+        setUser(newUser)
+      }
+
+      routeUser(registeredUser)
+    } catch (error) {
+      console.log("Error while connecting user: ", error)
+    } finally {
+      setLoadingUser(false)
+    }
+  }
 
   function routeUser(registeredUser: User | null): void {
-    if (!isConnected) return
-
-    if (
-      (!registeredUser || !registeredUser?.registered) &&
-      pathname === "/auth/signup"
-    ) {
-      router.push("/auth/signup/profile")
-    }
-
-    if (registeredUser?.registered) {
-      router.push("/dashboard")
+    switch (pathname) {
+      case "/auth/signup":
+      case "/auth/login":
+        router.push(registeredUser ? "/dashboard" : "/auth/signup/profile")
+        break
     }
   }
 
@@ -135,6 +151,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     user,
     setUser,
     isConnected,
+    loadingUser,
     disconnectWallet,
   }
 

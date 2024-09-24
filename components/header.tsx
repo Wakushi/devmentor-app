@@ -10,39 +10,50 @@ import NavLinkButton from "./ui/nav-link"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 
 export default function Header() {
-  const { user, isConnected, disconnectWallet } = useUser()
+  const { user, isConnected, disconnectWallet, loadingUser } = useUser()
 
-  async function getUserBalance() {
-    if (!web3AuthInstance.provider) return
-    const balance = await getBalance(web3AuthInstance.provider, user?.address)
-    console.log("Balance: ", balance)
-    console.log("User: ", user)
+  const getUserBalance = async () => {
+    if (!web3AuthInstance.provider || !user?.address) return
+    const balance = await getBalance(web3AuthInstance.provider, user.address)
+    console.log("Balance: ", balance, "User: ", user)
   }
 
-  function Navigation() {
+  type NavLinkVariant = "ghost" | "filled" | "filled-secondary" | "outline"
+  type NavLink = {
+    href: string
+    label: string
+    variant?: NavLinkVariant
+  }
+
+  const renderNavLinks = (links: NavLink[]) =>
+    links.map(({ href, label, variant = "ghost" }) => (
+      <NavLinkButton key={href} variant={variant} href={href}>
+        {label}
+      </NavLinkButton>
+    ))
+
+  const Navigation = () => {
     if (isConnected && user?.registered) {
+      const navLinks = [
+        { href: "/", label: "Home" },
+        { href: "/dashboard", label: "Dashboard" },
+      ]
+
       return (
-        <nav className="flex items-center gap-8">
-          <div className="flex items-center">
-            <NavLinkButton variant="ghost" href="/">
-              Home
-            </NavLinkButton>
-            <NavLinkButton variant="ghost" href="/dashboard">
-              Dashboard
-            </NavLinkButton>
-          </div>
+        <nav className="flex items-center gap-8 fade-in-bottom-delay">
+          <div className="flex items-center">{renderNavLinks(navLinks)}</div>
           <div className="flex items-center gap-2">
             <Avatar className="w-[30px] h-[30px]" onClick={getUserBalance}>
               <AvatarImage src={user?.web3AuthData?.profileImage} />
               <AvatarFallback className="text-d1">
-                {user.name![0]}
+                {user.name?.[0]}
               </AvatarFallback>
             </Avatar>
             <p className="text-mid font-semibold">{user.name}</p>
             <TooltipWrapper message="Disconnect wallet">
               <IoMdLogOut
                 className="text-2xl text-brand cursor-pointer hover:opacity-80"
-                onClick={() => disconnectWallet()}
+                onClick={disconnectWallet}
               />
             </TooltipWrapper>
           </div>
@@ -50,20 +61,20 @@ export default function Header() {
       )
     }
 
+    const authLinks: NavLink[] = [
+      { href: "/", label: "Home" },
+      { href: "/auth/signup", label: "Signup", variant: "outline" },
+      { href: "/auth/login", label: "Login", variant: "filled" },
+    ]
+
     return (
-      <nav className="flex items-center gap-2">
-        <NavLinkButton href="/">Home</NavLinkButton>
-        <NavLinkButton href="/auth/signup" variant="outline">
-          Signup
-        </NavLinkButton>
-        <NavLinkButton href="/auth/login" variant="filled">
-          Login
-        </NavLinkButton>
+      <nav className="flex items-center gap-2 fade-in-bottom-delay">
+        {renderNavLinks(authLinks)}
         {isConnected && (
           <TooltipWrapper message="Disconnect wallet">
             <IoMdLogOut
               className="text-2xl text-brand cursor-pointer hover:opacity-80"
-              onClick={() => disconnectWallet()}
+              onClick={disconnectWallet}
             />
           </TooltipWrapper>
         )}
@@ -71,21 +82,19 @@ export default function Header() {
     )
   }
 
-  return (
-    <header className="fixed top-5 left-1/2 -translate-x-1/2 rounded-xl w-[95%] flex items-center justify-between px-8 py-4 glass z-[10]">
-      <Logo />
-      <Navigation />
-    </header>
-  )
-}
-
-function Logo() {
-  return (
+  const Logo = () => (
     <Link href="/" className="flex gap-1 items-center">
       <GiMountaintop className="text-3xl" />
       <div className="font-heading font-light text-2xl flex items-center drop-shadow-md">
         DEVMENTOR
       </div>
     </Link>
+  )
+
+  return (
+    <header className="fixed top-5 left-1/2 -translate-x-1/2 rounded-xl w-[95%] flex items-center justify-between px-8 py-4 glass z-[10]">
+      <Logo />
+      {!loadingUser && <Navigation />}
+    </header>
   )
 }

@@ -181,7 +181,7 @@ export default function ProfileCreationPage() {
       const contacts = Array.from(selectedContacts, ([field, value]) => ({
         type: field,
         value,
-      }))
+      })).filter((contact) => contact.value)
 
       const getUsername = (): string => {
         if (contacts.length === 1 && contacts[0].type === ContactType.EMAIL) {

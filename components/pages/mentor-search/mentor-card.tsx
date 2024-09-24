@@ -35,7 +35,7 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
           <div>
             <p className="text-lg font-semibold">{name}</p>
             <div className="flex items-center mt-1">
-              <StarIcon className="w-4 h-4 text-yellow-400 mr-1" />
+              <StarIcon className="w-4 h-4 text-accent fill-accent mr-1" />
               <span className="text-sm font-medium">
                 {getAverageRating(reviews)}
               </span>

@@ -22,6 +22,8 @@ import {
 import AnimatedBackground from "@/components/ui/animated-background"
 import { useUser } from "@/services/user.service"
 import LoadingScreen from "@/components/ui/loading-screen"
+import NavLinkButton from "@/components/ui/nav-link"
+import { FaLongArrowAltRight } from "react-icons/fa"
 
 export default function DashboardPage() {
   const { user, loadingUser } = useUser()
@@ -172,12 +174,13 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <div className="glass border border-stone-800 p-4 rounded shadow">
           <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-          <button className="w-full bg-blue-500 text-white py-2 rounded mb-2">
-            Find a Mentor
-          </button>
-          <button className="w-full bg-green-500 text-white py-2 rounded">
-            Book a Session
-          </button>
+          <div className="flex flex-col gap-2">
+            <div className="w-full">
+              <NavLinkButton variant="filled" href="/mentor-search">
+                Find a Mentor <FaLongArrowAltRight />
+              </NavLinkButton>
+            </div>
+          </div>
         </div>
       </div>
 

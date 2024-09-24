@@ -1,77 +1,20 @@
-import React from "react"
+import AnimatedBackground from "@/components/ui/animated-background"
+import { Button } from "@/components/ui/button"
+import { IoIosFlash } from "react-icons/io"
 
-const MentorSearchPage = () => {
+export default function MentorSearch() {
   return (
-    <div className="p-4 bg-gray-100 min-h-screen">
+    <div className="p-4 pt-40 min-h-screen m-auto w-[90%]">
       <h1 className="text-2xl font-bold mb-6">Find Your Mentor</h1>
 
-      <div className="grid grid-cols-4 gap-4">
+      <div className="flex gap-4">
         {/* Filters Sidebar */}
-        <div className="col-span-1 bg-white p-4 rounded shadow">
-          <h2 className="text-xl font-semibold mb-4">Filters</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Expertise
-              </label>
-              <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                <option>All</option>
-                <option>Blockchain</option>
-                <option>Smart Contracts</option>
-                <option>DeFi</option>
-                {/* Add more options */}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Language
-              </label>
-              <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-                <option>All</option>
-                <option>English</option>
-                <option>Spanish</option>
-                <option>Mandarin</option>
-                {/* Add more options */}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Max Hourly Rate
-              </label>
-              <input
-                type="number"
-                placeholder="USD"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-              />
-            </div>
-            <div>
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="rounded border-gray-300 text-indigo-600 shadow-sm"
-                />
-                <span className="ml-2 text-sm text-gray-600">
-                  Free sessions only
-                </span>
-              </label>
-            </div>
-          </div>
-        </div>
-
+        <Filters />
         {/* Mentor List and Quick Match */}
-        <div className="col-span-3 space-y-4">
-          {/* Quick Match Button */}
-          <div className="bg-white p-4 rounded shadow text-center">
-            <button className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold">
-              Quick Match with Free Mentor
-            </button>
-            <p className="text-sm text-gray-600 mt-2">
-              Instantly connect with an available free mentor
-            </p>
-          </div>
+        <div className="flex-3 flex flex-col gap-4">
+          <QuickMatchButton />
 
-          {/* Mentor Cards */}
-          <div className="bg-white p-4 rounded shadow">
+          <div className="glass p-4 rounded shadow">
             <div className="flex items-start">
               <img
                 src="/api/placeholder/80/80"
@@ -99,7 +42,7 @@ const MentorSearchPage = () => {
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded shadow">
+          <div className="glass p-4 rounded shadow">
             <div className="flex items-start">
               <img
                 src="/api/placeholder/80/80"
@@ -143,8 +86,76 @@ const MentorSearchPage = () => {
           </div>
         </div>
       </div>
+      <AnimatedBackground shader={false} />
     </div>
   )
 }
 
-export default MentorSearchPage
+function Filters() {
+  return (
+    <div className="flex-1 glass p-4 rounded shadow">
+      <h2 className="text-xl font-semibold mb-4">Filters</h2>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Expertise
+          </label>
+          <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+            <option>All</option>
+            <option>Blockchain</option>
+            <option>Smart Contracts</option>
+            <option>DeFi</option>
+            {/* Add more options */}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Language
+          </label>
+          <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+            <option>All</option>
+            <option>English</option>
+            <option>Spanish</option>
+            <option>Mandarin</option>
+            {/* Add more options */}
+          </select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Max Hourly Rate
+          </label>
+          <input
+            type="number"
+            placeholder="USD"
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+          />
+        </div>
+        <div>
+          <label className="flex items-center">
+            <input
+              type="checkbox"
+              className="rounded border-gray-300 text-indigo-600 shadow-sm"
+            />
+            <span className="ml-2 text-sm text-gray-600">
+              Free sessions only
+            </span>
+          </label>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function QuickMatchButton() {
+  return (
+    <div className="glass flex flex-col items-center justify-center p-8 rounded shadow text-center">
+      <Button className="flex text-body items-center gap-2 px-6 py-3 rounded-full">
+        <IoIosFlash />
+        Quick Match with Free Mentor
+      </Button>
+      <p className="text-sm text-gray-600 mt-2">
+        Instantly connect with an available free mentor
+      </p>
+    </div>
+  )
+}

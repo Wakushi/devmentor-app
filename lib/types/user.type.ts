@@ -16,12 +16,22 @@ export type User = {
   id?: string
   address: `0x${string}`
   name?: string
-  email?: string
   registered?: boolean
   role?: Role
   languages?: Language[]
-  experience?: Experience
   learningFields?: LearningField[]
   contacts?: Contact[]
   web3AuthData?: Partial<OpenloginUserInfo>
+}
+
+export type Student = User & {
+  experience?: Experience
+}
+
+export type Mentor = User & {
+  validated: boolean
+  yearsOfExperience: number
+  reviews: any[]
+  sessionCount: number
+  hourlyRate: number
 }

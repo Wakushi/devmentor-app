@@ -37,10 +37,11 @@ export default function Header() {
       const navLinks = [
         { href: "/", label: "Home" },
         { href: "/dashboard/student", label: "Dashboard" },
+        { href: "/mentor-search", label: "Mentors" },
       ]
 
       return (
-        <nav className="flex items-center gap-8 fade-in-bottom-delay">
+        <nav className="flex items-center gap-8">
           <div className="flex items-center">{renderNavLinks(navLinks)}</div>
           <div className="flex items-center gap-2">
             <Avatar className="w-[30px] h-[30px]" onClick={getUserBalance}>
@@ -49,7 +50,7 @@ export default function Header() {
                 {user.name?.[0]}
               </AvatarFallback>
             </Avatar>
-            <p className="text-mid font-semibold">{user.name}</p>
+            <p className="text-mid">{user.name}</p>
             <TooltipWrapper message="Disconnect wallet">
               <IoMdLogOut
                 className="text-2xl text-brand cursor-pointer hover:opacity-80"
@@ -68,7 +69,7 @@ export default function Header() {
     ]
 
     return (
-      <nav className="flex items-center gap-2 fade-in-bottom-delay">
+      <nav className="flex items-center gap-2">
         {renderNavLinks(authLinks)}
         {isConnected && (
           <TooltipWrapper message="Disconnect wallet">

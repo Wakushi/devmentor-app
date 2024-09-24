@@ -18,6 +18,7 @@ export async function middleware(request: NextRequest) {
 
   const protectedRoutes = {
     "/dashboard/student": [Role.STUDENT],
+    "/mentor-search": [Role.STUDENT],
     "/dashboard/mentor": [Role.MENTOR],
   }
 
@@ -38,5 +39,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/mentor-search"],
 }

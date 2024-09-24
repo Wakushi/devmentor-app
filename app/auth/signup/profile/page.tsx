@@ -48,7 +48,7 @@ import { MdAlternateEmail } from "react-icons/md"
 import { IoIosClose } from "react-icons/io"
 import Stepper from "@/components/pages/auth/stepper"
 import { Separator } from "@/components/ui/separator"
-import { User } from "@/lib/types/user.type"
+import { Student } from "@/lib/types/user.type"
 import { useUser } from "@/services/user.service"
 import Loader from "@/components/ui/loader"
 import { CiCircleCheck } from "react-icons/ci"
@@ -190,7 +190,7 @@ export default function ProfileCreationPage() {
         return contacts[0].value
       }
 
-      const userPayload: User = {
+      const studentPayload: Student = {
         ...user,
         name: getUsername(),
         role: Role.STUDENT,
@@ -203,7 +203,7 @@ export default function ProfileCreationPage() {
       const response = await fetch("/api/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userPayload),
+        body: JSON.stringify(studentPayload),
       })
 
       const { createdUser } = await response.json()

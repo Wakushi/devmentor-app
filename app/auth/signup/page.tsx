@@ -15,10 +15,16 @@ const DynamicConnectors = dynamic(
 export default function SignUpPage() {
   return (
     <>
-      <section className="min-h-screen flex flex-col gap-4 justify-center items-center text-center">
+      <section className="min-h-screen fade-in-bottom flex flex-col gap-4 justify-center items-center text-center">
         <h1 className="text-5xl">Create an account</h1>
         <p className="text-xl">Start your journey with us!</p>
-        <Suspense fallback={<Loader />}>
+        <Suspense
+          fallback={
+            <div className="h-[90] flex justify-center items-center">
+              <Loader />
+            </div>
+          }
+        >
           <DynamicConnectors />
         </Suspense>
         <p className="text-small text-dim max-w-[500px]">

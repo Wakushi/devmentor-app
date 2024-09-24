@@ -20,11 +20,20 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import AnimatedBackground from "@/components/ui/animated-background"
+import { useUser } from "@/services/user.service"
+import { useRouter } from "next/navigation"
 
 export default function DashboardPage() {
+  const { user } = useUser()
+  const router = useRouter()
   const [showPreSessionModal, setShowPreSessionModal] = useState(false)
   const [showPostSessionModal, setShowPostSessionModal] = useState(false)
   const [rating, setRating] = useState(0)
+
+  if (!user) {
+    router.push("/auth/signup")
+    return
+  }
 
   const PreSessionModal = () => (
     <AlertDialog
@@ -118,7 +127,7 @@ export default function DashboardPage() {
 
   return (
     <div className="p-4 pt-40 min-h-screen m-auto w-[90%]">
-      <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-6">Welcome back, {user.name} !</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Upcoming Sessions */}

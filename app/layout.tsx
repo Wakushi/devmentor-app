@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body suppressHydrationWarning={true}>
         <Providers>
           <Header />
           <main className="min-h-screen flex flex-col gap-8">{children}</main>

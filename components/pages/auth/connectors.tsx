@@ -30,7 +30,7 @@ export default function Connectors() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 w-full max-w-[250px] min-h-[90px] my-2">
+    <div className="flex flex-col fade-in-bottom items-center justify-center gap-4 w-full max-w-[250px] min-h-[90px] my-2">
       {connectors.map((connector) => {
         const { id, icon, name } = connector
         return (

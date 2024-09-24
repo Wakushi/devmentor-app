@@ -70,6 +70,7 @@ const config = {
       fontSize: {
         title: "32px",
         body: "18px",
+        mid: "16px",
         small: "14px",
       },
       fontWeight: {

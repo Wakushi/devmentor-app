@@ -14,18 +14,20 @@ export default function Hero() {
   return (
     <section>
       <div className="min-h-screen flex gap-4 justify-center items-center">
-        <div>
-          <h1 className="max-w-2xl mb-4 drop-shadow-lg text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl">
-            Overcome{" "}
-            <span className="text-primary">development challenges</span>,
-            accelerate your <span className="text-primary">growth</span>
-          </h1>
-          <TypingAnimation
-            className="max-w-2xl h-[56px] text-start drop-shadow-lg mb-6 font-light lg:mb-8 md:text-lg lg:text-xl"
-            text="Connect with mentors who make learning seamless and stress-free for
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <h1 className="max-w-2xl mb-4 drop-shadow-lg text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl">
+              Overcome{" "}
+              <span className="text-primary">development challenges</span>,
+              accelerate your <span className="text-primary">growth</span>
+            </h1>
+            <TypingAnimation
+              className="max-w-2xl h-[56px] text-start drop-shadow-lg mb-6 font-light lg:mb-8 md:text-lg lg:text-xl"
+              text="Connect with mentors who make learning seamless and stress-free for
             budding Web3 enthusiasts!"
-            duration={30}
-          />
+              duration={30}
+            />
+          </div>
           <div className="flex items-center gap-2">
             <div className="h-[40px] w-[180px]">
               <NavLinkButton variant="outline" href="/">
@@ -34,7 +36,7 @@ export default function Hero() {
             </div>
             <div className="h-[40px] w-[180px]">
               <NavLinkButton
-                variant="filled"
+                variant="filled-secondary"
                 href={user && user.registered ? "/dashboard" : "/auth/signup"}
               >
                 Find a mentor <FaLongArrowAltRight />

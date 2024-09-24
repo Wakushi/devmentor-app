@@ -8,6 +8,7 @@ import { IoMdLogOut } from "react-icons/io"
 import TooltipWrapper from "./ui/custom-tooltip"
 import NavLinkButton from "./ui/nav-link"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { usePathname } from "next/navigation"
 
 export default function Header() {
   const { user, isConnected, disconnectWallet } = useUser()
@@ -38,7 +39,7 @@ export default function Header() {
                 {user.name![0]}
               </AvatarFallback>
             </Avatar>
-            <p className="text-small">{user.name}</p>
+            <p className="text-mid font-semibold">{user.name}</p>
             <TooltipWrapper message="Disconnect wallet">
               <IoMdLogOut
                 className="text-2xl text-brand cursor-pointer hover:opacity-80"
@@ -75,7 +76,9 @@ function Logo() {
   return (
     <Link href="/" className="flex gap-1 items-center">
       <GiMountaintop className="text-3xl" />
-      <div className="font-heading font-bold text-2xl">devmentor</div>
+      <div className="font-heading font-extralight text-2xl flex items-center drop-shadow-md">
+        D<span className="text-secondary">EVM</span>ENTOR
+      </div>
     </Link>
   )
 }

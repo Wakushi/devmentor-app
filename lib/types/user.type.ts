@@ -6,6 +6,7 @@ import {
   LearningField,
 } from "./profile-form.type"
 import { Role } from "./role.type"
+import { Review } from "./review.type"
 
 type Contact = {
   type: ContactType
@@ -31,7 +32,7 @@ export type Student = User & {
 export type Mentor = User & {
   validated: boolean
   yearsOfExperience: number
-  reviews: any[]
+  reviews: Review[]
   sessionCount: number
   hourlyRate: number
 }

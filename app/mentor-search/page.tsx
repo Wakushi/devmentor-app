@@ -1,161 +1,85 @@
+"use client"
+import Filters from "@/components/pages/mentor-search/filters"
+import MentorCard from "@/components/pages/mentor-search/mentor-card"
+import Pagination from "@/components/pages/mentor-search/pagination"
+import QuickMatchButton from "@/components/pages/mentor-search/quick-match-button"
 import AnimatedBackground from "@/components/ui/animated-background"
-import { Button } from "@/components/ui/button"
-import { IoIosFlash } from "react-icons/io"
+import { MENTORS_MOCK } from "@/lib/mock/mentor-mocks"
+import { Language, LearningField } from "@/lib/types/profile-form.type"
+import { Mentor } from "@/lib/types/user.type"
+import { useEffect, useState } from "react"
+
+const MENTORS_PER_PAGE = 5
 
 export default function MentorSearch() {
+  const [currentPage, setCurrentPage] = useState(1)
+  const [filteredMentors, setFilteredMentors] = useState<Mentor[]>(MENTORS_MOCK)
+  const [filters, setFilters] = useState({
+    expertise: "All",
+    language: "All",
+    maxHourlyRate: "",
+    freeSessionsOnly: false,
+  })
+
+  useEffect(() => {
+    const filtered = MENTORS_MOCK.filter((mentor) => {
+      return (
+        (filters.expertise === "All" ||
+          mentor.learningFields?.includes(
+            filters.expertise as LearningField
+          )) &&
+        (filters.language === "All" ||
+          mentor.languages?.includes(filters.language as Language)) &&
+        (filters.maxHourlyRate === "" ||
+          mentor.hourlyRate <= parseInt(filters.maxHourlyRate)) &&
+        (!filters.freeSessionsOnly || mentor.hourlyRate === 0)
+      )
+    })
+    setFilteredMentors(filtered)
+    setCurrentPage(1)
+  }, [filters])
+
+  const indexOfLastMentor = currentPage * MENTORS_PER_PAGE
+  const indexOfFirstMentor = indexOfLastMentor - MENTORS_PER_PAGE
+  const currentMentors = filteredMentors.slice(
+    indexOfFirstMentor,
+    indexOfLastMentor
+  )
+
+  const totalPages = Math.ceil(filteredMentors.length / MENTORS_PER_PAGE)
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber)
+  }
+
+  const handleFilterChange = (filterName: string, value: string | boolean) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [filterName]: value,
+    }))
+  }
   return (
-    <div className="p-4 pt-40 min-h-screen m-auto w-[90%]">
-      <h1 className="text-2xl font-bold mb-6">Find Your Mentor</h1>
+    <div className="relative flex gap-4 p-4 pt-40 min-h-screen m-auto w-[90%]">
+      <Filters
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        mentors={MENTORS_MOCK}
+      />
+      <div className="flex flex-col gap-4 ml-auto w-[80%]">
+        <QuickMatchButton />
 
-      <div className="flex gap-4">
-        {/* Filters Sidebar */}
-        <Filters />
-        {/* Mentor List and Quick Match */}
-        <div className="flex-3 flex flex-col gap-4">
-          <QuickMatchButton />
+        {currentMentors.map((mentor: Mentor) => (
+          <MentorCard key={mentor.id} mentor={mentor} />
+        ))}
 
-          <div className="glass p-4 rounded shadow">
-            <div className="flex items-start">
-              <img
-                src="/api/placeholder/80/80"
-                alt="Mentor"
-                className="rounded-full mr-4"
-              />
-              <div className="flex-grow">
-                <h3 className="text-lg font-semibold">Jane Doe</h3>
-                <p className="text-sm text-gray-600">
-                  Blockchain Expert | ⭐️ 4.9 (120 reviews)
-                </p>
-                <p className="text-sm text-gray-600">
-                  Languages: English, Spanish
-                </p>
-                <p className="text-sm font-semibold text-green-600">$50/hour</p>
-              </div>
-              <div className="text-right">
-                <div className="text-sm font-semibold text-blue-600 mb-2">
-                  Rank: #1
-                </div>
-                <button className="bg-blue-500 text-white px-4 py-2 rounded">
-                  Book Paid Session
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass p-4 rounded shadow">
-            <div className="flex items-start">
-              <img
-                src="/api/placeholder/80/80"
-                alt="Mentor"
-                className="rounded-full mr-4"
-              />
-              <div className="flex-grow">
-                <h3 className="text-lg font-semibold">John Smith</h3>
-                <p className="text-sm text-gray-600">
-                  Smart Contract Developer | ⭐️ 4.7 (85 reviews)
-                </p>
-                <p className="text-sm text-gray-600">
-                  Languages: English, Mandarin
-                </p>
-                <p className="text-sm font-semibold text-green-600">
-                  Free sessions
-                </p>
-              </div>
-              <div className="text-right">
-                <div className="text-sm font-semibold text-blue-600 mb-2">
-                  Rank: #2
-                </div>
-                <button className="bg-green-500 text-white px-4 py-2 rounded">
-                  Book Free Session
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* More mentor cards... */}
-
-          {/* Pagination */}
-          <div className="flex justify-center mt-4 space-x-2">
-            <button className="px-4 py-2 border rounded">Previous</button>
-            <button className="px-4 py-2 border rounded bg-blue-500 text-white">
-              1
-            </button>
-            <button className="px-4 py-2 border rounded">2</button>
-            <button className="px-4 py-2 border rounded">3</button>
-            <button className="px-4 py-2 border rounded">Next</button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
+
       <AnimatedBackground shader={false} />
-    </div>
-  )
-}
-
-function Filters() {
-  return (
-    <div className="flex-1 glass p-4 rounded shadow">
-      <h2 className="text-xl font-semibold mb-4">Filters</h2>
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Expertise
-          </label>
-          <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-            <option>All</option>
-            <option>Blockchain</option>
-            <option>Smart Contracts</option>
-            <option>DeFi</option>
-            {/* Add more options */}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Language
-          </label>
-          <select className="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-            <option>All</option>
-            <option>English</option>
-            <option>Spanish</option>
-            <option>Mandarin</option>
-            {/* Add more options */}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Max Hourly Rate
-          </label>
-          <input
-            type="number"
-            placeholder="USD"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          />
-        </div>
-        <div>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              className="rounded border-gray-300 text-indigo-600 shadow-sm"
-            />
-            <span className="ml-2 text-sm text-gray-600">
-              Free sessions only
-            </span>
-          </label>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function QuickMatchButton() {
-  return (
-    <div className="glass flex flex-col items-center justify-center p-8 rounded shadow text-center">
-      <Button className="flex text-body items-center gap-2 px-6 py-3 rounded-full">
-        <IoIosFlash />
-        Quick Match with Free Mentor
-      </Button>
-      <p className="text-sm text-gray-600 mt-2">
-        Instantly connect with an available free mentor
-      </p>
     </div>
   )
 }

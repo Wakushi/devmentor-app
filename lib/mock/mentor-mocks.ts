@@ -64,7 +64,7 @@ export const MENTORS_MOCK: Mentor[] = [
     validated: true,
     yearsOfExperience: 4,
     reviews: [
-      { rate: 4.9, comment: "Carol is an NFT genius!" },
+      { rate: 2.0, comment: "Carol is an NFT genius!" },
       { rate: 5.0, comment: "Incredible insights into Web3 development" },
     ],
     sessionCount: 35,

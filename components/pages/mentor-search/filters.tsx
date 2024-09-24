@@ -1,4 +1,5 @@
 "use client"
+import React, { useState } from "react"
 import {
   Select,
   SelectContent,
@@ -13,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mentor } from "@/lib/types/user.type"
 import { languageOptions } from "@/lib/types/profile-form.type"
 import { capitalizeFirstLetter } from "@/lib/utils"
+import { Star } from "lucide-react"
 
 interface FiltersProps {
   filters: {
@@ -20,8 +22,9 @@ interface FiltersProps {
     language: string
     maxHourlyRate: string
     freeSessionsOnly: boolean
+    minRating: number
   }
-  onFilterChange: (filterName: string, value: string | boolean) => void
+  onFilterChange: (filterName: string, value: string | boolean | number) => void
   mentors: Mentor[]
 }
 
@@ -105,6 +108,14 @@ export default function Filters({
           />
         </div>
 
+        <div className="space-y-2">
+          <Label htmlFor="minRating">Min Rating</Label>
+          <StarRating
+            rating={filters.minRating}
+            onRatingChange={(rating) => onFilterChange("minRating", rating)}
+          />
+        </div>
+
         <div className="flex items-center space-x-2">
           <Checkbox
             id="freeSessionsOnly"
@@ -117,5 +128,33 @@ export default function Filters({
         </div>
       </CardContent>
     </Card>
+  )
+}
+
+function StarRating({
+  rating,
+  onRatingChange,
+}: {
+  rating: number
+  onRatingChange: (rating: number) => void
+}) {
+  const [hoverRating, setHoverRating] = useState(0)
+
+  return (
+    <div className="flex items-center">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          className={`w-6 h-6 cursor-pointer transition-colors duration-150 ${
+            star <= (hoverRating || rating)
+              ? "text-primary fill-primary"
+              : "text-gray-300"
+          }`}
+          onClick={() => onRatingChange(star)}
+          onMouseEnter={() => setHoverRating(star)}
+          onMouseLeave={() => setHoverRating(0)}
+        />
+      ))}
+    </div>
   )
 }

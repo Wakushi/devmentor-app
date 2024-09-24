@@ -8,6 +8,7 @@ import { CiDollar } from "react-icons/ci"
 import { FaLongArrowAltRight } from "react-icons/fa"
 import NavLinkButton from "@/components/ui/nav-link"
 import Flag from "@/components/ui/flag"
+import { getAverageRating, getInitials } from "@/lib/utils"
 
 export default function MentorCard({ mentor }: { mentor: Mentor }) {
   const {
@@ -19,19 +20,6 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
     hourlyRate,
     address,
   } = mentor
-
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-  }
-
-  const getAverageRating = (reviews: { rate: number }[]) => {
-    const sum = reviews.reduce((acc, review) => acc + review.rate, 0)
-    return (sum / reviews.length).toFixed(1)
-  }
 
   return (
     <Card className="glass text-white overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-accent">

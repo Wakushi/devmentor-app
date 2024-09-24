@@ -7,32 +7,54 @@ import AnimatedBackground from "@/components/ui/animated-background"
 import { MENTORS_MOCK } from "@/lib/mock/mentor-mocks"
 import { Language, LearningField } from "@/lib/types/profile-form.type"
 import { Mentor } from "@/lib/types/user.type"
+import { getAverageRating } from "@/lib/utils"
 import { useEffect, useState } from "react"
 
 const MENTORS_PER_PAGE = 5
 
 export default function MentorSearch() {
   const [currentPage, setCurrentPage] = useState(1)
-  const [filteredMentors, setFilteredMentors] = useState<Mentor[]>(MENTORS_MOCK)
+  const [filteredMentors, setFilteredMentors] = useState<Mentor[]>([])
   const [filters, setFilters] = useState({
     expertise: "All",
     language: "All",
     maxHourlyRate: "",
     freeSessionsOnly: false,
+    minRating: 4,
   })
 
+  function fetchMentors(): Mentor[] {
+    return MENTORS_MOCK
+  }
+
+  const mentors = fetchMentors()
+
   useEffect(() => {
-    const filtered = MENTORS_MOCK.filter((mentor) => {
+    const filtered = mentors.filter((mentor) => {
+      const expertiseMatch =
+        filters.expertise === "All" ||
+        mentor.learningFields?.includes(filters.expertise as LearningField)
+
+      const langMatch =
+        filters.language === "All" ||
+        mentor.languages?.includes(filters.language as Language)
+
+      const hourlyRateMatch =
+        filters.maxHourlyRate === "" ||
+        mentor.hourlyRate <= parseInt(filters.maxHourlyRate)
+
+      const freeSessionMatch =
+        !filters.freeSessionsOnly || mentor.hourlyRate === 0
+
+      const minRatingMatch =
+        +getAverageRating(mentor.reviews) > filters.minRating
+
       return (
-        (filters.expertise === "All" ||
-          mentor.learningFields?.includes(
-            filters.expertise as LearningField
-          )) &&
-        (filters.language === "All" ||
-          mentor.languages?.includes(filters.language as Language)) &&
-        (filters.maxHourlyRate === "" ||
-          mentor.hourlyRate <= parseInt(filters.maxHourlyRate)) &&
-        (!filters.freeSessionsOnly || mentor.hourlyRate === 0)
+        expertiseMatch &&
+        langMatch &&
+        hourlyRateMatch &&
+        freeSessionMatch &&
+        minRatingMatch
       )
     })
     setFilteredMentors(filtered)
@@ -52,7 +74,10 @@ export default function MentorSearch() {
     setCurrentPage(pageNumber)
   }
 
-  const handleFilterChange = (filterName: string, value: string | boolean) => {
+  const handleFilterChange = (
+    filterName: string,
+    value: string | number | boolean
+  ) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
       [filterName]: value,
@@ -63,23 +88,37 @@ export default function MentorSearch() {
       <Filters
         filters={filters}
         onFilterChange={handleFilterChange}
-        mentors={MENTORS_MOCK}
+        mentors={mentors}
       />
       <div className="flex flex-col gap-4 ml-auto w-[80%]">
         <QuickMatchButton />
-        <div className="flex flex-col gap-4">
-          {currentMentors.map((mentor: Mentor) => (
-            <MentorCard key={mentor.id} mentor={mentor} />
-          ))}
-        </div>
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
+        {currentMentors.length ? (
+          <MentorList mentors={currentMentors} />
+        ) : (
+          <div className="w-full p-8 flex items-center justify-center">
+            <h3>No mentor available with these criterias</h3>
+          </div>
+        )}
+        {!!currentMentors.length && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
 
       <AnimatedBackground shader={false} />
+    </div>
+  )
+}
+
+function MentorList({ mentors }: { mentors: Mentor[] }) {
+  return (
+    <div className="flex flex-col gap-4">
+      {mentors.map((mentor: Mentor) => (
+        <MentorCard key={mentor.id} mentor={mentor} />
+      ))}
     </div>
   )
 }

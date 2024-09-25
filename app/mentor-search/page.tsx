@@ -83,6 +83,7 @@ export default function MentorSearch() {
       [filterName]: value,
     }))
   }
+
   return (
     <div className="relative flex gap-4 p-4 pt-[7rem] min-h-screen m-auto w-[95%]">
       <Filters

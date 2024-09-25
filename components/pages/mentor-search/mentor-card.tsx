@@ -73,7 +73,11 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
 
           <div className="flex flex-1 items-center text-sm text-gray-300">
             <CiDollar className="w-4 h-4 mr-2" />
-            <span>${hourlyRate}/hour</span>
+            {hourlyRate > 0 ? (
+              <span>${hourlyRate}/hour</span>
+            ) : (
+              <span>Free</span>
+            )}
           </div>
 
           <div>

@@ -26,7 +26,7 @@ export const MENTORS_MOCK: Mentor[] = [
       { rate: 4.9, comment: "Excellent at explaining complex concepts" },
     ],
     sessionCount: 42,
-    hourlyRate: 80,
+    hourlyRate: 0,
   },
   {
     id: "2",
@@ -110,7 +110,7 @@ export const MENTORS_MOCK: Mentor[] = [
       { rate: 4.8, comment: "Great insights into cryptocurrency markets" },
     ],
     sessionCount: 38,
-    hourlyRate: 85,
+    hourlyRate: 0,
   },
   {
     id: "6",

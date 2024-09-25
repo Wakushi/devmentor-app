@@ -3,6 +3,7 @@ import "./globals.css"
 import LoadingScreen from "@/components/ui/loading-screen"
 import Header from "@/components/header"
 import Providers from "@/providers"
+import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
   title: "Devmentor",
@@ -22,6 +23,7 @@ export default function RootLayout({
           <Header />
           <main className="min-h-screen flex flex-col gap-8">{children}</main>
         </Providers>
+        <Toaster />
         <LoadingScreen />
       </body>
     </html>

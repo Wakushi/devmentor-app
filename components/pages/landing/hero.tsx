@@ -11,7 +11,7 @@ export default function Hero() {
   const { user } = useUser()
 
   return (
-    <section>
+    <section className="relative">
       <div className="min-h-screen flex gap-4 justify-center items-center">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">

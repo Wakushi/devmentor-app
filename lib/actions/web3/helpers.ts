@@ -1,3 +1,4 @@
+import { publicClient } from "@/providers"
 import { IProvider } from "@web3auth/base"
 import {
   Address,
@@ -13,11 +14,6 @@ export const getBalance = async (
   userAddress?: Address
 ): Promise<string> => {
   try {
-    const publicClient = createPublicClient({
-      chain: baseSepolia,
-      transport: custom(provider),
-    })
-
     const walletClient = createWalletClient({
       chain: baseSepolia,
       transport: custom(provider),

@@ -6,7 +6,7 @@ export default function Loader({
   size = "8",
 }: {
   color?: "white" | "primary"
-  fill?: "primary" | "black"
+  fill?: "primary" | "black" | "white"
   size?: string
 }) {
   return (
@@ -18,6 +18,7 @@ export default function Loader({
           {
             "fill-black": fill === "black",
             "text-primary": color === "primary",
+            "fill-white": fill === "white",
           }
         )}
         viewBox="0 0 100 101"

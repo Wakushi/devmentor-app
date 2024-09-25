@@ -93,7 +93,7 @@ export default function Header() {
   )
 
   return (
-    <header className="fixed top-5 left-1/2 -translate-x-1/2 rounded-xl w-[95%] flex items-center justify-between px-8 py-4 glass z-[10]">
+    <header className="fixed top-5 left-1/2 -translate-x-1/2 rounded-md w-[95%] flex items-center justify-between px-8 py-4 glass z-[10]">
       <Logo />
       {!loadingUser && <Navigation />}
     </header>

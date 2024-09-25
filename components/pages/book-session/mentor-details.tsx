@@ -22,7 +22,7 @@ export default function MentorDetails({ mentor }: { mentor: Mentor }) {
   } = mentor
 
   return (
-    <Card className="flex-1 h-fit max-w-[800px] glass text-white border-none fade-in-left">
+    <Card className="flex-1 min-h-[370px] h-auto max-w-[800px] glass text-white border-none fade-in-left">
       <CardHeader>
         <CardTitle>Ready for Wisdom?</CardTitle>
         <p className="text-dim">

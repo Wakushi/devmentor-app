@@ -386,7 +386,7 @@ export default function ProfileCreationPage() {
                                 <div
                                   key={lang.value}
                                   className={clsx(
-                                    "flex flex-col items-center p-2 border rounded-xl cursor-pointer transition-all",
+                                    "flex flex-col items-center p-2 border rounded-md cursor-pointer transition-all",
                                     {
                                       "border-primary bg-primary bg-opacity-20":
                                         watchLanguages.includes(lang.value),

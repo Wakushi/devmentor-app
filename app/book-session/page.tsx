@@ -94,7 +94,7 @@ export default function BookSessionPage({
 
   return (
     <>
-      <div className="flex glass rounded-xl flex-col gap-4 p-8 mt-[8rem] h-fit max-w-[95%] mx-auto w-full">
+      <div className="flex glass rounded-md flex-col gap-4 p-8 mt-[8rem] h-fit max-w-[95%] mx-auto w-full">
         <div className="mb-2 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold mb-2">Book a session</h1>
@@ -123,6 +123,7 @@ export default function BookSessionPage({
           {bookStep === BookStep.PAYMENT_AND_VALIDATION &&
             confirmedTimeslot && (
               <PaymentAndValidationCard
+                mentor={mentor}
                 timeslot={confirmedTimeslot}
                 handleEditTimeslot={handleEditTimeslot}
               />

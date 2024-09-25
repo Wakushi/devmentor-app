@@ -11,8 +11,8 @@
     --primary-shade: #2563eb;
     --primary-faded: #273156;
 
-    --secondary: #38b2ac;
-    --secondary-shade: #2c7a7b;
+    --secondary: #5756bb;
+    --secondary-shade: #474596;
 
     --background: #121212;
     --text: #e0e0e0;
@@ -22,6 +22,7 @@
     --dm-d1: #6f6c90;
 
     --accent: var(--primary);
+    --dm-accent: #f4bc6d;
 
     --error: #e53e3e;
     --success: #38a169;

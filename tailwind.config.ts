@@ -24,6 +24,7 @@ const config = {
         secondary: "var(--secondary)",
         "secondary-shade": "var(--secondary-shade)",
         accent: "var(--accent)",
+        "dm-accent": "var(--dm-accent)",
         error: "var(--error)",
         success: "var(--success)",
         background: "var(--background)",

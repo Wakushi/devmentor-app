@@ -63,3 +63,21 @@ export function getTimeslotMatcher(
 
   return timeslotMatcher
 }
+
+export const formatDate = (timestamp: number) => {
+  const date = new Date(timestamp)
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
+}
+
+export const formatTime = (timestamp: number) => {
+  const date = new Date(timestamp)
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}

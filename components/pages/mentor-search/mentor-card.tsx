@@ -48,7 +48,7 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
             </div>
           </div>
 
-          <div className="flex flex-1 flex-wrap gap-2 mb-3">
+          <div className="flex flex-1 flex-wrap gap-2">
             {languages?.map((lang) => {
               const langOption = getLanguageOption(lang)
 
@@ -58,7 +58,7 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
             })}
           </div>
 
-          <div className="flex flex-2 flex-wrap gap-2 mb-3">
+          <div className="flex flex-2 flex-wrap gap-2">
             {learningFields?.map((field: LearningField) => (
               <Badge key={field} variant="secondary" className="text-xs">
                 {field.replace("_", " ")}
@@ -66,7 +66,7 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
             ))}
           </div>
 
-          <div className="flex flex-1 items-center text-sm text-gray-300 mb-2">
+          <div className="flex flex-1 items-center text-sm text-gray-300">
             <ClockIcon className="w-4 h-4 mr-2" />
             <span>{yearsOfExperience} years of experience</span>
           </div>

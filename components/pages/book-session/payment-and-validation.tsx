@@ -15,21 +15,25 @@ import {
 import { useUser } from "@/services/user.service"
 import { toast } from "@/hooks/use-toast"
 import Loader from "@/components/ui/loader"
-import { FaDollarSign, FaLock } from "react-icons/fa"
 import { FaCircleCheck } from "react-icons/fa6"
+import PaymentTab from "./payment-tab"
 
 export default function PaymentAndValidationCard({
   mentor,
   timeslot,
+  setSuccess,
   handleEditTimeslot,
 }: {
   mentor: Mentor
   timeslot: Timeslot
+  setSuccess: (success: boolean) => void
   handleEditTimeslot: () => void
 }) {
   const { user } = useUser()
   const [paid, setPaid] = useState<boolean>(false)
   const [processingPayment, setProcessingPayment] = useState<boolean>(false)
+
+  const isFree = mentor.hourlyRate === 0
 
   async function handlePayment(): Promise<void> {
     if (!user?.address) return
@@ -83,6 +87,12 @@ export default function PaymentAndValidationCard({
     }
   }
 
+  function handleConfirmSession(): void {
+    if (!isFree && !paid) return
+
+    setSuccess(true)
+  }
+
   return (
     <Card className="flex flex-col flex-1 max-w-[800px] h-fit glass text-white border-none fade-in-bottom">
       <CardHeader>
@@ -95,38 +105,21 @@ export default function PaymentAndValidationCard({
           handleEditTimeslot={handleEditTimeslot}
         />
 
-        <div>
-          <div className="flex flex-col mb-4">
-            <h3 className="text-2xl">Payment</h3>
-            <p className="text-dim text-base">
-              Funds will only be sent to your mentor at the end of the session.
-            </p>
-          </div>
-          <div>
-            {paid ? (
-              <div className="button-base pointer-events-none border-success bg-success">
-                <FaLock />
-                {mentor.hourlyRate} USD locked
-              </div>
-            ) : (
-              <Button className="min-w-[200px]" onClick={handlePayment}>
-                {processingPayment ? (
-                  <Loader size="4" />
-                ) : (
-                  <>
-                    <FaDollarSign className="text-xl" />
-                    Lock {mentor.hourlyRate} USD
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {!!!mentor.hourlyRate && (
-          <Button variant="secondary" className="self-end">
+        {isFree ? (
+          <Button
+            onClick={handleConfirmSession}
+            variant="secondary"
+            className="self-end"
+          >
             Book session <IoIosFlash className="text-lg" />
           </Button>
+        ) : (
+          <PaymentTab
+            paid={paid}
+            mentor={mentor}
+            handlePayment={handlePayment}
+            processingPayment={processingPayment}
+          />
         )}
       </CardContent>
     </Card>

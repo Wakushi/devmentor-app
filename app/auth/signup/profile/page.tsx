@@ -51,10 +51,10 @@ import { Separator } from "@/components/ui/separator"
 import { Student } from "@/lib/types/user.type"
 import { useUser } from "@/services/user.service"
 import Loader from "@/components/ui/loader"
-import { CiCircleCheck } from "react-icons/ci"
 import NavLinkButton from "@/components/ui/nav-link"
 import { Role } from "@/lib/types/role.type"
 import Flag from "@/components/ui/flag"
+import SuccessScreen from "@/components/success-screen"
 
 const learningFormSchema = z.object({
   learningFields: z
@@ -247,20 +247,16 @@ export default function ProfileCreationPage() {
 
     if (success) {
       return (
-        <div className="flex flex-col gap-4 justify-center items-center">
-          <CiCircleCheck className="text-8xl text-success fade-in-bottom" />
-          <div className="flex flex-col text-center">
-            <h3>Account created with success !</h3>
-            <p className="mb-4">
-              Let's find a mentor to help you for your first session
-            </p>
-          </div>
+        <SuccessScreen
+          title="Account created with success !"
+          subtitle="Let's find a mentor to help you for your first session"
+        >
           <div className="max-w-[300px]">
             <NavLinkButton href="/dashboard/student" variant="filled">
               Go to dashboard <FaLongArrowAltRight />
             </NavLinkButton>
           </div>
-        </div>
+        </SuccessScreen>
       )
     }
   }
@@ -286,7 +282,7 @@ export default function ProfileCreationPage() {
               <div className="flex flex-col fade-in-bottom">
                 <div className="mb-2">
                   <h2 onClick={onSubmit}>Your Learning Journey</h2>
-                  <p>
+                  <p className="text-dim">
                     Let's tailor your experience to your interests and goals
                   </p>
                 </div>
@@ -367,7 +363,9 @@ export default function ProfileCreationPage() {
               <div className="w-full flex flex-col fade-in-bottom">
                 <div className="mb-2">
                   <h2>Customize Your Learning</h2>
-                  <p>Help us match you with the right mentors and resources</p>
+                  <p className="text-dim">
+                    Help us match you with the right mentors and resources
+                  </p>
                 </div>
                 <Form {...languageForm}>
                   <form
@@ -386,7 +384,7 @@ export default function ProfileCreationPage() {
                                 <div
                                   key={lang.value}
                                   className={clsx(
-                                    "flex flex-col items-center p-2 border rounded-md cursor-pointer transition-all",
+                                    "flex flex-col items-center p-2 border rounded-md cursor-pointer transition-all hover:bg-primary-faded",
                                     {
                                       "border-primary bg-primary bg-opacity-20":
                                         watchLanguages.includes(lang.value),
@@ -429,7 +427,7 @@ export default function ProfileCreationPage() {
               <div className="flex flex-col fade-in-bottom">
                 <div className="mb-8">
                   <h2>Connect with mentors</h2>
-                  <p>
+                  <p className="text-dim">
                     Provide at least one way for your mentor to reach out to you
                   </p>
                 </div>

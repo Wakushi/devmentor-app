@@ -1,5 +1,5 @@
 "use client"
-import { FaLongArrowAltLeft } from "react-icons/fa"
+import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa"
 import { MENTORS_MOCK } from "@/lib/mock/mentor-mocks"
 import { Button } from "@/components/ui/button"
 import AnimatedBackground from "@/components/ui/animated-background"
@@ -13,6 +13,7 @@ import LoadingScreen from "@/components/ui/loading-screen"
 import PaymentAndValidationCard from "@/components/pages/book-session/payment-and-validation"
 import { IoIosArrowBack } from "react-icons/io"
 import NavLinkButton from "@/components/ui/nav-link"
+import SuccessScreen from "@/components/success-screen"
 
 enum BookStep {
   TIMESLOT_SELECTION = "TIMESLOT_SELECTION",
@@ -28,6 +29,7 @@ export default function BookSessionPage({
   const [timeslots, setTimeslots] = useState<Timeslot[]>([])
   const [confirmedTimeslot, setConfirmedTimeslot] = useState<Timeslot>()
   const [loading, setLoading] = useState<boolean>(true)
+  const [success, setSuccess] = useState<boolean>(false)
 
   const [bookStep, setBookStep] = useState<BookStep>(
     BookStep.TIMESLOT_SELECTION
@@ -92,6 +94,23 @@ export default function BookSessionPage({
     )
   }
 
+  if (success) {
+    return (
+      <div className="flex flex-col items-center justify-center p-4 min-h-screen">
+        <SuccessScreen
+          title="Session booked with success !"
+          subtitle="You can find all your session detail in the dashboard"
+        >
+          <div className="max-w-[300px]">
+            <NavLinkButton href="/dashboard/student" variant="filled">
+              Go to dashboard <FaLongArrowAltRight />
+            </NavLinkButton>
+          </div>
+        </SuccessScreen>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="flex glass rounded-md flex-col gap-4 p-8 mt-[8rem] h-fit max-w-[95%] mx-auto w-full">
@@ -125,6 +144,7 @@ export default function BookSessionPage({
               <PaymentAndValidationCard
                 mentor={mentor}
                 timeslot={confirmedTimeslot}
+                setSuccess={setSuccess}
                 handleEditTimeslot={handleEditTimeslot}
               />
             )}

@@ -17,7 +17,7 @@ export default function TimeslotCardList({
   }
 
   return (
-    <div className="flex flex-col self-stretch h-full gap-2 min-w-[280px]">
+    <div className="flex flex-col self-stretch h-full gap-2 min-w-[280px] fade-in-right">
       {timeslots.map((slot) => (
         <TimeslotCard
           key={slot.id}

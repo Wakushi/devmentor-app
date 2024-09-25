@@ -157,6 +157,16 @@ h6 {
   animation: fade-in-bottom 500ms forwards ease-in-out;
 }
 
+.fade-in-left {
+  opacity: 0;
+  animation: fade-in-left 500ms forwards ease-in-out;
+}
+
+.fade-in-right {
+  opacity: 0;
+  animation: fade-in-right 300ms forwards ease-in-out;
+}
+
 .fade-in-bottom-delay {
   opacity: 0;
   animation: fade-in-bottom 300ms 200ms forwards ease-in-out;
@@ -208,6 +218,28 @@ h6 {
   0% {
     opacity: 0;
     transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+@keyframes fade-in-left {
+  0% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0px);
+  }
+}
+
+@keyframes fade-in-right {
+  0% {
+    opacity: 0;
+    transform: translateX(5px);
   }
   100% {
     opacity: 1;

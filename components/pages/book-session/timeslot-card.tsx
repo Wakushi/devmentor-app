@@ -7,10 +7,12 @@ export default function TimeslotCard({
   timeslot,
   selected,
   handleSlotSelect,
+  handleConfirmTimeslot,
 }: {
   timeslot: Timeslot
   selected: boolean
   handleSlotSelect: (timeslot: Timeslot) => void
+  handleConfirmTimeslot: (timeslot: Timeslot) => void
 }) {
   function TimeDisplay() {
     return (
@@ -34,7 +36,10 @@ export default function TimeslotCard({
     <div className="flex items-center gap-2 h-[45px]">
       <TimeDisplay />
       {selected && (
-        <Button className="bg-transparent h-full text-base px-8 py-2 cursor-pointer rounded shadow-lg border-2 border-white hover:border-primary-shade">
+        <Button
+          onClick={() => handleConfirmTimeslot(timeslot)}
+          className="bg-transparent fade-in-right h-full text-base px-8 py-2 cursor-pointer rounded shadow-lg border-2 border-white hover:border-primary-shade"
+        >
           Confirm
         </Button>
       )}

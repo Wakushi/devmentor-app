@@ -1,31 +1,31 @@
 "use client"
-
 import { useState } from "react"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { generateMockTimeslots } from "@/lib/mock/utils"
 import { Timeslot } from "@/lib/types/timeslot.type"
-import { getTimeslotMatcher } from "@/lib/utils"
+import { getSlotDate, getTimeslotMatcher } from "@/lib/utils"
 import TimeslotCardList from "./timeslot-card-list"
 
-export default function SessionCalendar() {
-  const [timeslots, setTimeslots] = useState<Timeslot[]>(
-    generateMockTimeslots(new Date("2024-09-25"), 1)
+export default function SessionCalendar({
+  timeslots,
+  handleConfirmTimeslot,
+  selectedTimeslot,
+}: {
+  timeslots: Timeslot[]
+  handleConfirmTimeslot: (timeslot: Timeslot) => void
+  selectedTimeslot?: Timeslot
+}) {
+  const [selectedSlot, setSelectedSlot] = useState<Timeslot | undefined>()
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    selectedTimeslot ? new Date(selectedTimeslot.date) : undefined
   )
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const [selectedDateAvailableSlots, setSelectedDateAvailableSlots] = useState<
     Timeslot[]
-  >([])
-  const [selectedSlot, setSelectedSlot] = useState<Timeslot | undefined>()
-  const mockAvailableTimeslots = timeslots.filter((slot) => !slot.isBooked)
+  >(selectedTimeslot ? getTimeslotsByDate(getSlotDate(selectedTimeslot)) : [])
 
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
-      date.setHours(0, 0, 0, 0)
-      const selectedDateTimestamp = date.getTime()
-      const timeslots = mockAvailableTimeslots.filter(
-        (slot) => slot.date === selectedDateTimestamp
-      )
+      const timeslots = getTimeslotsByDate(date)
 
       if (timeslots.length) {
         setSelectedDateAvailableSlots(timeslots)
@@ -37,20 +37,21 @@ export default function SessionCalendar() {
     setSelectedDate(date)
   }
 
+  function getTimeslotsByDate(date: Date): Timeslot[] {
+    date.setHours(0, 0, 0, 0)
+    const selectedDateTimestamp = date.getTime()
+    const dayTimeslots = timeslots.filter(
+      (slot) => slot.date === selectedDateTimestamp
+    )
+    return dayTimeslots || []
+  }
+
   const handleSlotSelect = (slot: Timeslot) => {
     setSelectedSlot(slot)
   }
 
-  const handleBooking = () => {
-    if (selectedDate && selectedSlot) {
-      console.log(
-        `Booking for ${selectedDate.toDateString()} at ${selectedSlot}`
-      )
-    }
-  }
-
   return (
-    <Card className="flex-1 glass text-white max-w-fit">
+    <Card className="flex-1 glass text-white max-w-fit fade-in-bottom">
       <CardHeader>
         <CardTitle>Select Date and Time</CardTitle>
       </CardHeader>
@@ -60,13 +61,14 @@ export default function SessionCalendar() {
             mode="single"
             selected={selectedDate}
             onSelect={handleDateSelect}
-            disabled={getTimeslotMatcher(mockAvailableTimeslots)}
+            disabled={getTimeslotMatcher(timeslots)}
             className="calendar rounded-md p-0 mb-4 mx-auto"
           />
           <TimeslotCardList
             selectedTimeslot={selectedSlot}
             timeslots={selectedDateAvailableSlots}
             handleSlotSelect={handleSlotSelect}
+            handleConfirmTimeslot={handleConfirmTimeslot}
           />
         </div>
       </CardContent>

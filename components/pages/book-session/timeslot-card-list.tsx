@@ -5,10 +5,12 @@ export default function TimeslotCardList({
   timeslots,
   selectedTimeslot,
   handleSlotSelect,
+  handleConfirmTimeslot,
 }: {
   timeslots: Timeslot[]
   selectedTimeslot?: Timeslot
   handleSlotSelect: (timeslot: Timeslot) => void
+  handleConfirmTimeslot: (timeslot: Timeslot) => void
 }) {
   if (!timeslots.length) {
     return null
@@ -22,6 +24,7 @@ export default function TimeslotCardList({
           timeslot={slot}
           selected={slot.id === selectedTimeslot?.id}
           handleSlotSelect={handleSlotSelect}
+          handleConfirmTimeslot={handleConfirmTimeslot}
         />
       ))}
     </div>

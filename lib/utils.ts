@@ -82,6 +82,16 @@ export const formatTime = (timestamp: number) => {
   })
 }
 
+export function getStartTime(timeslot: Timeslot): number {
+  const { startTime, date } = timeslot
+
+  const startHours = new Date(startTime).getHours()
+  const startDate = new Date(date)
+  startDate.setHours(startHours)
+
+  return startDate.getTime()
+}
+
 export function createGoogleCalendarLink(event: {
   title: string
   startDate: Date

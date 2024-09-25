@@ -24,6 +24,9 @@ import { useUser } from "@/services/user.service"
 import LoadingScreen from "@/components/ui/loading-screen"
 import NavLinkButton from "@/components/ui/nav-link"
 import { FaLongArrowAltRight } from "react-icons/fa"
+import { useQuery } from "@tanstack/react-query"
+import { Session } from "@/lib/types/session.type"
+import SessionCardList from "@/components/pages/dashboard/session-card-list"
 
 export default function DashboardPage() {
   const { user, loadingUser } = useUser()
@@ -31,9 +34,25 @@ export default function DashboardPage() {
   const [showPostSessionModal, setShowPostSessionModal] = useState(false)
   const [rating, setRating] = useState(0)
 
-  if (loadingUser || !user) {
+  const { data: sessions, isLoading: loadingSessions } = useQuery<
+    Session[],
+    Error
+  >({
+    queryKey: ["sessions", user?.address],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/session?studentAddress=${user?.address}`
+      )
+      const { sessions } = await response.json()
+      return sessions
+    },
+  })
+
+  if (loadingUser || loadingSessions || !user) {
     return <LoadingScreen />
   }
+
+  console.log("sessions: ", sessions)
 
   const PreSessionModal = () => (
     <AlertDialog
@@ -133,43 +152,15 @@ export default function DashboardPage() {
         {/* Upcoming Sessions */}
         <div className="glass border border-stone-800 p-4 rounded-md shadow">
           <h2 className="text-xl font-semibold mb-4">Upcoming Sessions</h2>
-          <ul className="space-y-2">
-            <li className="flex justify-between items-center">
-              <span>Blockchain Basics with John Doe</span>
-              <button
-                onClick={() => setShowPreSessionModal(true)}
-                className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm"
-              >
-                View Details
-              </button>
-            </li>
-          </ul>
-        </div>
-
-        {/* Recent Activity */}
-        <div className="glass border border-stone-800 p-4 rounded-md shadow">
-          <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
-          <ul className="space-y-2">
-            <li className="flex justify-between items-center">
-              <span>Session completed with Jane Smith</span>
-              <button
-                onClick={() => setShowPostSessionModal(true)}
-                className="bg-green-500 text-white px-3 py-1 rounded-md text-sm"
-              >
-                Leave Feedback
-              </button>
-            </li>
-          </ul>
-        </div>
-
-        {/* Learning Progress */}
-        <div className="glass border border-stone-800 p-4 rounded-md shadow">
-          <h2 className="text-xl font-semibold mb-4">Learning Progress</h2>
-          <p>You've completed 5 sessions this month!</p>
+          {sessions?.length ? (
+            <SessionCardList sessions={sessions} />
+          ) : (
+            <p>No session booked for now.</p>
+          )}
         </div>
 
         {/* Quick Actions */}
-        <div className="glass border border-stone-800 p-4 rounded-md shadow">
+        <div className="glass border h-fit border-stone-800 p-4 rounded-md shadow">
           <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
           <div className="flex flex-col gap-2">
             <div className="w-full">

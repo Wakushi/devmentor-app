@@ -17,6 +17,8 @@ import { toast } from "@/hooks/use-toast"
 import Loader from "@/components/ui/loader"
 import { FaCircleCheck } from "react-icons/fa6"
 import PaymentTab from "./payment-tab"
+import { Session } from "@/lib/types/session.type"
+import { getStartTime } from "@/lib/utils"
 
 export default function PaymentAndValidationCard({
   mentor,
@@ -64,6 +66,7 @@ export default function PaymentAndValidationCard({
         event: ContractEvent.SESSION_BOOKED,
         args: { student: user.address },
         handler: () => {
+          createSession()
           setProcessingPayment(false)
           setSuccess(true)
 
@@ -84,10 +87,31 @@ export default function PaymentAndValidationCard({
     }
   }
 
-  function handleConfirmSession(): void {
+  async function handleConfirmSession(): Promise<void> {
     if (!isFree) return
-
+    createSession()
     setSuccess(true)
+  }
+
+  async function createSession(): Promise<void> {
+    if (!user?.address) return
+
+    const sessionPayload: Session = {
+      mentorAddress: mentor.address,
+      studentAddress: user?.address,
+      startTime: getStartTime(timeslot),
+      valueLocked: mentor.hourlyRate,
+      cancelled: false,
+    }
+
+    const response = await fetch("/api/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(sessionPayload),
+    })
+
+    const { createdSession } = await response.json()
+    console.log("createdSession: ", createdSession)
   }
 
   return (

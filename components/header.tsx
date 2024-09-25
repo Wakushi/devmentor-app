@@ -8,6 +8,7 @@ import { IoMdLogOut } from "react-icons/io"
 import TooltipWrapper from "./ui/custom-tooltip"
 import NavLinkButton from "./ui/nav-link"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { getInitials } from "@/lib/utils"
 
 export default function Header() {
   const { user, isConnected, logOut, loadingUser } = useUser()
@@ -45,9 +46,14 @@ export default function Header() {
           <div className="flex items-center">{renderNavLinks(navLinks)}</div>
           <div className="flex items-center gap-2">
             <Avatar className="w-[30px] h-[30px]" onClick={getUserBalance}>
-              <AvatarImage src={user?.web3AuthData?.profileImage} />
+              <AvatarImage
+                src={
+                  user?.web3AuthData?.profileImage ||
+                  `https://api.dicebear.com/9.x/notionists/svg?seed=${user.name}`
+                }
+              />
               <AvatarFallback className="text-d1">
-                {user.name?.[0]}
+                {getInitials(user.name || "")}
               </AvatarFallback>
             </Avatar>
             <p className="text-mid">{user.name}</p>

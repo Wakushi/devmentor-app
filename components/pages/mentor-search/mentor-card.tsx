@@ -23,7 +23,7 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
   } = mentor
 
   return (
-    <Card className="bg-primary-faded rounded-md border border-primary-faded text-white overflow-hidden hover:shadow-xl transition-all duration-300 hover:border-white cursor-pointer">
+    <Card className="bg-primary-faded rounded-md border border-primary-faded text-white overflow-hidden transition-all duration-300 hover:border-white cursor-pointer hover:-translate-y-1 hover:shadow-xl">
       <Link href={`/book-session?mentor=${address}`}>
         <CardContent className="flex items-center justify-between gap-4 p-4">
           <div className="flex items-center gap-2">

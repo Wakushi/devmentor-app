@@ -75,11 +75,9 @@ export default function PaymentAndValidationCard({
         },
       })
     } catch (error: any) {
-      console.log("handlePayment error: ", error)
-
       toast({
         title: "Error",
-        description: error,
+        description: "Payment cancelled, please try again",
       })
 
       setProcessingPayment(false)

@@ -21,7 +21,7 @@
     --dm-l1: #eff0f6;
     --dm-d1: #6f6c90;
 
-    --accent: #f6ae55;
+    --accent: var(--primary);
 
     --error: #e53e3e;
     --success: #38a169;
@@ -128,6 +128,20 @@ h6 {
 .loader:after {
   --s: -1;
   animation-delay: 0.75s;
+}
+
+.calendar .rdp-button {
+  border: transparent;
+  background-color: transparent;
+}
+
+.calendar .rdp-button:hover {
+  background-color: transparent;
+  border: 1px solid white;
+}
+
+.calendar .rdp-button[aria-selected="true"]:hover {
+  background-color: var(--primary);
 }
 
 .disappear {

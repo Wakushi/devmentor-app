@@ -44,7 +44,7 @@ const PreSessionReminder = () => {
             <Video className="mr-2" />
             Join Video Call
           </a>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-dim">
             Make sure your camera and microphone are working before joining.
           </p>
         </div>

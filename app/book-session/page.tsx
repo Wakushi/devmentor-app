@@ -18,9 +18,7 @@ export default function BookSessionPage({
       <div className="flex flex-col items-center justify-center gap-6 p-4 min-h-screen">
         <div className="text-center">
           <h3 className="text-2xl font-bold">Mentor not found</h3>
-          <p className="text-gray-600">
-            Sorry, but we couldn't find your mentor.
-          </p>
+          <p className="text-dim">Sorry, but we couldn't find your mentor.</p>
         </div>
         <Button variant="default" asChild>
           <a href="/mentor-search" className="flex items-center gap-2">
@@ -32,18 +30,20 @@ export default function BookSessionPage({
   }
 
   return (
-    <div className="flex flex-col gap-4 p-4 pt-[8rem] min-h-screen max-w-[90%] mx-auto w-full">
-      <div className="mb-2">
-        <h1 className="text-3xl font-bold mb-2">Book a session</h1>
-        <p className="text-gray-600">
-          Pick out the perfect time for your mentoring session
-        </p>
-      </div>
-      <div className="flex flex-col md:flex-row gap-8">
-        <MentorDetails mentor={mentor} />
-        <SessionCalendar />
+    <>
+      <div className="flex glass rounded-xl flex-col gap-4 p-8 mt-[8rem] h-fit max-w-[95%] mx-auto w-full">
+        <div className="mb-2">
+          <h1 className="text-3xl font-bold mb-2">Book a session</h1>
+          <p className="text-dim">
+            Pick out the perfect time for your mentoring session
+          </p>
+        </div>
+        <div className="flex flex-col md:flex-row gap-8">
+          <MentorDetails mentor={mentor} />
+          <SessionCalendar />
+        </div>
       </div>
       <AnimatedBackground shader={false} />
-    </div>
+    </>
   )
 }

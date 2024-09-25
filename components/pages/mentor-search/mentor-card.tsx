@@ -6,10 +6,10 @@ import { Mentor } from "@/lib/types/user.type"
 import { getLanguageOption, LearningField } from "@/lib/types/profile-form.type"
 import { CiDollar } from "react-icons/ci"
 import { FaLongArrowAltRight } from "react-icons/fa"
-import NavLinkButton from "@/components/ui/nav-link"
 import Flag from "@/components/ui/flag"
 import { getAverageRating, getInitials } from "@/lib/utils"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 export default function MentorCard({ mentor }: { mentor: Mentor }) {
   const {
@@ -77,12 +77,9 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
           </div>
 
           <div>
-            <NavLinkButton
-              variant="filled"
-              href={`/book-session?mentor=${address}`}
-            >
+            <Button>
               Book Session <FaLongArrowAltRight />
-            </NavLinkButton>
+            </Button>
           </div>
         </CardContent>
       </Link>

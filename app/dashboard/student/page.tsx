@@ -99,14 +99,14 @@ export default function DashboardPage() {
             </div>
             <textarea
               rows={3}
-              className="w-full p-2 border rounded mb-4"
+              className="w-full p-2 border rounded-xl mb-4"
               placeholder="Share your thoughts about the session..."
             ></textarea>
             <div className="flex items-center mb-4">
               <DollarSign size={24} className="text-green-500 mr-2" />
               <input
                 type="number"
-                className="p-2 border rounded w-24"
+                className="p-2 border rounded-xl w-24"
                 placeholder="Tip amount"
               />
               <span className="ml-2">USD</span>
@@ -131,48 +131,45 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Upcoming Sessions */}
-        <div className="glass border border-stone-800 p-4 rounded shadow">
+        <div className="glass border border-stone-800 p-4 rounded-xl shadow">
           <h2 className="text-xl font-semibold mb-4">Upcoming Sessions</h2>
           <ul className="space-y-2">
             <li className="flex justify-between items-center">
               <span>Blockchain Basics with John Doe</span>
               <button
                 onClick={() => setShowPreSessionModal(true)}
-                className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                className="bg-blue-500 text-white px-3 py-1 rounded-xl text-sm"
               >
                 View Details
               </button>
             </li>
-            {/* Add more upcoming sessions here */}
           </ul>
         </div>
 
         {/* Recent Activity */}
-        <div className="glass border border-stone-800 p-4 rounded shadow">
+        <div className="glass border border-stone-800 p-4 rounded-xl shadow">
           <h2 className="text-xl font-semibold mb-4">Recent Activity</h2>
           <ul className="space-y-2">
             <li className="flex justify-between items-center">
               <span>Session completed with Jane Smith</span>
               <button
                 onClick={() => setShowPostSessionModal(true)}
-                className="bg-green-500 text-white px-3 py-1 rounded text-sm"
+                className="bg-green-500 text-white px-3 py-1 rounded-xl text-sm"
               >
                 Leave Feedback
               </button>
             </li>
-            {/* Add more recent activities here */}
           </ul>
         </div>
 
         {/* Learning Progress */}
-        <div className="glass border border-stone-800 p-4 rounded shadow">
+        <div className="glass border border-stone-800 p-4 rounded-xl shadow">
           <h2 className="text-xl font-semibold mb-4">Learning Progress</h2>
           <p>You've completed 5 sessions this month!</p>
-          {/* Add a progress bar or chart here */}
         </div>
 
         {/* Quick Actions */}
-        <div className="glass border border-stone-800 p-4 rounded shadow">
+        <div className="glass border border-stone-800 p-4 rounded-xl shadow">
           <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
           <div className="flex flex-col gap-2">
             <div className="w-full">

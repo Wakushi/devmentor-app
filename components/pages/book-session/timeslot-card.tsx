@@ -38,7 +38,7 @@ export default function TimeslotCard({
       {selected && (
         <Button
           onClick={() => handleConfirmTimeslot(timeslot)}
-          className="bg-transparent fade-in-right h-full text-base px-8 py-2 cursor-pointer rounded shadow-lg border-2 border-white hover:border-primary-shade"
+          className="fade-in-right h-full text-base px-8 py-2 cursor-pointer rounded shadow-lg"
         >
           Confirm
         </Button>

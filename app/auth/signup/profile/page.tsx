@@ -171,6 +171,22 @@ export default function ProfileCreationPage() {
     return selectedContacts.get(field) || ""
   }
 
+  function currentStepIndex(): number {
+    return steps.findIndex((s) => s === step)
+  }
+
+  function isCurrentStepValid(): boolean {
+    switch (step) {
+      case ProfileSteps.LEARNING:
+        return learningForm.formState.isValid
+      case ProfileSteps.LANGUAGE:
+        return languageForm.formState.isValid
+      case ProfileSteps.CONTACT:
+        const contacts = Array.from(selectedContacts.values()).filter((v) => v)
+        return !!contacts.length
+    }
+  }
+
   async function onSubmit() {
     if (!user || !user.address) return
 
@@ -216,22 +232,6 @@ export default function ProfileCreationPage() {
     } catch (error) {
       setLoading(false)
       setSuccess(false)
-    }
-  }
-
-  function currentStepIndex(): number {
-    return steps.findIndex((s) => s === step)
-  }
-
-  function isCurrentStepValid(): boolean {
-    switch (step) {
-      case ProfileSteps.LEARNING:
-        return learningForm.formState.isValid
-      case ProfileSteps.LANGUAGE:
-        return languageForm.formState.isValid
-      case ProfileSteps.CONTACT:
-        const contacts = Array.from(selectedContacts.values()).filter((v) => v)
-        return !!contacts.length
     }
   }
 

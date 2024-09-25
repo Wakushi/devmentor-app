@@ -10,7 +10,19 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const user: User = await req.json()
     const createdUser = await createUser(user)
-    return NextResponse.json({ createdUser })
+    const token = await createUserJwtToken(user)
+
+    const response = NextResponse.json({ createdUser })
+
+    response.cookies.set({
+      name: process.env.NEXT_PUBLIC_TOKEN_COOKIE as string,
+      value: token,
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    })
+
+    return response
   } catch (error) {
     console.error("API error:", error)
     return NextResponse.json({ error: "Failed to add client" }, { status: 500 })

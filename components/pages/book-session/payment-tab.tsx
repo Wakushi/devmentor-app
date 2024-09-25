@@ -1,15 +1,13 @@
 import { Button } from "@/components/ui/button"
 import Loader from "@/components/ui/loader"
 import { Mentor } from "@/lib/types/user.type"
-import { FaDollarSign, FaLock } from "react-icons/fa"
+import { FaDollarSign } from "react-icons/fa"
 
 export default function PaymentTab({
-  paid,
   mentor,
   handlePayment,
   processingPayment,
 }: {
-  paid: boolean
   mentor: Mentor
   handlePayment: () => void
   processingPayment: boolean
@@ -23,23 +21,16 @@ export default function PaymentTab({
         </p>
       </div>
       <div>
-        {paid ? (
-          <div className="button-base pointer-events-none border-success bg-success">
-            <FaLock />
-            {mentor.hourlyRate} USD locked
-          </div>
-        ) : (
-          <Button className="min-w-[200px]" onClick={handlePayment}>
-            {processingPayment ? (
-              <Loader size="4" />
-            ) : (
-              <>
-                <FaDollarSign className="text-xl" />
-                Lock {mentor.hourlyRate} USD
-              </>
-            )}
-          </Button>
-        )}
+        <Button className="min-w-[200px]" onClick={handlePayment}>
+          {processingPayment ? (
+            <Loader size="4" />
+          ) : (
+            <>
+              <FaDollarSign className="text-xl" />
+              Lock {mentor.hourlyRate} USD
+            </>
+          )}
+        </Button>
       </div>
     </div>
   )

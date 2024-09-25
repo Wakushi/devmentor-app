@@ -54,7 +54,9 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
 
               if (!langOption) return null
 
-              return <Flag key={address + lang} lang={langOption} />
+              return (
+                <Flag size="small" key={address + lang} lang={langOption} />
+              )
             })}
           </div>
 

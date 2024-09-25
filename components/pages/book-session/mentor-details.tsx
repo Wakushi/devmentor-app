@@ -66,7 +66,9 @@ export default function MentorDetails({ mentor }: { mentor: Mentor }) {
             {languages?.map((lang) => {
               const langOption = getLanguageOption(lang)
               if (!langOption) return null
-              return <Flag key={address + lang} lang={langOption} />
+              return (
+                <Flag size="small" key={address + lang} lang={langOption} />
+              )
             })}
           </div>
 

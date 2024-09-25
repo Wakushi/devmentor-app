@@ -81,3 +81,23 @@ export const formatTime = (timestamp: number) => {
     minute: "2-digit",
   })
 }
+
+export function createGoogleCalendarLink(event: {
+  title: string
+  startDate: Date
+  endDate: Date
+  description?: string
+}): string {
+  const baseUrl = "https://www.google.com/calendar/render?action=TEMPLATE"
+
+  const dateFormat = (date: Date): string =>
+    date.toISOString().replace(/-|:|\.\d\d\d/g, "")
+
+  const params = new URLSearchParams({
+    text: event.title,
+    dates: `${dateFormat(event.startDate)}/${dateFormat(event.endDate)}`,
+    details: event.description || "",
+  })
+
+  return `${baseUrl}&${params.toString()}`
+}

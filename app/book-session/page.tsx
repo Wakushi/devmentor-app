@@ -14,6 +14,8 @@ import PaymentAndValidationCard from "@/components/pages/book-session/payment-an
 import { IoIosArrowBack } from "react-icons/io"
 import NavLinkButton from "@/components/ui/nav-link"
 import SuccessScreen from "@/components/success-screen"
+import { createGoogleCalendarLink } from "@/lib/utils"
+import { FcGoogle } from "react-icons/fc"
 
 enum BookStep {
   TIMESLOT_SELECTION = "TIMESLOT_SELECTION",
@@ -94,16 +96,42 @@ export default function BookSessionPage({
     )
   }
 
-  if (success) {
+  if (success && confirmedTimeslot) {
+    const { startTime, endTime, date } = confirmedTimeslot
+
+    const startHours = new Date(startTime).getHours()
+    const endHours = new Date(endTime).getHours()
+
+    const startDate = new Date(date)
+    startDate.setHours(startHours)
+
+    const endDate = new Date(date)
+    endDate.setHours(endHours)
+
+    const googleCalendarLink = createGoogleCalendarLink({
+      title: "Mentoring session",
+      description: `Mentoring session with ${mentor.name}`,
+      startDate,
+      endDate,
+    })
+
     return (
       <div className="flex flex-col items-center justify-center p-4 min-h-screen">
         <SuccessScreen
           title="Session booked with success !"
           subtitle="You can find all your session detail in the dashboard"
         >
-          <div className="max-w-[300px]">
+          <div className="max-w-[300px] flex flex-col gap-2 w-full">
             <NavLinkButton href="/dashboard/student" variant="filled">
               Go to dashboard <FaLongArrowAltRight />
+            </NavLinkButton>
+            <NavLinkButton
+              variant="outline"
+              target="_blank"
+              href={googleCalendarLink}
+            >
+              Add to calendar
+              <FcGoogle />
             </NavLinkButton>
           </div>
         </SuccessScreen>

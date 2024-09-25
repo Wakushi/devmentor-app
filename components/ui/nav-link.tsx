@@ -7,11 +7,13 @@ import { ReactNode } from "react"
 export default function NavLinkButton({
   href,
   children,
+  target = "_self",
   text = "mid",
   variant = "ghost",
 }: {
   href: string
   children: ReactNode
+  target?: "_blank" | "_self"
   text?: "small" | "mid" | "body" | "large"
   variant?: "filled" | "filled-secondary" | "outline" | "ghost"
 }) {
@@ -38,6 +40,7 @@ export default function NavLinkButton({
         }
       )}
       href={href}
+      target={target}
     >
       {children}
     </Link>

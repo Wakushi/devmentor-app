@@ -30,7 +30,6 @@ export default function PaymentAndValidationCard({
   handleEditTimeslot: () => void
 }) {
   const { user } = useUser()
-  const [paid, setPaid] = useState<boolean>(false)
   const [processingPayment, setProcessingPayment] = useState<boolean>(false)
 
   const isFree = mentor.hourlyRate === 0
@@ -57,20 +56,20 @@ export default function PaymentAndValidationCard({
       })
 
       toast({
-        title: "Creating session...",
+        title: "Locking funds...",
         action: <Loader fill="white" color="primary" size="4" />,
       })
 
       watchForEvent({
         event: ContractEvent.SESSION_BOOKED,
         args: { student: user.address },
-        handler: (logs: any) => {
+        handler: () => {
           setProcessingPayment(false)
-          setPaid(true)
+          setSuccess(true)
 
           toast({
             title: "Success",
-            description: "Session created with success !",
+            description: "Payment processed successfully !",
             action: <FaCircleCheck className="text-white" />,
           })
         },
@@ -88,7 +87,7 @@ export default function PaymentAndValidationCard({
   }
 
   function handleConfirmSession(): void {
-    if (!isFree && !paid) return
+    if (!isFree) return
 
     setSuccess(true)
   }
@@ -115,7 +114,6 @@ export default function PaymentAndValidationCard({
           </Button>
         ) : (
           <PaymentTab
-            paid={paid}
             mentor={mentor}
             handlePayment={handlePayment}
             processingPayment={processingPayment}

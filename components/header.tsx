@@ -9,6 +9,7 @@ import TooltipWrapper from "./ui/custom-tooltip"
 import NavLinkButton from "./ui/nav-link"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { getInitials } from "@/lib/utils"
+import { Role } from "@/lib/types/role.type"
 
 export default function Header() {
   const { user, isConnected, logOut, loadingUser } = useUser()
@@ -37,9 +38,12 @@ export default function Header() {
     if (isConnected && user?.registered) {
       const navLinks = [
         { href: "/", label: "Home" },
-        { href: "/dashboard/student", label: "Dashboard" },
-        { href: "/mentor-search", label: "Mentors" },
+        { href: `/dashboard/${user.role?.toLowerCase()}`, label: "Dashboard" },
       ]
+
+      if (user.role === Role.STUDENT) {
+        navLinks.push({ href: "/mentor-search", label: "Mentors" })
+      }
 
       return (
         <nav className="flex items-center gap-8">

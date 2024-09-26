@@ -230,7 +230,7 @@ export default function MentorSignUpPage() {
       const { createdUser } = await response.json()
 
       queryClient.invalidateQueries({
-        queryKey: [QueryKeys.USER, createdUser.address.toLowerCase()],
+        queryKey: [QueryKeys.USER, createdUser.address],
       })
 
       setLoading(false)

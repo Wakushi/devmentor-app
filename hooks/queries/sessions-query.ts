@@ -7,7 +7,7 @@ export default function useSessionsQuery(
   user: Student | Mentor | null | undefined
 ) {
   const sessionsQuery = useQuery<Session[], Error>({
-    queryKey: [QueryKeys.SESSIONS, user?.address.toLowerCase()],
+    queryKey: [QueryKeys.SESSIONS, user?.address],
     queryFn: async () => {
       const response = await fetch(
         `/api/session?studentAddress=${user?.address}`

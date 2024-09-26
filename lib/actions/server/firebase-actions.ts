@@ -11,7 +11,7 @@ export const createUser = async (user: User): Promise<User | null> => {
     const newUser = {
       ...user,
       registered: true,
-      address: user.address.toLowerCase() as Address,
+      address: user.address as Address,
     }
     const docRef = await adminDb.collection(USER_COLLECTION).add(newUser)
     const createdUser: User = { ...newUser, id: docRef.id }

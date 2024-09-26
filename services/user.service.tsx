@@ -1,11 +1,11 @@
 "use client"
-import { createContext, ReactNode, useContext } from "react"
+import { createContext, ReactNode, useContext, useEffect } from "react"
 import { useAccount, useDisconnect } from "wagmi"
 import { web3AuthInstance } from "@/lib/Web3AuthConnectorInstance"
-import { usePathname, useRouter, useSearchParams } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Mentor, Student, User } from "@/lib/types/user.type"
 import { IProvider } from "@web3auth/base"
-import { Address, createWalletClient, custom } from "viem"
+import { createWalletClient, custom } from "viem"
 import { baseSepolia } from "viem/chains"
 import { OpenloginUserInfo } from "@web3auth/openlogin-adapter"
 import { Role } from "@/lib/types/role.type"
@@ -45,9 +45,13 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     Student | Mentor | null,
     Error
   >({
-    queryKey: [QueryKeys.USER, address?.toLowerCase() ?? "0x"],
+    queryKey: [QueryKeys.USER, address ?? "0x"],
     queryFn: () => fetchUser(),
   })
+
+  useEffect(() => {
+    queryClient.refetchQueries({ queryKey: [QueryKeys.USER, address ?? "0x"] })
+  }, [web3AuthInstance.connected])
 
   async function fetchUser(): Promise<Student | Mentor | null> {
     if (!isConnected) return null
@@ -55,24 +59,19 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     try {
       let registeredUser: User | null = null
       let web3AuthData: Partial<OpenloginUserInfo> | null = null
-      let userAddress: Address | null = null
 
       switch (connector?.name) {
         case Connectors.WEB3AUTH:
           if (!web3AuthInstance.connected) return null
+          if (!address) return null
 
-          userAddress = await getUserAddress()
-
-          if (!userAddress) return null
-
-          registeredUser = await getRegisteredUser(userAddress)
+          registeredUser = await getRegisteredUser(address)
           web3AuthData = await web3AuthInstance.getUserInfo()
           break
 
         default:
           if (!address) return null
 
-          userAddress = address
           registeredUser = await getRegisteredUser(address)
 
           break
@@ -83,7 +82,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
       return registeredUser
         ? registeredUser
         : {
-            address: userAddress,
+            address,
             web3AuthData,
           }
     } catch (error) {
@@ -154,7 +153,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
 
       disconnectAsync().then(() => {
         queryClient.resetQueries({
-          queryKey: [QueryKeys.USER, address?.toLowerCase()],
+          queryKey: [QueryKeys.USER, address],
         })
       })
     } catch (error) {

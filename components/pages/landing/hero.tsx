@@ -3,12 +3,37 @@
 import TypingAnimation from "@/components/magicui/typing-animation"
 import AnimatedBackground from "@/components/ui/animated-background"
 import NavLinkButton from "@/components/ui/nav-link"
+import { Role } from "@/lib/types/role.type"
 import { useUser } from "@/services/user.service"
 import Image from "next/image"
 import { FaLongArrowAltRight } from "react-icons/fa"
 
 export default function Hero() {
   const { user } = useUser()
+
+  const mentorLink = (): string => {
+    let url = "/auth/signup?role=mentor"
+
+    if (user?.role === Role.MENTOR) {
+      url = "/dashboard/mentor"
+    }
+
+    return url
+  }
+
+  const studentLink = (): string => {
+    let url = "/auth/signup?role=student"
+
+    if (user?.role === Role.MENTOR) {
+      url = "/dashboard/mentor"
+    }
+
+    if (user?.role === Role.STUDENT) {
+      url = "/mentor-search"
+    }
+
+    return url
+  }
 
   return (
     <section className="relative">
@@ -29,19 +54,12 @@ export default function Hero() {
           </div>
           <div className="flex items-center gap-2">
             <div className="h-[40px] w-[180px]">
-              <NavLinkButton variant="outline" href="/auth/signup?role=mentor">
+              <NavLinkButton variant="outline" href={mentorLink()}>
                 Become a mentor
               </NavLinkButton>
             </div>
             <div className="h-[40px] w-[180px]">
-              <NavLinkButton
-                variant="filled"
-                href={
-                  user && user.registered
-                    ? "/mentor-search"
-                    : "/auth/signup?role=student"
-                }
-              >
+              <NavLinkButton variant="filled" href={studentLink()}>
                 Find a mentor <FaLongArrowAltRight />
               </NavLinkButton>
             </div>

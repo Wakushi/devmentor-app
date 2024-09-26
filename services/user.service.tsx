@@ -2,7 +2,7 @@
 import { createContext, ReactNode, useContext } from "react"
 import { useAccount, useDisconnect } from "wagmi"
 import { web3AuthInstance } from "@/lib/Web3AuthConnectorInstance"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { Mentor, Student, User } from "@/lib/types/user.type"
 import { IProvider } from "@web3auth/base"
 import { Address, createWalletClient, custom } from "viem"
@@ -162,12 +162,18 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     }
   }
 
-  function routeUser(registeredUser: User | null): void {
+  function routeUser(registeredUser: Student | Mentor | null): void {
+    const url = new URL(window.location.href)
+    const pathname = url.pathname
+    const role = url.searchParams.get("role")
+
     switch (pathname) {
       case "/auth/signup":
       case "/auth/login":
         router.push(
-          registeredUser ? "/dashboard/student" : "/auth/signup/profile"
+          registeredUser
+            ? `/dashboard/${registeredUser.role?.toLowerCase()}`
+            : `/auth/signup/${role || "choice"}`
         )
         break
     }

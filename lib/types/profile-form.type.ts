@@ -1,7 +1,13 @@
-export enum ProfileSteps {
+export enum StudentSignUpSteps {
   LEARNING = "LEARNING",
   LANGUAGE = "LANGUAGE",
   CONTACT = "CONTACT",
+}
+
+export enum MentorSignUpSteps {
+  IDENTITY = "IDENTITY",
+  LANGUAGE = "LANGUAGE",
+  RATE_AND_LINKS = "RATE_AND_LINKS",
 }
 
 export enum Experience {

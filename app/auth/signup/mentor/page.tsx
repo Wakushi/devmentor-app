@@ -27,28 +27,22 @@ import {
 } from "@/components/ui/select"
 import {
   ContactType,
-  Experience,
-  experienceDescriptions,
   Language,
   languageOptions,
   LearningField,
   learningFieldOptions,
-  ProfileSteps,
+  MentorSignUpSteps,
 } from "@/lib/types/profile-form.type"
 import {
-  FaDiscord,
   FaGithub,
   FaLinkedin,
   FaLongArrowAltRight,
-  FaTelegram,
   FaTwitter,
 } from "react-icons/fa"
 import { Input } from "@/components/ui/input"
-import { MdAlternateEmail } from "react-icons/md"
-import { IoIosClose } from "react-icons/io"
 import Stepper from "@/components/pages/auth/stepper"
 import { Separator } from "@/components/ui/separator"
-import { Student } from "@/lib/types/user.type"
+import { Mentor } from "@/lib/types/user.type"
 import { useUser } from "@/services/user.service"
 import Loader from "@/components/ui/loader"
 import NavLinkButton from "@/components/ui/nav-link"
@@ -57,12 +51,14 @@ import Flag from "@/components/ui/flag"
 import SuccessScreen from "@/components/success-screen"
 import { useQueryClient } from "@tanstack/react-query"
 import { QueryKeys } from "@/lib/types/query-keys.type"
+import { IoIosClose } from "react-icons/io"
 
-const learningFormSchema = z.object({
+const identityFormSchema = z.object({
+  name: z.string().min(3, "Minimum length is 3"),
+  yearsOfExperience: z.coerce.number().min(1),
   learningFields: z
     .array(z.nativeEnum(LearningField))
-    .min(1, "Please select at least one learning field"),
-  experience: z.nativeEnum(Experience),
+    .min(1, "Please select at least one teaching field"),
 })
 
 const languageFormSchema = z.object({
@@ -71,22 +67,11 @@ const languageFormSchema = z.object({
     .min(1, "Please select at least one language"),
 })
 
+const rateLinksFormSchema = z.object({
+  hourlyRate: z.string(),
+})
+
 const contactOptions = [
-  {
-    placeholder: "Discord username",
-    field: ContactType.DISCORD,
-    icon: <FaDiscord />,
-  },
-  {
-    placeholder: "Email address",
-    field: ContactType.EMAIL,
-    icon: <MdAlternateEmail />,
-  },
-  {
-    placeholder: "Twitter handle",
-    field: ContactType.TWITTER,
-    icon: <FaTwitter />,
-  },
   {
     placeholder: "LinkedIn profile",
     field: ContactType.LINKEDIN,
@@ -98,33 +83,39 @@ const contactOptions = [
     icon: <FaGithub />,
   },
   {
-    placeholder: "Telegram username",
-    field: ContactType.TELEGRAM,
-    icon: <FaTelegram />,
+    placeholder: "Twitter handle",
+    field: ContactType.TWITTER,
+    icon: <FaTwitter />,
   },
 ]
 
-export default function ProfileCreationPage() {
+export default function MentorSignUpPage() {
   const { user } = useUser()
   const queryClient = useQueryClient()
 
   const [loading, setLoading] = useState<boolean>(false)
   const [success, setSuccess] = useState<boolean>(false)
-  const [step, setStep] = useState<ProfileSteps>(ProfileSteps.LEARNING)
+  const [step, setStep] = useState<MentorSignUpSteps>(
+    MentorSignUpSteps.IDENTITY
+  )
   const [selectedContacts, setSelectedContacts] = useState<
     Map<ContactType, string>
   >(new Map())
 
-  const steps = Array.from(Object.keys(ProfileSteps) as ProfileSteps[])
+  const steps = Array.from(
+    Object.keys(MentorSignUpSteps) as MentorSignUpSteps[]
+  )
 
-  type LearningFormValues = z.infer<typeof learningFormSchema>
+  type LearningFormValues = z.infer<typeof identityFormSchema>
   type LanguageFormValues = z.infer<typeof languageFormSchema>
+  type RateLinksFormValues = z.infer<typeof rateLinksFormSchema>
 
-  const learningForm = useForm<LearningFormValues>({
-    resolver: zodResolver(learningFormSchema),
+  const identityForm = useForm<LearningFormValues>({
+    resolver: zodResolver(identityFormSchema),
     defaultValues: {
+      name: "",
+      yearsOfExperience: 1,
       learningFields: [],
-      experience: Experience.NOVICE,
     },
   })
 
@@ -135,32 +126,18 @@ export default function ProfileCreationPage() {
     },
   })
 
-  const watchExperience = learningForm.watch("experience")
+  const rateAndLinksForm = useForm<RateLinksFormValues>({
+    resolver: zodResolver(rateLinksFormSchema),
+    defaultValues: {
+      hourlyRate: "0",
+    },
+  })
+
   const watchLanguages = languageForm.watch("languages")
+  const watchHourlyRate = rateAndLinksForm.watch("hourlyRate")
 
-  function handleNextStep(): void {
-    switch (step) {
-      case ProfileSteps.LEARNING:
-        setStep(ProfileSteps.LANGUAGE)
-        break
-      case ProfileSteps.LANGUAGE:
-        setStep(ProfileSteps.CONTACT)
-        break
-      case ProfileSteps.CONTACT:
-        onSubmit()
-        break
-    }
-  }
-
-  function handlePreviousStep(): void {
-    switch (step) {
-      case ProfileSteps.LANGUAGE:
-        setStep(ProfileSteps.LEARNING)
-        break
-      case ProfileSteps.CONTACT:
-        setStep(ProfileSteps.LANGUAGE)
-        break
-    }
+  function getContactByField(field: ContactType): string {
+    return selectedContacts.get(field) || ""
   }
 
   function handleContactChange(value: string, field: ContactType): void {
@@ -171,8 +148,29 @@ export default function ProfileCreationPage() {
     })
   }
 
-  function getContactByField(field: ContactType): string {
-    return selectedContacts.get(field) || ""
+  function handleNextStep(): void {
+    switch (step) {
+      case MentorSignUpSteps.IDENTITY:
+        setStep(MentorSignUpSteps.LANGUAGE)
+        break
+      case MentorSignUpSteps.LANGUAGE:
+        setStep(MentorSignUpSteps.RATE_AND_LINKS)
+        break
+      case MentorSignUpSteps.RATE_AND_LINKS:
+        onSubmit()
+        break
+    }
+  }
+
+  function handlePreviousStep(): void {
+    switch (step) {
+      case MentorSignUpSteps.LANGUAGE:
+        setStep(MentorSignUpSteps.IDENTITY)
+        break
+      case MentorSignUpSteps.RATE_AND_LINKS:
+        setStep(MentorSignUpSteps.LANGUAGE)
+        break
+    }
   }
 
   function currentStepIndex(): number {
@@ -181,13 +179,21 @@ export default function ProfileCreationPage() {
 
   function isCurrentStepValid(): boolean {
     switch (step) {
-      case ProfileSteps.LEARNING:
-        return learningForm.formState.isValid
-      case ProfileSteps.LANGUAGE:
+      case MentorSignUpSteps.IDENTITY:
+        return identityForm.formState.isValid
+      case MentorSignUpSteps.LANGUAGE:
         return languageForm.formState.isValid
-      case ProfileSteps.CONTACT:
+      case MentorSignUpSteps.RATE_AND_LINKS:
         const contacts = Array.from(selectedContacts.values()).filter((v) => v)
-        return !!contacts.length
+        const hourlyRate = Number(watchHourlyRate)
+        return (
+          !!contacts.length &&
+          !Number.isNaN(hourlyRate) &&
+          hourlyRate >= 0 &&
+          hourlyRate < 1000
+        )
+      default:
+        return false
     }
   }
 
@@ -197,34 +203,28 @@ export default function ProfileCreationPage() {
     setLoading(true)
 
     try {
-      const { learningFields, experience } = learningForm.getValues()
+      const { name, learningFields, yearsOfExperience } =
+        identityForm.getValues()
       const { languages } = languageForm.getValues()
-      const contacts = Array.from(selectedContacts, ([field, value]) => ({
-        type: field,
-        value,
-      })).filter((contact) => contact.value)
+      const { hourlyRate } = rateAndLinksForm.getValues()
 
-      const getUsername = (): string => {
-        if (contacts.length === 1 && contacts[0].type === ContactType.EMAIL) {
-          return contacts[0].value.split("@")[0]
-        }
-        return contacts[0].value
-      }
-
-      const studentPayload: Student = {
+      const mentorPayload: Mentor = {
         ...user,
-        name: getUsername(),
-        role: Role.STUDENT,
+        name,
+        yearsOfExperience,
         learningFields,
-        experience,
         languages,
-        contacts,
+        hourlyRate: +hourlyRate,
+        sessionCount: 0,
+        validated: false,
+        reviews: [],
+        role: Role.MENTOR,
       }
 
       const response = await fetch("/api/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(studentPayload),
+        body: JSON.stringify(mentorPayload),
       })
 
       const { createdUser } = await response.json()
@@ -255,10 +255,10 @@ export default function ProfileCreationPage() {
       return (
         <SuccessScreen
           title="Account created with success !"
-          subtitle="Let's find a mentor to help you for your first session"
+          subtitle="Let's discover your dashboard and update your availabilties"
         >
           <div className="max-w-[300px]">
-            <NavLinkButton href="/dashboard/student" variant="filled">
+            <NavLinkButton href="/dashboard/mentor" variant="filled">
               Go to dashboard <FaLongArrowAltRight />
             </NavLinkButton>
           </div>
@@ -271,7 +271,7 @@ export default function ProfileCreationPage() {
     <section className="min-h-screen flex flex-col gap-4 justify-center items-center text-center">
       <Card
         className={clsx(
-          "flex flex-col items-center justify-center min-w-[500px] max-w-[580px] min-h-[550px] gap-8 p-8 text-white text-start glass",
+          "flex flex-col items-center justify-center min-w-[500px] max-w-[580px] min-h-[550px] border-stone-800 gap-8 p-8 text-white text-start glass",
           {
             "fade-out-card": success,
           }
@@ -284,23 +284,74 @@ export default function ProfileCreationPage() {
             <Stepper steps={steps} currentStep={step} />
             <Separator className="opacity-30" />
 
-            {step === ProfileSteps.LEARNING && (
-              <div className="flex flex-col fade-in-bottom">
+            {step === MentorSignUpSteps.IDENTITY && (
+              <div className="flex flex-col w-full justify-start fade-in-bottom">
                 <div className="mb-2">
-                  <h2 onClick={onSubmit}>Your Learning Journey</h2>
+                  <h2 className="leading-tight">
+                    Forge the next generation of developers
+                  </h2>
                   <p className="text-dim">
-                    Let's tailor your experience to your interests and goals
+                    Share your expertise and passion with us
                   </p>
                 </div>
-                <Form {...learningForm}>
-                  <form className="space-y-2 my-4">
+                <Form {...identityForm}>
+                  <form
+                    className="space-y-2 my-4"
+                    onSubmit={identityForm.handleSubmit(onSubmit)}
+                  >
+                    {/* NAME */}
                     <FormField
-                      control={learningForm.control}
+                      control={identityForm.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Patrick Collins" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* YEARS OF EXPERIENCE */}
+                    <FormField
+                      control={identityForm.control}
+                      name="yearsOfExperience"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Years of experience</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value.toString()}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select your years of experience" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="2">2 years</SelectItem>
+                              <SelectItem value="3">3 years</SelectItem>
+                              <SelectItem value="4">4 years</SelectItem>
+                              <SelectItem value="5">5 years</SelectItem>
+                              <SelectItem value="6">6 years</SelectItem>
+                              <SelectItem value="7">7+ years</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* TEACHING FIELDS */}
+                    <FormField
+                      control={identityForm.control}
                       name="learningFields"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>
-                            Which domains do you want to master?
+                            Which fields do you want to teach?
                           </FormLabel>
                           <FormControl>
                             <MultiSelect
@@ -319,64 +370,23 @@ export default function ProfileCreationPage() {
                         </FormItem>
                       )}
                     />
-
-                    <FormField
-                      control={learningForm.control}
-                      name="experience"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            How would you describe your journey so far ?
-                          </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select your experience level" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {Object.entries(experienceDescriptions).map(
-                                ([value, { label }]) => (
-                                  <SelectItem key={value} value={value}>
-                                    {label}
-                                  </SelectItem>
-                                )
-                              )}
-                            </SelectContent>
-                          </Select>
-                          {watchExperience && (
-                            <FormDescription>
-                              {
-                                experienceDescriptions[
-                                  watchExperience as Experience
-                                ].description
-                              }
-                            </FormDescription>
-                          )}
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                   </form>
                 </Form>
               </div>
             )}
 
-            {step === ProfileSteps.LANGUAGE && (
+            {step === MentorSignUpSteps.LANGUAGE && (
               <div className="w-full flex flex-col fade-in-bottom">
                 <div className="mb-2">
-                  <h2>Customize Your Learning</h2>
+                  <h2>Breaking Language Barriers</h2>
                   <p className="text-dim">
-                    Help us match you with the right mentors and resources
+                    Tell us which languages you speak fluently
                   </p>
                 </div>
                 <Form {...languageForm}>
                   <form
-                    onSubmit={languageForm.handleSubmit(onSubmit)}
                     className="space-y-4 my-4"
+                    onSubmit={(e) => e.preventDefault()}
                   >
                     <FormField
                       control={languageForm.control}
@@ -429,14 +439,45 @@ export default function ProfileCreationPage() {
               </div>
             )}
 
-            {step === ProfileSteps.CONTACT && (
-              <div className="flex flex-col fade-in-bottom">
-                <div className="mb-8">
-                  <h2>Connect with mentors</h2>
+            {step === MentorSignUpSteps.RATE_AND_LINKS && (
+              <div className="w-full flex flex-col fade-in-bottom">
+                <div className="mb-2">
+                  <h2>Showcase Your Value</h2>
                   <p className="text-dim">
-                    Provide at least one way for your mentor to reach out to you
+                    Set your rate and share your digital footprint
                   </p>
                 </div>
+                <Form {...rateAndLinksForm}>
+                  <form
+                    className="space-y-4 my-4"
+                    onSubmit={identityForm.handleSubmit(onSubmit)}
+                  >
+                    <FormField
+                      control={rateAndLinksForm.control}
+                      name="hourlyRate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Hourly Rate (USD)</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="Enter your hourly rate"
+                            />
+                          </FormControl>
+                          <FormDescription>
+                            Leave the field empty if you don't want to apply
+                            fees (You can always update this later.)
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </form>
+                </Form>
+                <p className="form-label mb-4">
+                  Share your GitHub, LinkedIn, or portfolio URL to help us
+                  verify your experience and approve your candidature.
+                </p>
                 <div className="flex flex-col gap-2">
                   {contactOptions.map(({ placeholder, field, icon }) => {
                     return (
@@ -471,6 +512,10 @@ export default function ProfileCreationPage() {
                     )
                   })}
                 </div>
+                <p className="text-[0.8rem] text-dim mt-2">
+                  These won't be shared with anyone and will be deleted after
+                  your candidature is reviewed.
+                </p>
               </div>
             )}
 

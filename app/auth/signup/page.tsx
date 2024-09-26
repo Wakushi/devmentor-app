@@ -11,6 +11,10 @@ const DynamicConnectors = dynamic(
   }
 )
 
+const LoginRedirect = dynamic(() => import("@/components/login-redirect"), {
+  ssr: false,
+})
+
 export default function SignUpPage() {
   return (
     <>
@@ -36,6 +40,9 @@ export default function SignUpPage() {
             Log in
           </Link>
         </p>
+        <Suspense>
+          <LoginRedirect />
+        </Suspense>
       </section>
       <AnimatedBackground shader={false} />
     </>

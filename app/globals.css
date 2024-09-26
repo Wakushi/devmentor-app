@@ -116,6 +116,10 @@ h6 {
   @apply inline-flex border items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 shadow gap-2 h-9 px-4 py-2 min-w-[200px];
 }
 
+.form-label {
+  @apply text-sm font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70;
+}
+
 .loader {
   display: inline-flex;
   gap: 5px;

@@ -14,10 +14,13 @@ export default function Flag({
       <img
         src={`https://flagsapi.com/${lang.code}/flat/64.png`}
         alt={`${lang.label} flag`}
-        className={clsx("object-cover rounded drop-shadow-lg", {
-          "w-12 h-12": size === "default",
-          "w-8 h-8": size === "small",
-        })}
+        className={clsx(
+          "object-cover rounded drop-shadow-lg fade-in-bottom opacity-0",
+          {
+            "w-12 h-12": size === "default",
+            "w-8 h-8": size === "small",
+          }
+        )}
       />
     </TooltipWrapper>
   )

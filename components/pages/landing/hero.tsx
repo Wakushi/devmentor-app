@@ -29,15 +29,17 @@ export default function Hero() {
           </div>
           <div className="flex items-center gap-2">
             <div className="h-[40px] w-[180px]">
-              <NavLinkButton variant="outline" href="/">
-                Learn more
+              <NavLinkButton variant="outline" href="/auth/signup?role=mentor">
+                Become a mentor
               </NavLinkButton>
             </div>
             <div className="h-[40px] w-[180px]">
               <NavLinkButton
                 variant="filled"
                 href={
-                  user && user.registered ? "/mentor-search" : "/auth/signup"
+                  user && user.registered
+                    ? "/mentor-search"
+                    : "/auth/signup?role=student"
                 }
               >
                 Find a mentor <FaLongArrowAltRight />

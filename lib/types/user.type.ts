@@ -21,12 +21,12 @@ export type User = {
   role?: Role
   languages?: Language[]
   learningFields?: LearningField[]
-  contacts?: Contact[]
   web3AuthData?: Partial<OpenloginUserInfo> | null
 }
 
 export type Student = User & {
   experience?: Experience
+  contacts?: Contact[]
 }
 
 export type Mentor = User & {

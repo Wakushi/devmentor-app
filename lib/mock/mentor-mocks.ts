@@ -15,10 +15,6 @@ export const MENTORS_MOCK: Mentor[] = [
     role: Role.MENTOR,
     languages: [Language.ENGLISH, Language.FRENCH],
     learningFields: [LearningField.BLOCKCHAIN, LearningField.SMART_CONTRACTS],
-    contacts: [
-      { type: ContactType.EMAIL, value: "alice@example.com" },
-      { type: ContactType.GITHUB, value: "alice_blockchain" },
-    ],
     validated: true,
     yearsOfExperience: 5,
     reviews: [
@@ -36,10 +32,6 @@ export const MENTORS_MOCK: Mentor[] = [
     role: Role.MENTOR,
     languages: [Language.ENGLISH, Language.SPANISH],
     learningFields: [LearningField.DEFI, LearningField.CRYPTOCURRENCY],
-    contacts: [
-      { type: ContactType.LINKEDIN, value: "bob-smith-defi" },
-      { type: ContactType.TWITTER, value: "@bob_defi_expert" },
-    ],
     validated: true,
     yearsOfExperience: 3,
     reviews: [
@@ -57,10 +49,6 @@ export const MENTORS_MOCK: Mentor[] = [
     role: Role.MENTOR,
     languages: [Language.ENGLISH, Language.GERMAN],
     learningFields: [LearningField.NFT, LearningField.WEB3_DEVELOPMENT],
-    contacts: [
-      { type: ContactType.DISCORD, value: "carol#1234" },
-      { type: ContactType.GITHUB, value: "carol_nft_dev" },
-    ],
     validated: true,
     yearsOfExperience: 4,
     reviews: [
@@ -78,10 +66,7 @@ export const MENTORS_MOCK: Mentor[] = [
     role: Role.MENTOR,
     languages: [Language.ENGLISH, Language.CHINESE],
     learningFields: [LearningField.TOKENOMICS, LearningField.DAO],
-    contacts: [
-      { type: ContactType.EMAIL, value: "david@example.com" },
-      { type: ContactType.TELEGRAM, value: "@david_tokenomics" },
-    ],
+
     validated: true,
     yearsOfExperience: 6,
     reviews: [
@@ -99,10 +84,7 @@ export const MENTORS_MOCK: Mentor[] = [
     role: Role.MENTOR,
     languages: [Language.ENGLISH, Language.JAPANESE],
     learningFields: [LearningField.BLOCKCHAIN, LearningField.CRYPTOCURRENCY],
-    contacts: [
-      { type: ContactType.LINKEDIN, value: "eva-brown-crypto" },
-      { type: ContactType.GITHUB, value: "eva_blockchain" },
-    ],
+
     validated: true,
     yearsOfExperience: 4,
     reviews: [
@@ -123,10 +105,7 @@ export const MENTORS_MOCK: Mentor[] = [
       LearningField.SMART_CONTRACTS,
       LearningField.WEB3_DEVELOPMENT,
     ],
-    contacts: [
-      { type: ContactType.EMAIL, value: "frank@example.com" },
-      { type: ContactType.DISCORD, value: "frank#5678" },
-    ],
+
     validated: true,
     yearsOfExperience: 5,
     reviews: [
@@ -144,10 +123,7 @@ export const MENTORS_MOCK: Mentor[] = [
     role: Role.MENTOR,
     languages: [Language.ENGLISH, Language.RUSSIAN],
     learningFields: [LearningField.DEFI, LearningField.TOKENOMICS],
-    contacts: [
-      { type: ContactType.TWITTER, value: "@grace_defi_expert" },
-      { type: ContactType.LINKEDIN, value: "grace-kim-defi" },
-    ],
+
     validated: true,
     yearsOfExperience: 3,
     reviews: [
@@ -165,10 +141,7 @@ export const MENTORS_MOCK: Mentor[] = [
     role: Role.MENTOR,
     languages: [Language.ENGLISH, Language.CHINESE],
     learningFields: [LearningField.NFT, LearningField.BLOCKCHAIN],
-    contacts: [
-      { type: ContactType.GITHUB, value: "henry_nft_dev" },
-      { type: ContactType.TELEGRAM, value: "@henry_blockchain" },
-    ],
+
     validated: true,
     yearsOfExperience: 4,
     reviews: [
@@ -186,10 +159,7 @@ export const MENTORS_MOCK: Mentor[] = [
     role: Role.MENTOR,
     languages: [Language.ENGLISH, Language.SPANISH],
     learningFields: [LearningField.DAO, LearningField.WEB3_DEVELOPMENT],
-    contacts: [
-      { type: ContactType.EMAIL, value: "isabel@example.com" },
-      { type: ContactType.DISCORD, value: "isabel#9012" },
-    ],
+
     validated: true,
     yearsOfExperience: 5,
     reviews: [
@@ -207,10 +177,7 @@ export const MENTORS_MOCK: Mentor[] = [
     role: Role.MENTOR,
     languages: [Language.ENGLISH, Language.FRENCH],
     learningFields: [LearningField.CRYPTOCURRENCY, LearningField.BLOCKCHAIN],
-    contacts: [
-      { type: ContactType.LINKEDIN, value: "jack-thompson-crypto" },
-      { type: ContactType.TWITTER, value: "@jack_crypto_expert" },
-    ],
+
     validated: true,
     yearsOfExperience: 6,
     reviews: [

@@ -3,12 +3,12 @@ import {
   getUserByAddress,
 } from "@/lib/actions/server/firebase-actions"
 import { createUserJwtToken } from "@/lib/jwt"
-import { User } from "@/lib/types/user.type"
+import { Mentor, Student, User } from "@/lib/types/user.type"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const user: User = await req.json()
+    const user: Mentor | Student = await req.json()
     const createdUser = await createUser(user)
     const token = await createUserJwtToken(user)
 
@@ -30,10 +30,10 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 }
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
-  try {
-    const { searchParams } = new URL(req.url)
-    const address = searchParams.get("address")
+  const { searchParams } = new URL(req.url)
+  const address = searchParams.get("address")
 
+  try {
     if (!address) {
       return NextResponse.json(
         { error: "User address is required" },

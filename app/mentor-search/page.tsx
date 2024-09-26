@@ -131,7 +131,7 @@ export default function MentorSearch() {
 
 function MentorList({ mentors }: { mentors: Mentor[] }) {
   return (
-    <div className="flex flex-col gap-4 fade-in-bottom">
+    <div className="flex flex-col gap-4">
       {mentors.map((mentor: Mentor) => (
         <MentorCard key={mentor.id} mentor={mentor} />
       ))}

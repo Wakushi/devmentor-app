@@ -4,18 +4,19 @@ import { useState, useEffect } from "react"
 import { useAccount, useDisconnect } from "wagmi"
 import { web3AuthInstance } from "@/lib/Web3AuthConnectorInstance"
 import { usePathname, useRouter } from "next/navigation"
-import { User } from "@/lib/types/user.type"
+import { Mentor, Student, User } from "@/lib/types/user.type"
 import { IProvider } from "@web3auth/base"
 import { Address, createWalletClient, custom } from "viem"
 import { baseSepolia } from "viem/chains"
 import { OpenloginUserInfo } from "@web3auth/openlogin-adapter"
+import { Role } from "@/lib/types/role.type"
 
 interface UserContextProviderProps {
   children: ReactNode
 }
 
 interface UserContextProps {
-  user: User | null
+  user: Student | Mentor | null
   setUser: (user: User | ((prevUser: User | null) => User | null)) => void
   isConnected: boolean
   loadingUser: boolean
@@ -41,7 +42,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
   const router = useRouter()
   const pathname = usePathname()
 
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<Student | Mentor | null>(null)
   const [loadingUser, setLoadingUser] = useState<boolean>(true)
 
   useEffect(() => {
@@ -122,10 +123,17 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     return accounts && accounts.length ? accounts[0] : null
   }
 
-  async function getRegisteredUser(address: string): Promise<User | null> {
+  async function getRegisteredUser(
+    address: string
+  ): Promise<Student | Mentor | null> {
     const response = await fetch(`/api/user?address=${address}`)
     const { registeredUser } = await response.json()
-    return registeredUser
+
+    if (registeredUser.role === Role.MENTOR) {
+      return registeredUser as Mentor
+    }
+
+    return registeredUser as Student
   }
 
   async function getAccounts(provider: IProvider): Promise<any> {

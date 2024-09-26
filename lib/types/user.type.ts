@@ -22,7 +22,7 @@ export type User = {
   languages?: Language[]
   learningFields?: LearningField[]
   contacts?: Contact[]
-  web3AuthData?: Partial<OpenloginUserInfo>
+  web3AuthData?: Partial<OpenloginUserInfo> | null
 }
 
 export type Student = User & {

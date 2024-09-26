@@ -6,34 +6,25 @@ import NavLinkButton from "@/components/ui/nav-link"
 import { FaLongArrowAltRight } from "react-icons/fa"
 import SessionCardList from "@/components/pages/dashboard/session-card-list"
 import useSessionsQuery from "@/hooks/queries/sessions-query"
-import ErrorScreen from "@/components/error-screen"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
 import { SessionCardSkeleton } from "@/components/pages/dashboard/session-card"
 
 export default function DashboardPage() {
   const { user, loadingUser } = useUser()
-
   const sessionsQuery = useSessionsQuery(user)
 
   if (loadingUser) {
     return <LoadingScreen />
   }
 
-  if (!user) {
-    return (
-      <ErrorScreen
-        title="Something wrong happened!"
-        subtitle="We apologize for the inconvenience, please try again later."
-      />
-    )
-  }
+  if (!user) return
 
   return (
     <div className="p-4 pt-40 min-h-screen m-auto w-[90%]">
       <h1 className="text-2xl font-bold mb-6">Welcome back, {user.name} !</h1>
 
       <div className="flex gap-4">
-        <section className="glass border border-stone-800 p-4 rounded-md shadow fade-in-left">
+        <section className="glass border border-stone-800 p-4 rounded-md shadow">
           <h2 className="text-xl font-semibold mb-4">Upcoming Sessions</h2>
           {matchQueryStatus(sessionsQuery, {
             Loading: (

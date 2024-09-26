@@ -1,5 +1,3 @@
-"use client"
-
 import AnimatedBackground from "@/components/ui/animated-background"
 import Loader from "@/components/ui/loader"
 import dynamic from "next/dynamic"
@@ -21,7 +19,7 @@ export default function LoginPage() {
         <p className="text-xl">Welcome back! Please enter your details.</p>
         <Suspense
           fallback={
-            <div className="h-[90] flex justify-center items-center">
+            <div className="h-[90px] flex justify-center items-center">
               <Loader />
             </div>
           }

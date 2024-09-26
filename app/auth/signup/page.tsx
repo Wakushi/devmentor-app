@@ -1,5 +1,3 @@
-"use client"
-
 import AnimatedBackground from "@/components/ui/animated-background"
 import Loader from "@/components/ui/loader"
 import dynamic from "next/dynamic"

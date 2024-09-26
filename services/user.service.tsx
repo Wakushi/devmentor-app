@@ -1,6 +1,5 @@
 "use client"
 import { createContext, ReactNode, useContext } from "react"
-import { useState, useEffect } from "react"
 import { useAccount, useDisconnect } from "wagmi"
 import { web3AuthInstance } from "@/lib/Web3AuthConnectorInstance"
 import { usePathname, useRouter } from "next/navigation"
@@ -10,73 +9,68 @@ import { Address, createWalletClient, custom } from "viem"
 import { baseSepolia } from "viem/chains"
 import { OpenloginUserInfo } from "@web3auth/openlogin-adapter"
 import { Role } from "@/lib/types/role.type"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { QueryKeys } from "@/lib/types/query-keys.type"
 
 interface UserContextProviderProps {
   children: ReactNode
 }
 
 interface UserContextProps {
-  user: Student | Mentor | null
-  setUser: (user: User | ((prevUser: User | null) => User | null)) => void
-  isConnected: boolean
+  user: Student | Mentor | null | undefined
   loadingUser: boolean
+  isConnected: boolean
   logOut: () => void
 }
 
 enum Connectors {
-  METAMASK = "MetaMask",
   WEB3AUTH = "Web3Auth",
 }
 
 const UserContext = createContext<UserContextProps>({
   user: null,
-  setUser: () => {},
+  loadingUser: false,
   isConnected: false,
-  loadingUser: true,
   logOut: () => {},
 })
 
 export default function UserContextProvider(props: UserContextProviderProps) {
   const { address, connector, isConnected } = useAccount()
-  const { disconnect } = useDisconnect()
+  const { disconnectAsync } = useDisconnect()
   const router = useRouter()
   const pathname = usePathname()
+  const queryClient = useQueryClient()
 
-  const [user, setUser] = useState<Student | Mentor | null>(null)
-  const [loadingUser, setLoadingUser] = useState<boolean>(true)
+  const { data: user, isLoading: loadingUser } = useQuery<
+    Student | Mentor | null,
+    Error
+  >({
+    queryKey: [QueryKeys.USER, address?.toLowerCase() ?? "0x"],
+    queryFn: () => fetchUser(),
+  })
 
-  useEffect(() => {
-    handleUserConnect()
-  }, [address, web3AuthInstance.connected])
-
-  async function handleUserConnect(): Promise<void> {
-    if (!isConnected) {
-      setLoadingUser(false)
-      return
-    }
-
-    setLoadingUser(true)
+  async function fetchUser(): Promise<Student | Mentor | null> {
+    if (!isConnected) return null
 
     try {
       let registeredUser: User | null = null
-      let userInfo: Partial<OpenloginUserInfo> | null = null
+      let web3AuthData: Partial<OpenloginUserInfo> | null = null
       let userAddress: Address | null = null
 
       switch (connector?.name) {
         case Connectors.WEB3AUTH:
-          if (!web3AuthInstance.connected) return
+          if (!web3AuthInstance.connected) return null
 
-          userInfo = await web3AuthInstance.getUserInfo()
           userAddress = await getUserAddress()
 
-          if (!userAddress) return
+          if (!userAddress) return null
 
           registeredUser = await getRegisteredUser(userAddress)
-
+          web3AuthData = await web3AuthInstance.getUserInfo()
           break
 
         default:
-          if (!address) return
+          if (!address) return null
 
           userAddress = address
           registeredUser = await getRegisteredUser(address)
@@ -84,33 +78,17 @@ export default function UserContextProvider(props: UserContextProviderProps) {
           break
       }
 
-      if (registeredUser) {
-        setUser(registeredUser)
-      } else {
-        const newUser = {
-          address: userAddress,
-          userInfo,
-        }
-
-        setUser(newUser)
-      }
-
       routeUser(registeredUser)
+
+      return registeredUser
+        ? registeredUser
+        : {
+            address: userAddress,
+            web3AuthData,
+          }
     } catch (error) {
       console.log("Error while connecting user: ", error)
-    } finally {
-      setLoadingUser(false)
-    }
-  }
-
-  function routeUser(registeredUser: User | null): void {
-    switch (pathname) {
-      case "/auth/signup":
-      case "/auth/login":
-        router.push(
-          registeredUser ? "/dashboard/student" : "/auth/signup/profile"
-        )
-        break
+      return null
     }
   }
 
@@ -126,14 +104,18 @@ export default function UserContextProvider(props: UserContextProviderProps) {
   async function getRegisteredUser(
     address: string
   ): Promise<Student | Mentor | null> {
-    const response = await fetch(`/api/user?address=${address}`)
-    const { registeredUser } = await response.json()
+    try {
+      const response = await fetch(`/api/user?address=${address}`)
+      const { registeredUser } = await response.json()
 
-    if (registeredUser.role === Role.MENTOR) {
-      return registeredUser as Mentor
+      if (registeredUser.role === Role.MENTOR) {
+        return registeredUser as Mentor
+      }
+
+      return registeredUser as Student
+    } catch (error: any) {
+      return null
     }
-
-    return registeredUser as Student
   }
 
   async function getAccounts(provider: IProvider): Promise<any> {
@@ -168,17 +150,31 @@ export default function UserContextProvider(props: UserContextProviderProps) {
         throw new Error("Failed to log out")
       }
 
-      disconnect()
-      setUser(null)
       router.push("/")
+
+      disconnectAsync().then(() => {
+        queryClient.resetQueries({
+          queryKey: [QueryKeys.USER, address?.toLowerCase()],
+        })
+      })
     } catch (error) {
       console.error(error)
     }
   }
 
+  function routeUser(registeredUser: User | null): void {
+    switch (pathname) {
+      case "/auth/signup":
+      case "/auth/login":
+        router.push(
+          registeredUser ? "/dashboard/student" : "/auth/signup/profile"
+        )
+        break
+    }
+  }
+
   const context: UserContextProps = {
     user,
-    setUser,
     isConnected,
     loadingUser,
     logOut,

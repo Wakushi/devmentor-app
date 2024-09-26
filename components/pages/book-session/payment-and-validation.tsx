@@ -23,12 +23,12 @@ import { getStartTime } from "@/lib/utils"
 export default function PaymentAndValidationCard({
   mentor,
   timeslot,
-  setSuccess,
+  setCreatedSession,
   handleEditTimeslot,
 }: {
   mentor: Mentor
   timeslot: Timeslot
-  setSuccess: (success: boolean) => void
+  setCreatedSession: (session: Session) => void
   handleEditTimeslot: () => void
 }) {
   const { user } = useUser()
@@ -65,10 +65,13 @@ export default function PaymentAndValidationCard({
       watchForEvent({
         event: ContractEvent.SESSION_BOOKED,
         args: { student: user.address },
-        handler: () => {
-          createSession()
+        handler: async () => {
+          const session = await createSession()
+
+          if (!session) return
+
           setProcessingPayment(false)
-          setSuccess(true)
+          setCreatedSession(session)
 
           toast({
             title: "Success",
@@ -89,12 +92,16 @@ export default function PaymentAndValidationCard({
 
   async function handleConfirmSession(): Promise<void> {
     if (!isFree) return
-    createSession()
-    setSuccess(true)
+
+    const session = await createSession()
+
+    if (!session) return
+
+    setCreatedSession(session)
   }
 
-  async function createSession(): Promise<void> {
-    if (!user?.address) return
+  async function createSession(): Promise<Session | null> {
+    if (!user?.address) return null
 
     const sessionPayload: Session = {
       mentorAddress: mentor.address,
@@ -111,7 +118,7 @@ export default function PaymentAndValidationCard({
     })
 
     const { createdSession } = await response.json()
-    console.log("createdSession: ", createdSession)
+    return { ...createdSession, mentor }
   }
 
   return (

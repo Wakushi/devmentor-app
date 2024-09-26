@@ -55,6 +55,8 @@ import NavLinkButton from "@/components/ui/nav-link"
 import { Role } from "@/lib/types/role.type"
 import Flag from "@/components/ui/flag"
 import SuccessScreen from "@/components/success-screen"
+import { useQueryClient } from "@tanstack/react-query"
+import { QueryKeys } from "@/lib/types/query-keys.type"
 
 const learningFormSchema = z.object({
   learningFields: z
@@ -103,7 +105,9 @@ const contactOptions = [
 ]
 
 export default function ProfileCreationPage() {
-  const { user, setUser } = useUser()
+  const { user } = useUser()
+  const queryClient = useQueryClient()
+
   const [loading, setLoading] = useState<boolean>(false)
   const [success, setSuccess] = useState<boolean>(false)
   const [step, setStep] = useState<ProfileSteps>(ProfileSteps.LEARNING)
@@ -225,7 +229,9 @@ export default function ProfileCreationPage() {
 
       const { createdUser } = await response.json()
 
-      setUser(createdUser)
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.USER, createdUser.address.toLowerCase()],
+      })
 
       setLoading(false)
       setSuccess(true)
@@ -384,11 +390,11 @@ export default function ProfileCreationPage() {
                                 <div
                                   key={lang.value}
                                   className={clsx(
-                                    "flex flex-col items-center p-2 border rounded-md cursor-pointer transition-all hover:bg-primary-faded",
+                                    "flex flex-col items-center p-2 border rounded-md cursor-pointer transition-all",
                                     {
-                                      "border-primary bg-primary bg-opacity-20":
+                                      "border-primary bg-primary  bg-opacity-20":
                                         watchLanguages.includes(lang.value),
-                                      "border-gray-300 glass":
+                                      "border-gray-300 glass hover:bg-primary-faded":
                                         !watchLanguages.includes(lang.value),
                                     }
                                   )}

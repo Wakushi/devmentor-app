@@ -16,6 +16,7 @@ import NavLinkButton from "@/components/ui/nav-link"
 import SuccessScreen from "@/components/success-screen"
 import { createGoogleCalendarLink } from "@/lib/utils"
 import { FcGoogle } from "react-icons/fc"
+import { Session } from "@/lib/types/session.type"
 
 enum BookStep {
   TIMESLOT_SELECTION = "TIMESLOT_SELECTION",
@@ -31,7 +32,7 @@ export default function BookSessionPage({
   const [timeslots, setTimeslots] = useState<Timeslot[]>([])
   const [confirmedTimeslot, setConfirmedTimeslot] = useState<Timeslot>()
   const [loading, setLoading] = useState<boolean>(true)
-  const [success, setSuccess] = useState<boolean>(false)
+  const [createdSession, setCreatedSession] = useState<Session | null>(null)
 
   const [bookStep, setBookStep] = useState<BookStep>(
     BookStep.TIMESLOT_SELECTION
@@ -96,7 +97,7 @@ export default function BookSessionPage({
     )
   }
 
-  if (success && confirmedTimeslot) {
+  if (!!createdSession && confirmedTimeslot) {
     const { startTime, endTime, date } = confirmedTimeslot
 
     const startHours = new Date(startTime).getHours()
@@ -110,7 +111,9 @@ export default function BookSessionPage({
 
     const googleCalendarLink = createGoogleCalendarLink({
       title: "Mentoring session",
-      description: `Mentoring session with ${mentor.name}`,
+      description: `Mentoring session with ${
+        createdSession.mentor?.name || mentor.name
+      }`,
       startDate,
       endDate,
     })
@@ -118,7 +121,9 @@ export default function BookSessionPage({
     return (
       <div className="flex flex-col items-center justify-center p-4 min-h-screen">
         <SuccessScreen
-          title="Session booked with success !"
+          title={`Session booked with ${
+            createdSession.mentor?.name || mentor.name
+          } !`}
           subtitle="You can find all your session detail in the dashboard"
         >
           <div className="max-w-[300px] flex flex-col gap-2 w-full">
@@ -172,7 +177,7 @@ export default function BookSessionPage({
               <PaymentAndValidationCard
                 mentor={mentor}
                 timeslot={confirmedTimeslot}
-                setSuccess={setSuccess}
+                setCreatedSession={setCreatedSession}
                 handleEditTimeslot={handleEditTimeslot}
               />
             )}

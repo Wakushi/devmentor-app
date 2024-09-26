@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query"
 import { Session } from "@/lib/types/session.type"
 import { Mentor, Student } from "@/lib/types/user.type"
+import { QueryKeys } from "@/lib/types/query-keys.type"
 
-export default function useSessionsQuery(user: Student | Mentor | null) {
+export default function useSessionsQuery(
+  user: Student | Mentor | null | undefined
+) {
   const sessionsQuery = useQuery<Session[], Error>({
-    queryKey: ["sessions", user?.address],
+    queryKey: [QueryKeys.SESSIONS, user?.address.toLowerCase()],
     queryFn: async () => {
       const response = await fetch(
         `/api/session?studentAddress=${user?.address}`

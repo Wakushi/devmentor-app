@@ -39,7 +39,9 @@ export default function Filters({
   const uniqueLanguages = Array.from(
     new Set(mentors.flatMap((mentor) => mentor.languages || []))
   )
-  const maxRate = Math.max(...mentors.map((mentor) => mentor.hourlyRate))
+  const maxRate = mentors.length
+    ? Math.max(...mentors.map((mentor) => mentor.hourlyRate))
+    : 0
 
   function getLanguageLabel(language: string): string {
     const lang = languageOptions.find((l) => l.value === language)
@@ -47,7 +49,7 @@ export default function Filters({
   }
 
   return (
-    <Card className="w-full flex-1 glass text-white border-stone-800 rounded-md fade-in-left">
+    <Card className="w-full flex-1 glass text-white min-w-[300px] border-stone-800 rounded-md fade-in-left">
       <CardHeader>
         <CardTitle>Filters</CardTitle>
       </CardHeader>

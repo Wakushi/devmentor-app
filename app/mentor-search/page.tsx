@@ -1,10 +1,13 @@
 "use client"
 import Filters from "@/components/pages/mentor-search/filters"
-import MentorCard from "@/components/pages/mentor-search/mentor-card"
+import MentorCard, {
+  MentorCardSkeleton,
+} from "@/components/pages/mentor-search/mentor-card"
 import Pagination from "@/components/pages/mentor-search/pagination"
 import QuickMatchButton from "@/components/pages/mentor-search/quick-match-button"
 import AnimatedBackground from "@/components/ui/animated-background"
-import { MENTORS_MOCK } from "@/lib/mock/mentor-mocks"
+import useMentorsQuery from "@/hooks/queries/mentors-query"
+import { matchQueryStatus } from "@/lib/matchQueryStatus"
 import { Language, LearningField } from "@/lib/types/profile-form.type"
 import { Mentor } from "@/lib/types/user.type"
 import { getAverageRating } from "@/lib/utils"
@@ -13,6 +16,9 @@ import { useEffect, useState } from "react"
 const MENTORS_PER_PAGE = 5
 
 export default function MentorSearch() {
+  const mentorsQuery = useMentorsQuery()
+  const { data: mentors } = mentorsQuery
+
   const [currentPage, setCurrentPage] = useState(1)
   const [filteredMentors, setFilteredMentors] = useState<Mentor[]>([])
   const [filters, setFilters] = useState({
@@ -23,13 +29,9 @@ export default function MentorSearch() {
     minRating: 4,
   })
 
-  function fetchMentors(): Mentor[] {
-    return MENTORS_MOCK
-  }
-
-  const mentors = fetchMentors()
-
   useEffect(() => {
+    if (!mentors) return
+
     const filtered = mentors.filter((mentor) => {
       const expertiseMatch =
         filters.expertise === "All" ||
@@ -59,7 +61,7 @@ export default function MentorSearch() {
     })
     setFilteredMentors(filtered)
     setCurrentPage(1)
-  }, [filters])
+  }, [mentors, filters])
 
   const indexOfLastMentor = currentPage * MENTORS_PER_PAGE
   const indexOfFirstMentor = indexOfLastMentor - MENTORS_PER_PAGE
@@ -89,24 +91,37 @@ export default function MentorSearch() {
       <Filters
         filters={filters}
         onFilterChange={handleFilterChange}
-        mentors={mentors}
+        mentors={mentors || []}
       />
-      <div className="flex flex-col gap-4 ml-auto w-[80%]">
+      <div className="flex flex-col gap-4 ml-auto w-full">
         <QuickMatchButton />
-        {currentMentors.length ? (
-          <MentorList mentors={currentMentors} />
-        ) : (
-          <div className="w-full p-8 flex items-center justify-center">
-            <h3>No mentor available with these criterias</h3>
-          </div>
-        )}
-        {!!currentMentors.length && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        )}
+
+        {matchQueryStatus(mentorsQuery, {
+          Loading: (
+            <div className="flex flex-col gap-4">
+              <MentorCardSkeleton />
+              <MentorCardSkeleton />
+              <MentorCardSkeleton />
+              <MentorCardSkeleton />
+            </div>
+          ),
+          Errored: <p>Something wrong happened</p>,
+          Empty: (
+            <div className="w-full p-8 flex items-center justify-center">
+              <h3>No mentor available with these criterias</h3>
+            </div>
+          ),
+          Success: () => (
+            <>
+              <MentorList mentors={currentMentors} />
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </>
+          ),
+        })}
       </div>
 
       <AnimatedBackground shader={false} />

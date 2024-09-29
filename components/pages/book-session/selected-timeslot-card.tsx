@@ -14,7 +14,7 @@ export default function SelectedTimeslotCard({
   return (
     <Button
       onClick={handleEditTimeslot}
-      className="flex items-center max-h-none justify-between w-full h-auto max-w-none p-4 rounded-md shadow-lg border-stone-800 hover:shadow-xl hover:bg-white hover:bg-opacity-[0.03] glass hover:opacity-80 cursor-pointer"
+      className="flex items-center max-h-none border-none justify-between w-full h-auto max-w-none p-4 rounded-md shadow-lg hover:shadow-xl hover:bg-white hover:bg-opacity-[0.03] glass hover:opacity-80 cursor-pointer"
     >
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 text-base">

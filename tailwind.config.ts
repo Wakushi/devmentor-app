@@ -74,6 +74,7 @@ const config = {
         body: "18px",
         mid: "16px",
         small: "14px",
+        "extra-small": "12px",
       },
       fontWeight: {
         normal: "400",

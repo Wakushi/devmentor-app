@@ -1,7 +1,6 @@
 "use client"
-import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa"
+
 import { MENTORS_MOCK } from "@/lib/mock/mentor-mocks"
-import { Button } from "@/components/ui/button"
 import AnimatedBackground from "@/components/ui/animated-background"
 import MentorDetails from "@/components/pages/book-session/mentor-details"
 import SessionCalendar from "@/components/pages/book-session/session-calendar"
@@ -10,16 +9,31 @@ import { Mentor } from "@/lib/types/user.type"
 import { Timeslot } from "@/lib/types/timeslot.type"
 import { generateMockTimeslots } from "@/lib/mock/utils"
 import LoadingScreen from "@/components/ui/loading-screen"
-import PaymentAndValidationCard from "@/components/pages/book-session/payment-and-validation"
+import SessionRecap from "@/components/pages/book-session/session-recap"
 import { IoIosArrowBack } from "react-icons/io"
 import NavLinkButton from "@/components/ui/nav-link"
-import SuccessScreen from "@/components/success-screen"
-import { createGoogleCalendarLink } from "@/lib/utils"
-import { FcGoogle } from "react-icons/fc"
 import { Session } from "@/lib/types/session.type"
+import Stepper from "@/components/pages/auth/stepper"
+import { Separator } from "@/components/ui/separator"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import SessionGoalInput from "@/components/pages/book-session/session-goal"
+import {
+  ContractEvent,
+  watchForEvent,
+  writeBookSession,
+} from "@/lib/actions/web3/contract"
+import { useUser } from "@/services/user.service"
+import { toast } from "@/hooks/use-toast"
+import Loader from "@/components/ui/loader"
+import { FaCircleCheck } from "react-icons/fa6"
+import { getStartTime } from "@/lib/utils"
+import SessionBookedScreen from "@/components/pages/book-session/session-booked-screen"
+import MentorNotFound from "@/components/pages/book-session/mentor-not-found"
+import BookSessionNavigation from "@/components/pages/book-session/book-session-navigation"
 
-enum BookStep {
+export enum BookStep {
   TIMESLOT_SELECTION = "TIMESLOT_SELECTION",
+  SESSION_GOALS = "SESSION_GOALS",
   PAYMENT_AND_VALIDATION = "PAYMENT_AND_VALIDATION",
 }
 
@@ -28,15 +42,21 @@ export default function BookSessionPage({
 }: {
   searchParams?: { [key: string]: string | string[] | undefined }
 }) {
+  const { user } = useUser()
+
   const [mentor, setMentor] = useState<Mentor>()
   const [timeslots, setTimeslots] = useState<Timeslot[]>([])
   const [confirmedTimeslot, setConfirmedTimeslot] = useState<Timeslot>()
   const [loading, setLoading] = useState<boolean>(true)
   const [createdSession, setCreatedSession] = useState<Session | null>(null)
+  const [sessionGoals, setSessionGoals] = useState<string>("")
+  const [processingPayment, setProcessingPayment] = useState<boolean>(false)
 
   const [bookStep, setBookStep] = useState<BookStep>(
     BookStep.TIMESLOT_SELECTION
   )
+
+  const steps = Array.from(Object.keys(BookStep) as BookStep[])
 
   useEffect(() => {
     async function fetchMentor() {
@@ -70,11 +90,154 @@ export default function BookSessionPage({
     if (!selectedSlot) return
 
     setConfirmedTimeslot(selectedSlot)
-    setBookStep(BookStep.PAYMENT_AND_VALIDATION)
+    setBookStep(BookStep.SESSION_GOALS)
+  }
+
+  function currentStepIndex(): number {
+    return getStepIndex(bookStep)
+  }
+
+  function getStepIndex(step: BookStep): number {
+    return steps.findIndex((s) => s === step)
+  }
+
+  function isCurrentStepValid(): boolean {
+    switch (bookStep) {
+      case BookStep.TIMESLOT_SELECTION:
+        return false
+      case BookStep.SESSION_GOALS:
+        return sessionGoals.length > 10 && sessionGoals.length < 1000
+      case BookStep.PAYMENT_AND_VALIDATION:
+        return false
+      default:
+        return false
+    }
+  }
+
+  function handleNextStep(): void {
+    switch (bookStep) {
+      case BookStep.TIMESLOT_SELECTION:
+        setBookStep(BookStep.SESSION_GOALS)
+        break
+      case BookStep.SESSION_GOALS:
+        setBookStep(BookStep.PAYMENT_AND_VALIDATION)
+        break
+    }
+  }
+
+  function handlePrevStep(): void {
+    switch (bookStep) {
+      case BookStep.SESSION_GOALS:
+        setBookStep(BookStep.TIMESLOT_SELECTION)
+        break
+      case BookStep.PAYMENT_AND_VALIDATION:
+        setBookStep(BookStep.SESSION_GOALS)
+        break
+    }
+  }
+
+  function handleStepClick(step: BookStep): void {
+    if (getStepIndex(step) < currentStepIndex()) {
+      setBookStep(step)
+      return
+    }
+
+    if (!isCurrentStepValid()) return
+
+    setBookStep(step)
+  }
+
+  async function handlePayment(): Promise<void> {
+    if (!user?.address || !mentor) return
+
+    setProcessingPayment(true)
+
+    // Determine the ETH / USDC amount to be paid from the mentor's hourly rate
+    const usdAmountDue = mentor.hourlyRate
+    const ethAmount = 0.001
+
+    toast({
+      title: "Processing payment...",
+      action: <Loader fill="white" color="primary" size="4" />,
+    })
+
+    try {
+      await writeBookSession({
+        studentAddress: user?.address,
+        mentorAddress: mentor.address,
+        ethPayment: ethAmount.toString(),
+      })
+
+      toast({
+        title: "Locking funds...",
+        action: <Loader fill="white" color="primary" size="4" />,
+      })
+
+      watchForEvent({
+        event: ContractEvent.SESSION_BOOKED,
+        args: { student: user.address },
+        handler: async () => {
+          const session = await createSession()
+
+          if (!session) return
+
+          setProcessingPayment(false)
+          setCreatedSession(session)
+
+          toast({
+            title: "Success",
+            description: "Payment processed successfully !",
+            action: <FaCircleCheck className="text-white" />,
+          })
+        },
+      })
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Payment cancelled, please try again",
+      })
+
+      setProcessingPayment(false)
+    }
+  }
+
+  async function handleConfirmFreeSession(): Promise<void> {
+    if (mentor?.hourlyRate && mentor?.hourlyRate > 0) return
+
+    const session = await createSession()
+
+    if (!session) return
+
+    setCreatedSession(session)
   }
 
   function handleEditTimeslot(): void {
     setBookStep(BookStep.TIMESLOT_SELECTION)
+  }
+
+  function handleEditSessionGoals(): void {
+    setBookStep(BookStep.SESSION_GOALS)
+  }
+
+  async function createSession(): Promise<Session | null> {
+    if (!user?.address || !mentor || !confirmedTimeslot) return null
+
+    const sessionPayload: Session = {
+      mentorAddress: mentor.address,
+      studentAddress: user?.address,
+      startTime: getStartTime(confirmedTimeslot),
+      valueLocked: mentor.hourlyRate,
+      cancelled: false,
+    }
+
+    const response = await fetch("/api/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(sessionPayload),
+    })
+
+    const { createdSession } = await response.json()
+    return { ...createdSession, mentor }
   }
 
   if (loading) {
@@ -82,65 +245,16 @@ export default function BookSessionPage({
   }
 
   if (!searchParams?.mentor || !mentor) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-6 p-4 min-h-screen">
-        <div className="text-center">
-          <h3 className="text-2xl font-bold">Mentor not found</h3>
-          <p className="text-dim">Sorry, but we couldn't find your mentor.</p>
-        </div>
-        <Button variant="default" asChild>
-          <a href="/mentor-search" className="flex items-center gap-2">
-            <FaLongArrowAltLeft /> Back to mentor list
-          </a>
-        </Button>
-      </div>
-    )
+    return <MentorNotFound />
   }
 
   if (!!createdSession && confirmedTimeslot) {
-    const { startTime, endTime, date } = confirmedTimeslot
-
-    const startHours = new Date(startTime).getHours()
-    const endHours = new Date(endTime).getHours()
-
-    const startDate = new Date(date)
-    startDate.setHours(startHours)
-
-    const endDate = new Date(date)
-    endDate.setHours(endHours)
-
-    const googleCalendarLink = createGoogleCalendarLink({
-      title: "Mentoring session",
-      description: `Mentoring session with ${
-        createdSession.mentor?.name || mentor.name
-      }`,
-      startDate,
-      endDate,
-    })
-
     return (
-      <div className="flex flex-col items-center justify-center p-4 min-h-screen">
-        <SuccessScreen
-          title={`Session booked with ${
-            createdSession.mentor?.name || mentor.name
-          } !`}
-          subtitle="You can find all your session detail in the dashboard"
-        >
-          <div className="max-w-[300px] flex flex-col gap-2 w-full">
-            <NavLinkButton href="/dashboard/student" variant="filled">
-              Go to dashboard <FaLongArrowAltRight />
-            </NavLinkButton>
-            <NavLinkButton
-              variant="outline"
-              target="_blank"
-              href={googleCalendarLink}
-            >
-              Add to calendar
-              <FcGoogle />
-            </NavLinkButton>
-          </div>
-        </SuccessScreen>
-      </div>
+      <SessionBookedScreen
+        mentor={mentor}
+        confirmedTimeslot={confirmedTimeslot}
+        createdSession={createdSession}
+      />
     )
   }
 
@@ -164,23 +278,54 @@ export default function BookSessionPage({
         <div className="flex flex-col md:flex-row gap-8">
           <MentorDetails mentor={mentor} />
 
-          {bookStep === BookStep.TIMESLOT_SELECTION && (
-            <SessionCalendar
-              timeslots={timeslots}
-              selectedTimeslot={confirmedTimeslot}
-              handleConfirmTimeslot={handleConfirmTimeslot}
-            />
-          )}
-
-          {bookStep === BookStep.PAYMENT_AND_VALIDATION &&
-            confirmedTimeslot && (
-              <PaymentAndValidationCard
-                mentor={mentor}
-                timeslot={confirmedTimeslot}
-                setCreatedSession={setCreatedSession}
-                handleEditTimeslot={handleEditTimeslot}
+          <Card className="flex-1 flex-col items-center justify-center text-white border-stone-800 text-start glass">
+            <CardHeader className="flex flex-col items-center gap-6">
+              <Stepper
+                steps={steps}
+                currentStep={bookStep}
+                handleStepClick={(step: BookStep) => handleStepClick(step)}
               />
-            )}
+              <Separator className="opacity-30" />
+            </CardHeader>
+            <CardContent className="flex flex-col items-center justify-center gap-6">
+              {bookStep === BookStep.TIMESLOT_SELECTION && (
+                <SessionCalendar
+                  timeslots={timeslots}
+                  selectedTimeslot={confirmedTimeslot}
+                  handleConfirmTimeslot={handleConfirmTimeslot}
+                />
+              )}
+
+              {bookStep === BookStep.SESSION_GOALS && (
+                <SessionGoalInput
+                  sessionGoals={sessionGoals}
+                  setSessionGoals={setSessionGoals}
+                />
+              )}
+
+              {bookStep === BookStep.PAYMENT_AND_VALIDATION &&
+                confirmedTimeslot && (
+                  <SessionRecap
+                    timeslot={confirmedTimeslot}
+                    sessionGoals={sessionGoals}
+                    handleEditTimeslot={handleEditTimeslot}
+                    handleEditSessionGoals={handleEditSessionGoals}
+                  />
+                )}
+
+              <BookSessionNavigation
+                bookStep={bookStep}
+                steps={steps}
+                currentStepIndex={currentStepIndex()}
+                currentStepValid={isCurrentStepValid()}
+                handlePrevStep={handlePrevStep}
+                handleNextStep={handleNextStep}
+                mentor={mentor}
+                handlePayment={handlePayment}
+                processingPayment={processingPayment}
+              />
+            </CardContent>
+          </Card>
         </div>
       </div>
       <AnimatedBackground shader={false} />

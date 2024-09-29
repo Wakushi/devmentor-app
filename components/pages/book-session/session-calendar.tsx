@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react"
 import { Calendar } from "@/components/ui/calendar"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Timeslot } from "@/lib/types/timeslot.type"
 import { getSlotDate, getTimeslotMatcher } from "@/lib/utils"
 import TimeslotCardList from "./timeslot-card-list"
@@ -51,9 +51,12 @@ export default function SessionCalendar({
   }
 
   return (
-    <Card className="flex-1 glass text-white max-w-fit fade-in-bottom">
+    <Card className="glass border-stone-800 text-white max-w-fit fade-in-bottom">
       <CardHeader>
-        <CardTitle>Select Date and Time</CardTitle>
+        <h3 className="text-2xl">Sync Your Blockchain Calendar</h3>
+        <p className="text-dim text-base">
+          Pick a time to mine some knowledge with your mentor!
+        </p>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="flex gap-8 items-center">

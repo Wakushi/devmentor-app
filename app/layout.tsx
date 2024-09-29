@@ -24,7 +24,7 @@ export default function RootLayout({
           <main className="min-h-screen flex flex-col gap-8">{children}</main>
         </Providers>
         <Toaster />
-        <LoadingScreen />
+        {/* <LoadingScreen /> */}
       </body>
     </html>
   )

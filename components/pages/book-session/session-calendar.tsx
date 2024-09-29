@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Timeslot } from "@/lib/types/timeslot.type"
 import { getSlotDate, getTimeslotMatcher } from "@/lib/utils"
 import TimeslotCardList from "./timeslot-card-list"
+import { CalendarDays } from "lucide-react"
 
 export default function SessionCalendar({
   timeslots,
@@ -53,9 +54,13 @@ export default function SessionCalendar({
   return (
     <Card className="glass border-stone-800 text-white max-w-fit fade-in-bottom">
       <CardHeader>
-        <h3 className="text-2xl">Sync Your Blockchain Calendar</h3>
+        <div className="flex items-center gap-2">
+          <CalendarDays className="w-5 h-5" />
+          <h3 className="text-2xl">Schedule your session</h3>
+        </div>
         <p className="text-dim text-base">
-          Pick a time to mine some knowledge with your mentor!
+          Choose a time to tap into your mentor's expertise and grow your
+          skills!
         </p>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">

@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
+import { GoGoal } from "react-icons/go"
 
 export default function SessionGoalInput({
   sessionGoals,
@@ -11,7 +12,10 @@ export default function SessionGoalInput({
   return (
     <Card className="flex-1 glass border-stone-800 text-white max-w-fit fade-in-bottom">
       <CardHeader>
-        <h3 className="text-2xl">Session Objectives</h3>
+        <div className="flex items-center gap-2">
+          <GoGoal className="w-5 h-5" />
+          <h3 className="text-2xl">Session Objectives</h3>
+        </div>
         <p className="text-dim text-base">
           Describe your specific learning goals for this session below. This
           information is crucial for your mentor to structure an effective and

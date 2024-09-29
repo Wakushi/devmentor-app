@@ -7,8 +7,8 @@ import { FaLongArrowAltRight } from "react-icons/fa"
 import SessionCardList from "@/components/pages/dashboard/session-card-list"
 import useSessionsQuery from "@/hooks/queries/sessions-query"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
-import { BsCalendar2X } from "react-icons/bs"
 import Loader from "@/components/ui/loader"
+import Image from "next/image"
 
 export default function DashboardPage() {
   const { user, loadingUser } = useUser()
@@ -56,9 +56,14 @@ export default function DashboardPage() {
 
 function EmptyDashboard() {
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center gap-8">
-      <BsCalendar2X className="text-8xl text-dim opacity-20" />
-      <div className="flex flex-col text-center">
+    <div className="min-h-screen flex flex-col justify-center items-center">
+      <Image
+        width={300}
+        height={300}
+        src="/assets/search.gif"
+        alt="Search icon"
+      />
+      <div className="flex flex-col text-center mb-8">
         <h3>No upcoming sessions</h3>
         <p className="text-dim">Let's book a session with a mentor !</p>
       </div>

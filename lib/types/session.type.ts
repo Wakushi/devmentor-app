@@ -7,6 +7,7 @@ export type Session = {
   studentAddress: Address
   startTime: number
   valueLocked: number
+  objectives: string
   cancelled?: boolean
   mentor?: Mentor
 }

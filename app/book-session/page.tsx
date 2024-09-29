@@ -51,6 +51,7 @@ export default function BookSessionPage({
   const [createdSession, setCreatedSession] = useState<Session | null>(null)
   const [sessionGoals, setSessionGoals] = useState<string>("")
   const [processingPayment, setProcessingPayment] = useState<boolean>(false)
+  const [editedStep, setEditedStep] = useState<BookStep | null>(null)
 
   const [bookStep, setBookStep] = useState<BookStep>(
     BookStep.TIMESLOT_SELECTION
@@ -90,6 +91,13 @@ export default function BookSessionPage({
     if (!selectedSlot) return
 
     setConfirmedTimeslot(selectedSlot)
+
+    if (editedStep === BookStep.TIMESLOT_SELECTION) {
+      setEditedStep(null)
+      setBookStep(BookStep.PAYMENT_AND_VALIDATION)
+      return
+    }
+
     setBookStep(BookStep.SESSION_GOALS)
   }
 
@@ -211,12 +219,9 @@ export default function BookSessionPage({
     setCreatedSession(session)
   }
 
-  function handleEditTimeslot(): void {
-    setBookStep(BookStep.TIMESLOT_SELECTION)
-  }
-
-  function handleEditSessionGoals(): void {
-    setBookStep(BookStep.SESSION_GOALS)
+  function handleEditStep(step: BookStep): void {
+    setEditedStep(step)
+    setBookStep(step)
   }
 
   async function createSession(): Promise<Session | null> {
@@ -225,6 +230,7 @@ export default function BookSessionPage({
     const sessionPayload: Session = {
       mentorAddress: mentor.address,
       studentAddress: user?.address,
+      objectives: sessionGoals,
       startTime: getStartTime(confirmedTimeslot),
       valueLocked: mentor.hourlyRate,
       cancelled: false,
@@ -308,8 +314,7 @@ export default function BookSessionPage({
                   <SessionRecap
                     timeslot={confirmedTimeslot}
                     sessionGoals={sessionGoals}
-                    handleEditTimeslot={handleEditTimeslot}
-                    handleEditSessionGoals={handleEditSessionGoals}
+                    handleEditStep={handleEditStep}
                   />
                 )}
 
@@ -323,6 +328,7 @@ export default function BookSessionPage({
                 mentor={mentor}
                 handlePayment={handlePayment}
                 processingPayment={processingPayment}
+                handleConfirmFreeSession={handleConfirmFreeSession}
               />
             </CardContent>
           </Card>

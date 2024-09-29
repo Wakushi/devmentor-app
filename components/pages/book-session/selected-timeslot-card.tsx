@@ -1,3 +1,4 @@
+import { BookStep } from "@/app/book-session/page"
 import { Button } from "@/components/ui/button"
 import { Timeslot } from "@/lib/types/timeslot.type"
 import { formatDate, formatTime } from "@/lib/utils"
@@ -6,27 +7,27 @@ import { MdEdit } from "react-icons/md"
 
 export default function SelectedTimeslotCard({
   timeslot,
-  handleEditTimeslot,
+  handleEditStep,
 }: {
   timeslot: Timeslot
-  handleEditTimeslot: () => void
+  handleEditStep: (step: BookStep) => void
 }) {
   return (
     <Button
-      onClick={handleEditTimeslot}
-      className="flex items-center max-h-none border-none justify-between w-full h-auto max-w-none p-4 rounded-md shadow-lg hover:shadow-xl hover:bg-white hover:bg-opacity-[0.03] glass hover:opacity-80 cursor-pointer"
+      onClick={() => handleEditStep(BookStep.TIMESLOT_SELECTION)}
+      className="flex text-balance text-left items-center max-h-none border-none justify-between w-full h-auto max-w-none p-4 rounded-md shadow-lg hover:shadow-xl hover:bg-white hover:bg-opacity-[0.03] glass hover:opacity-80 cursor-pointer"
     >
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-base">
+        <div className="flex gap-2">
           <CalendarDays className="w-5 h-5" />
-          <span>{formatDate(timeslot.date)}</span>
+          <h3 className="text-body font-sans">Date and time</h3>
         </div>
-        <div className="flex items-center gap-2 text-base">
-          <Clock className="w-5 h-5" />
+        <p className="font-normal w-[550px]">
+          <span>{formatDate(timeslot.date)}</span>,{" "}
           <span>
-            {formatTime(timeslot.startTime)} - {formatTime(timeslot.endTime)}
+            {formatTime(timeslot.startTime)} to {formatTime(timeslot.endTime)}
           </span>
-        </div>
+        </p>
       </div>
       <MdEdit className="text-3xl" />
     </Button>

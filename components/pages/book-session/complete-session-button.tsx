@@ -8,21 +8,27 @@ export default function CompleteSessionButton({
   mentor,
   handlePayment,
   processingPayment,
+  handleConfirmFreeSession,
 }: {
   mentor: Mentor
   handlePayment: () => void
   processingPayment: boolean
+  handleConfirmFreeSession: () => void
 }) {
   if (mentor.hourlyRate === 0) {
     return (
-      <Button onClick={() => {}} variant="secondary" className="self-end">
+      <Button
+        onClick={handleConfirmFreeSession}
+        variant="secondary"
+        className="self-end"
+      >
         Book session <IoIosFlash className="text-lg" />
       </Button>
     )
   }
 
   return (
-    <Button className="min-w-[200px]" onClick={handlePayment}>
+    <Button onClick={handlePayment}>
       {processingPayment ? (
         <Loader size="4" />
       ) : (

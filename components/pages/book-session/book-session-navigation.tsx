@@ -14,6 +14,7 @@ interface BookSessionNavigationProps {
   mentor: Mentor
   handlePayment: () => void
   processingPayment: boolean
+  handleConfirmFreeSession: () => void
 }
 
 export default function BookSessionNavigation({
@@ -26,9 +27,10 @@ export default function BookSessionNavigation({
   mentor,
   handlePayment,
   processingPayment,
+  handleConfirmFreeSession,
 }: BookSessionNavigationProps) {
   return (
-    <div className="flex items-center gap-4 ml-auto">
+    <div className="flex items-center gap-2 ml-auto">
       {currentStepIndex > 0 && (
         <Button variant="outline-white" onClick={handlePrevStep}>
           Back
@@ -53,6 +55,7 @@ export default function BookSessionNavigation({
           mentor={mentor}
           handlePayment={handlePayment}
           processingPayment={processingPayment}
+          handleConfirmFreeSession={handleConfirmFreeSession}
         />
       )}
     </div>

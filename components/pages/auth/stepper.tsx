@@ -1,3 +1,4 @@
+import { capitalizeFirstLetter } from "@/lib/utils"
 import clsx from "clsx"
 
 export default function Stepper({
@@ -22,7 +23,11 @@ export default function Stepper({
             className="flex items-center gap-4"
             onClick={() => handleStepClick(step)}
           >
-            <StepBubble index={index} currentStepIndex={currentStepIndex()} />
+            <StepBubble
+              title={capitalizeFirstLetter(step.toLowerCase())}
+              index={index}
+              currentStepIndex={currentStepIndex()}
+            />
             {index < steps.length - 1 && (
               <StepJunctionBar
                 index={index}
@@ -38,23 +43,38 @@ export default function Stepper({
 
 function StepBubble({
   index,
+  title,
   currentStepIndex,
 }: {
   index: number
+  title: string
   currentStepIndex: number
 }) {
   return (
-    <div
-      className={clsx(
-        "w-[40px] h-[40px] flex select-none justify-center items-center rounded-full",
-        {
-          "bg-primary text-white hover:bg-primary-shade cursor-pointer":
-            currentStepIndex >= index,
-          "bg-l1 text-d1 opacity-40": currentStepIndex < index,
-        }
-      )}
-    >
-      {index + 1}
+    <div className="relative flex flex-col justify-center items-center">
+      <div
+        className={clsx(
+          "w-[40px] h-[40px] flex select-none justify-center items-center rounded-full",
+          {
+            "bg-primary text-white hover:bg-primary-shade cursor-pointer":
+              currentStepIndex >= index,
+            "bg-l1 text-d1 opacity-40": currentStepIndex < index,
+          }
+        )}
+      >
+        {index + 1}
+      </div>
+      <span
+        className={clsx(
+          "absolute left-1/2 -translate-x-1/2 -bottom-6 text-center text-extra-small",
+          {
+            "text-dim": currentStepIndex < index,
+            "text-white": currentStepIndex >= index,
+          }
+        )}
+      >
+        {title}
+      </span>
     </div>
   )
 }

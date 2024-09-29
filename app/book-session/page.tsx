@@ -32,9 +32,9 @@ import MentorNotFound from "@/components/pages/book-session/mentor-not-found"
 import BookSessionNavigation from "@/components/pages/book-session/book-session-navigation"
 
 export enum BookStep {
-  TIMESLOT_SELECTION = "TIMESLOT_SELECTION",
-  SESSION_GOALS = "SESSION_GOALS",
-  PAYMENT_AND_VALIDATION = "PAYMENT_AND_VALIDATION",
+  SCHEDULE = "SCHEDULE",
+  OBJECTIVES = "OBJECTIVES",
+  RECAP = "RECAP",
 }
 
 export default function BookSessionPage({
@@ -53,9 +53,7 @@ export default function BookSessionPage({
   const [processingPayment, setProcessingPayment] = useState<boolean>(false)
   const [editedStep, setEditedStep] = useState<BookStep | null>(null)
 
-  const [bookStep, setBookStep] = useState<BookStep>(
-    BookStep.TIMESLOT_SELECTION
-  )
+  const [bookStep, setBookStep] = useState<BookStep>(BookStep.SCHEDULE)
 
   const steps = Array.from(Object.keys(BookStep) as BookStep[])
 
@@ -92,13 +90,13 @@ export default function BookSessionPage({
 
     setConfirmedTimeslot(selectedSlot)
 
-    if (editedStep === BookStep.TIMESLOT_SELECTION) {
+    if (editedStep === BookStep.SCHEDULE) {
       setEditedStep(null)
-      setBookStep(BookStep.PAYMENT_AND_VALIDATION)
+      setBookStep(BookStep.RECAP)
       return
     }
 
-    setBookStep(BookStep.SESSION_GOALS)
+    setBookStep(BookStep.OBJECTIVES)
   }
 
   function currentStepIndex(): number {
@@ -111,11 +109,11 @@ export default function BookSessionPage({
 
   function isCurrentStepValid(): boolean {
     switch (bookStep) {
-      case BookStep.TIMESLOT_SELECTION:
+      case BookStep.SCHEDULE:
         return false
-      case BookStep.SESSION_GOALS:
+      case BookStep.OBJECTIVES:
         return sessionGoals.length > 10 && sessionGoals.length < 1000
-      case BookStep.PAYMENT_AND_VALIDATION:
+      case BookStep.RECAP:
         return false
       default:
         return false
@@ -124,22 +122,22 @@ export default function BookSessionPage({
 
   function handleNextStep(): void {
     switch (bookStep) {
-      case BookStep.TIMESLOT_SELECTION:
-        setBookStep(BookStep.SESSION_GOALS)
+      case BookStep.SCHEDULE:
+        setBookStep(BookStep.OBJECTIVES)
         break
-      case BookStep.SESSION_GOALS:
-        setBookStep(BookStep.PAYMENT_AND_VALIDATION)
+      case BookStep.OBJECTIVES:
+        setBookStep(BookStep.RECAP)
         break
     }
   }
 
   function handlePrevStep(): void {
     switch (bookStep) {
-      case BookStep.SESSION_GOALS:
-        setBookStep(BookStep.TIMESLOT_SELECTION)
+      case BookStep.OBJECTIVES:
+        setBookStep(BookStep.SCHEDULE)
         break
-      case BookStep.PAYMENT_AND_VALIDATION:
-        setBookStep(BookStep.SESSION_GOALS)
+      case BookStep.RECAP:
+        setBookStep(BookStep.OBJECTIVES)
         break
     }
   }
@@ -285,7 +283,7 @@ export default function BookSessionPage({
           <MentorDetails mentor={mentor} />
 
           <Card className="flex-1 flex-col items-center justify-center text-white border-stone-800 text-start glass">
-            <CardHeader className="flex flex-col items-center gap-6">
+            <CardHeader className="flex flex-col items-center gap-8">
               <Stepper
                 steps={steps}
                 currentStep={bookStep}
@@ -294,7 +292,7 @@ export default function BookSessionPage({
               <Separator className="opacity-30" />
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center gap-6">
-              {bookStep === BookStep.TIMESLOT_SELECTION && (
+              {bookStep === BookStep.SCHEDULE && (
                 <SessionCalendar
                   timeslots={timeslots}
                   selectedTimeslot={confirmedTimeslot}
@@ -302,21 +300,20 @@ export default function BookSessionPage({
                 />
               )}
 
-              {bookStep === BookStep.SESSION_GOALS && (
+              {bookStep === BookStep.OBJECTIVES && (
                 <SessionGoalInput
                   sessionGoals={sessionGoals}
                   setSessionGoals={setSessionGoals}
                 />
               )}
 
-              {bookStep === BookStep.PAYMENT_AND_VALIDATION &&
-                confirmedTimeslot && (
-                  <SessionRecap
-                    timeslot={confirmedTimeslot}
-                    sessionGoals={sessionGoals}
-                    handleEditStep={handleEditStep}
-                  />
-                )}
+              {bookStep === BookStep.RECAP && confirmedTimeslot && (
+                <SessionRecap
+                  timeslot={confirmedTimeslot}
+                  sessionGoals={sessionGoals}
+                  handleEditStep={handleEditStep}
+                />
+              )}
 
               <BookSessionNavigation
                 bookStep={bookStep}

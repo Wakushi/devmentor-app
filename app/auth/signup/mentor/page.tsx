@@ -154,9 +154,9 @@ export default function MentorSignUpPage() {
         setStep(MentorSignUpSteps.LANGUAGE)
         break
       case MentorSignUpSteps.LANGUAGE:
-        setStep(MentorSignUpSteps.RATE_AND_LINKS)
+        setStep(MentorSignUpSteps.CREDENTIALS)
         break
-      case MentorSignUpSteps.RATE_AND_LINKS:
+      case MentorSignUpSteps.CREDENTIALS:
         onSubmit()
         break
     }
@@ -167,7 +167,7 @@ export default function MentorSignUpPage() {
       case MentorSignUpSteps.LANGUAGE:
         setStep(MentorSignUpSteps.IDENTITY)
         break
-      case MentorSignUpSteps.RATE_AND_LINKS:
+      case MentorSignUpSteps.CREDENTIALS:
         setStep(MentorSignUpSteps.LANGUAGE)
         break
     }
@@ -183,7 +183,7 @@ export default function MentorSignUpPage() {
         return identityForm.formState.isValid
       case MentorSignUpSteps.LANGUAGE:
         return languageForm.formState.isValid
-      case MentorSignUpSteps.RATE_AND_LINKS:
+      case MentorSignUpSteps.CREDENTIALS:
         const contacts = Array.from(selectedContacts.values()).filter((v) => v)
         const hourlyRate = Number(watchHourlyRate)
         return (
@@ -439,7 +439,7 @@ export default function MentorSignUpPage() {
               </div>
             )}
 
-            {step === MentorSignUpSteps.RATE_AND_LINKS && (
+            {step === MentorSignUpSteps.CREDENTIALS && (
               <div className="w-full flex flex-col fade-in-bottom">
                 <div className="mb-2">
                   <h2>Showcase Your Value</h2>

@@ -7,7 +7,7 @@ export enum StudentSignUpSteps {
 export enum MentorSignUpSteps {
   IDENTITY = "IDENTITY",
   LANGUAGE = "LANGUAGE",
-  RATE_AND_LINKS = "RATE_AND_LINKS",
+  CREDENTIALS = "CREDENTIALS",
 }
 
 export enum Experience {

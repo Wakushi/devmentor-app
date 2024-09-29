@@ -14,7 +14,7 @@ export default function SelectedTimeslotCard({
 }) {
   return (
     <Button
-      onClick={() => handleEditStep(BookStep.TIMESLOT_SELECTION)}
+      onClick={() => handleEditStep(BookStep.SCHEDULE)}
       className="flex text-balance text-left items-center max-h-none border-none justify-between w-full h-auto max-w-none p-4 rounded-md shadow-lg hover:shadow-xl hover:bg-white hover:bg-opacity-[0.03] glass hover:opacity-80 cursor-pointer"
     >
       <div className="flex flex-col gap-2">

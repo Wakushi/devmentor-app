@@ -37,7 +37,7 @@ export default function BookSessionNavigation({
         </Button>
       )}
 
-      {bookStep !== BookStep.TIMESLOT_SELECTION &&
+      {bookStep !== BookStep.SCHEDULE &&
         currentStepIndex !== steps.length - 1 && (
           <Button
             className={clsx("", {

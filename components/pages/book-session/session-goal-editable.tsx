@@ -12,7 +12,7 @@ export default function SessionGoalEditable({
 }) {
   return (
     <Button
-      onClick={() => handleEditStep(BookStep.SESSION_GOALS)}
+      onClick={() => handleEditStep(BookStep.OBJECTIVES)}
       className="flex text-balance text-left items-center max-h-none border-none justify-between w-full h-auto max-w-none p-4 rounded-md shadow-lg hover:shadow-xl hover:bg-white hover:bg-opacity-[0.03] glass hover:opacity-80 cursor-pointer"
     >
       <div className="flex flex-col gap-2">

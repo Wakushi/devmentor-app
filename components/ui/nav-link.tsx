@@ -15,7 +15,7 @@ export default function NavLinkButton({
   children: ReactNode
   target?: "_blank" | "_self"
   text?: "small" | "mid" | "body" | "large"
-  variant?: "filled" | "filled-secondary" | "outline" | "ghost"
+  variant?: "filled" | "filled-secondary" | "outline" | "ghost" | "accent"
 }) {
   const pathname = usePathname()
 
@@ -28,6 +28,8 @@ export default function NavLinkButton({
             variant === "filled",
           "bg-secondary border-secondary hover:bg-secondary-shade hover:text-slate-50 active:bg-slate-50 active:text-secondary shadow-sm ":
             variant === "filled-secondary",
+          "bg-dm-accent border border-dm-accent hover:bg-dm-accent hover:text-slate-50 active:bg-slate-50 active:text-dm-accent shadow-sm ":
+            variant === "accent",
           "border border-white bg-transparent shadow-sm ":
             variant === "outline",
           "bg-transparent shadow-none underline-offset-4 hover:underline":

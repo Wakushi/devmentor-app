@@ -32,7 +32,7 @@ export default function DashboardPage() {
         Empty: <EmptyDashboard />,
         Success: ({ data: sessions }) => (
           <div className="min-h-screen flex flex-col gap-6 max-w-[95%] mx-auto w-full pt-header-distance">
-            <div className="flex w-full items-center gap-4">
+            <div className="flex w-full items-center gap-8">
               <h1 className="text-2xl font-bold">
                 Welcome back, {user.name} !
               </h1>

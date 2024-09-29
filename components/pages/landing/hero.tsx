@@ -37,13 +37,13 @@ export default function Hero() {
 
   return (
     <section className="relative">
-      <div className="min-h-screen flex gap-4 justify-center items-center">
+      <div className="min-h-screen flex gap-14 justify-center items-center">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <h1 className="max-w-2xl mb-4 drop-shadow-lg text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl">
               Overcome{" "}
-              <span className="text-primary">development challenges</span>,
-              learn from the <span className="text-primary">best</span>
+              <span className="text-dm-accent">development challenges</span>,
+              learn from the <span className="text-dm-accent">best</span>
             </h1>
             <TypingAnimation
               className="max-w-2xl h-[56px] text-start drop-shadow-lg mb-6 font-light lg:mb-8 md:text-lg lg:text-xl"

@@ -87,7 +87,7 @@ export default function MentorSearch() {
   }
 
   return (
-    <div className="relative flex gap-4 pt-[7rem] min-h-screen m-auto w-[95%]">
+    <div className="relative flex gap-4 pt-header-distance min-h-screen m-auto w-[95%]">
       <Filters
         filters={filters}
         onFilterChange={handleFilterChange}

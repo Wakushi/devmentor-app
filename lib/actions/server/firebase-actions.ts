@@ -62,7 +62,6 @@ export async function getSessionsByStudentAddress(
       .get()
 
     if (snapshot.empty) {
-      console.log("No matching documents.")
       return null
     }
 

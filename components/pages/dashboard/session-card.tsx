@@ -11,7 +11,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { BsThreeDots } from "react-icons/bs"
-import { Skeleton } from "@/components/ui/skeleton"
 
 export function SessionCard({ session }: { session: Session }) {
   const { startTime } = session
@@ -92,19 +91,5 @@ function SessionOptions() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
-}
-
-export function SessionCardSkeleton() {
-  return (
-    <div className="glass rounded px-4 py-2">
-      <div className="flex items-center space-x-4 min-w-[450px]">
-        <Skeleton className="h-12 w-12 rounded-full bg-dim bg-opacity-15" />
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-[250px] bg-dim bg-opacity-15" />
-          <Skeleton className="h-4 w-[200px] bg-dim bg-opacity-15" />
-        </div>
-      </div>
-    </div>
   )
 }

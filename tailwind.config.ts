@@ -118,6 +118,9 @@ const config = {
         "2": "2 2 0%",
         "3": "3 3 0%",
       },
+      padding: {
+        "header-distance": "8rem",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

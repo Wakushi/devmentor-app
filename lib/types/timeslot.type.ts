@@ -1,7 +1,6 @@
 import { Address } from "viem"
 
 export type Timeslot = {
-  id?: string
   mentorAddress: Address
   date: number
   timeStart: number

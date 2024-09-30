@@ -1,5 +1,6 @@
 import { Timeslot } from "@/lib/types/timeslot.type"
 import TimeslotCard from "./timeslot-card"
+import { getTimeslotId } from "@/lib/utils"
 
 export default function TimeslotCardList({
   timeslots,
@@ -20,9 +21,12 @@ export default function TimeslotCardList({
     <div className="flex flex-col self-stretch h-full gap-2 min-w-[280px] fade-in-right">
       {timeslots.map((slot) => (
         <TimeslotCard
-          key={slot.id}
+          key={getTimeslotId(slot)}
           timeslot={slot}
-          selected={slot.id === selectedTimeslot?.id}
+          selected={
+            !!selectedTimeslot &&
+            getTimeslotId(slot) === getTimeslotId(selectedTimeslot)
+          }
           handleSlotSelect={handleSlotSelect}
           handleConfirmTimeslot={handleConfirmTimeslot}
         />

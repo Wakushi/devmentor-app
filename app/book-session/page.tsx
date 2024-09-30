@@ -7,7 +7,6 @@ import SessionCalendar from "@/components/pages/book-session/session-calendar"
 import { useEffect, useState } from "react"
 import { Mentor } from "@/lib/types/user.type"
 import { Timeslot } from "@/lib/types/timeslot.type"
-import { generateMockTimeslots } from "@/lib/mock/utils"
 import LoadingScreen from "@/components/ui/loading-screen"
 import SessionRecap from "@/components/pages/book-session/session-recap"
 import { IoIosArrowBack } from "react-icons/io"
@@ -30,6 +29,7 @@ import { getStartTime } from "@/lib/utils"
 import SessionBookedScreen from "@/components/pages/book-session/session-booked-screen"
 import MentorNotFound from "@/components/pages/book-session/mentor-not-found"
 import BookSessionNavigation from "@/components/pages/book-session/book-session-navigation"
+import { getMentorTimeslots } from "@/lib/actions/client/pinata-actions"
 
 export enum BookStep {
   SCHEDULE = "SCHEDULE",
@@ -73,12 +73,12 @@ export default function BookSessionPage({
 
   useEffect(() => {
     async function fetchMentorTimeslots() {
-      const mentorSlots = generateMockTimeslots(
-        new Date("2024-09-25"),
-        2
-      ).filter((slot) => !slot.isBooked)
+      if (!mentor?.timeslotsHash) return
 
-      setTimeslots(mentorSlots)
+      const mentorSlots = await getMentorTimeslots(mentor)
+      const availableSlots = mentorSlots.filter((slot) => !slot.isBooked)
+
+      setTimeslots(availableSlots)
       setLoading(false)
     }
 

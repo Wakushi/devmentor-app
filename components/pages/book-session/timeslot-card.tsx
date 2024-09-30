@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Timeslot } from "@/lib/types/timeslot.type"
-import { getSlotStartHour } from "@/lib/utils"
+import { getSlotStartHour, getTimeslotId } from "@/lib/utils"
 import clsx from "clsx"
 
 export default function TimeslotCard({
@@ -24,7 +24,7 @@ export default function TimeslotCard({
             "bg-white text-primary-shade": selected,
           }
         )}
-        key={timeslot.id}
+        key={getTimeslotId(timeslot)}
         onClick={() => handleSlotSelect(timeslot)}
       >
         <span className="text-base">{getSlotStartHour(timeslot)}</span>

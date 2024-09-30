@@ -179,6 +179,7 @@ export function computeTimeslots(
     const slotDate = new Date(today)
 
     slotDate.setDate(today.getDate() + i)
+    slotDate.setHours(0, 0, 0, 0)
 
     const slotDateDay = slotDate.getDay()
 
@@ -200,4 +201,18 @@ export function computeTimeslots(
   }
 
   return timeslots
+}
+
+export function hashCode(str: string): number {
+  let hash = 5381
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) + hash + str.charCodeAt(i)
+  }
+  return hash
+}
+
+export function getTimeslotId(slot: Timeslot): number {
+  const { mentorAddress, date, timeStart, timeEnd } = slot
+  const concatenatedString = `${mentorAddress}${date}${timeStart}${timeEnd}`
+  return hashCode(concatenatedString)
 }

@@ -1,8 +1,4 @@
-import {
-  ContactType,
-  Language,
-  LearningField,
-} from "../types/profile-form.type"
+import { Language, LearningField } from "../types/profile-form.type"
 import { Role } from "../types/role.type"
 import { Mentor } from "../types/user.type"
 
@@ -23,7 +19,7 @@ export const MENTORS_MOCK: Mentor[] = [
     ],
     sessionCount: 42,
     hourlyRate: 0,
-    timeslotsHash: "QmZAkAUteP3MuxPY7kggU6r9XSAxVi5x3sQNvQDs3AhpjM",
+    timeslotsHash: "QmeokVcxwkVocq3q2sRiWQA3fFLDkHmi7PBxVmmbKY52pm",
   },
   {
     id: "2",

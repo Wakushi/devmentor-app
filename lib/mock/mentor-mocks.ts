@@ -23,6 +23,7 @@ export const MENTORS_MOCK: Mentor[] = [
     ],
     sessionCount: 42,
     hourlyRate: 0,
+    timeslotsHash: "QmZAkAUteP3MuxPY7kggU6r9XSAxVi5x3sQNvQDs3AhpjM",
   },
   {
     id: "2",

@@ -35,4 +35,5 @@ export type Mentor = User & {
   reviews: Review[]
   sessionCount: number
   hourlyRate: number
+  timeslotsHash?: string
 }

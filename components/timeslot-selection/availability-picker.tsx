@@ -14,6 +14,7 @@ import {
   SATURDAY,
   SUNDAY,
 } from "@/lib/constants"
+import { pinMentorTimeslots } from "@/lib/actions/client/pinata-actions"
 
 export default function AvailabilityPicker({ mentor }: { mentor: Mentor }) {
   const DEFAULT_SLOT: DaySlot = {
@@ -97,8 +98,10 @@ export default function AvailabilityPicker({ mentor }: { mentor: Mentor }) {
     )
   }
 
-  function handleSaveTimeslots(): void {
+  async function handleSaveTimeslots(): Promise<void> {
     const timeslots = computeTimeslots(daysOfWeek, mentor.address)
+    const updatedMentor = await pinMentorTimeslots(mentor, timeslots)
+    console.log("updatedMentor: ", updatedMentor)
   }
 
   return (

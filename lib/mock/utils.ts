@@ -28,7 +28,6 @@ export function generateMockTimeslots(
       const isBooked = Math.random() < 0.5
 
       timeslots.push({
-        id: uuidv4(),
         mentorAddress: "0x",
         date,
         timeStart,

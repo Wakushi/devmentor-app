@@ -30,12 +30,7 @@ import SessionBookedScreen from "@/components/pages/book-session/session-booked-
 import MentorNotFound from "@/components/pages/book-session/mentor-not-found"
 import BookSessionNavigation from "@/components/pages/book-session/book-session-navigation"
 import { getMentorTimeslots } from "@/lib/actions/client/pinata-actions"
-
-export enum BookStep {
-  SCHEDULE = "SCHEDULE",
-  OBJECTIVES = "OBJECTIVES",
-  RECAP = "RECAP",
-}
+import { BookStep } from "@/lib/types/book-session-form.type"
 
 export default function BookSessionPage({
   searchParams,

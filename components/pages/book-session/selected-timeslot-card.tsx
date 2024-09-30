@@ -1,8 +1,8 @@
-import { BookStep } from "@/app/book-session/page"
 import { Button } from "@/components/ui/button"
+import { BookStep } from "@/lib/types/book-session-form.type"
 import { Timeslot } from "@/lib/types/timeslot.type"
 import { formatDate, formatTime } from "@/lib/utils"
-import { CalendarDays, Clock } from "lucide-react"
+import { CalendarDays } from "lucide-react"
 import { MdEdit } from "react-icons/md"
 
 export default function SelectedTimeslotCard({

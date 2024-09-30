@@ -1,8 +1,8 @@
-import { BookStep } from "@/app/book-session/page"
 import { Button } from "@/components/ui/button"
 import { Mentor } from "@/lib/types/user.type"
 import clsx from "clsx"
 import CompleteSessionButton from "./complete-session-button"
+import { BookStep } from "@/lib/types/book-session-form.type"
 
 interface BookSessionNavigationProps {
   bookStep: BookStep

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Timeslot } from "@/lib/types/timeslot.type"
 import SelectedTimeslotCard from "./selected-timeslot-card"
 import SessionGoalEditable from "./session-goal-editable"
-import { BookStep } from "@/app/book-session/page"
+import { BookStep } from "@/lib/types/book-session-form.type"
 
 export default function SessionRecap({
   timeslot,

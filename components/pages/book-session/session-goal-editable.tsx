@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { MdEdit } from "react-icons/md"
 import { GoGoal } from "react-icons/go"
-import { BookStep } from "@/app/book-session/page"
+import { BookStep } from "@/lib/types/book-session-form.type"
 
 export default function SessionGoalEditable({
   sessionGoals,

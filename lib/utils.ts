@@ -2,8 +2,9 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Address } from "viem"
 import { Review } from "./types/review.type"
-import { Timeslot } from "./types/timeslot.type"
+import { DayOfWeek, DaySlot, Timeslot } from "./types/timeslot.type"
 import { Matcher } from "react-day-picker"
+import { NINETY_DAYS, ONE_HOUR_IN_MS } from "./constants"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -38,10 +39,10 @@ export function getSlotDate(timeslot: Timeslot): Date {
 }
 
 export function getSlotStartHour(timeslot: Timeslot): string {
-  const startTime = new Date(timeslot.startTime)
+  const timeStart = new Date(timeslot.timeStart)
 
-  const hours = startTime.getHours()
-  const minutes = startTime.getMinutes()
+  const hours = timeStart.getHours()
+  const minutes = timeStart.getMinutes()
 
   const period = hours >= 12 ? "pm" : "am"
   const hours12 = hours % 12 || 12
@@ -82,13 +83,22 @@ export const formatTime = (timestamp: number) => {
 }
 
 export function getStartTime(timeslot: Timeslot): number {
-  const { startTime, date } = timeslot
+  const { timeStart, date } = timeslot
 
-  const startHours = new Date(startTime).getHours()
+  const startHours = new Date(timeStart).getHours()
   const startDate = new Date(date)
   startDate.setHours(startHours)
 
   return startDate.getTime()
+}
+
+export function getWeekdayName(
+  dayIndex: number,
+  locale: string = "en-US"
+): string {
+  return new Intl.DateTimeFormat(locale, { weekday: "long" }).format(
+    new Date(2017, 0, dayIndex + 1)
+  )
 }
 
 export function createGoogleCalendarLink(event: {
@@ -109,4 +119,85 @@ export function createGoogleCalendarLink(event: {
   })
 
   return `${baseUrl}&${params.toString()}`
+}
+
+export function computeTimeslots(
+  daysOfWeek: DayOfWeek[],
+  mentorAddress: Address
+): Timeslot[] {
+  const activeDays = daysOfWeek.filter((day) => day.active)
+  const hourlySlotsByDay: Map<number, DaySlot[]> = new Map()
+
+  const isSameSlot = (slotA: DaySlot, slotB: DaySlot): boolean => {
+    return (
+      slotA.timeStart === slotB.timeStart && slotA.timeEnd === slotB.timeEnd
+    )
+  }
+
+  activeDays.forEach((day) => {
+    const savedDaySlots: DaySlot[] = []
+
+    day.slots.forEach((slot) => {
+      // Initially, the day slots produced by the DayOfWeekCard component have:
+      // - a timeStart to represents when the first slot of the day begins
+      // - a timeEnd to represent when the last slot of the day ends
+
+      // To have time slots divided by hour, we need to transform these into hourly divided
+      // slots so that reelAmountOfSlots = (timeEnd - timeStart) / 1h
+
+      const { timeStart, timeEnd } = slot
+      const durationInHours = Math.floor((timeEnd - timeStart) / ONE_HOUR_IN_MS)
+
+      for (let i = 0; i < durationInHours; i++) {
+        const startTimeDate = new Date(timeStart + ONE_HOUR_IN_MS * i)
+        const endTimeDate = new Date(timeStart + ONE_HOUR_IN_MS * (i + 1))
+
+        const newSlot = {
+          timeStart: startTimeDate.getTime(),
+          timeEnd: endTimeDate.getTime(),
+          dayOfWeek: day.index,
+        }
+
+        if (savedDaySlots.some((daySlot) => isSameSlot(daySlot, newSlot)))
+          continue
+
+        savedDaySlots.push({
+          timeStart: startTimeDate.getTime(),
+          timeEnd: endTimeDate.getTime(),
+          dayOfWeek: day.index,
+        })
+      }
+    })
+
+    hourlySlotsByDay.set(day.index, savedDaySlots)
+  })
+
+  const timeslots: Timeslot[] = []
+  const today = new Date()
+
+  for (let i = 0; i < NINETY_DAYS; i++) {
+    const slotDate = new Date(today)
+
+    slotDate.setDate(today.getDate() + i)
+
+    const slotDateDay = slotDate.getDay()
+
+    if (!hourlySlotsByDay.has(slotDateDay)) continue
+
+    const slots = hourlySlotsByDay.get(slotDateDay)
+
+    if (!slots || !slots.length) continue
+
+    slots.forEach(({ timeStart, timeEnd }) => {
+      timeslots.push({
+        mentorAddress,
+        date: slotDate.getTime(),
+        timeStart,
+        timeEnd,
+        isBooked: false,
+      })
+    })
+  }
+
+  return timeslots
 }

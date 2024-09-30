@@ -13,7 +13,7 @@ import {
 import { BsThreeDots } from "react-icons/bs"
 
 export function SessionCard({ session }: { session: Session }) {
-  const { startTime } = session
+  const { timeStart } = session
 
   const name = "John Doe"
   const sessionPrice = session.mentor ? session.mentor.hourlyRate : null
@@ -22,7 +22,7 @@ export function SessionCard({ session }: { session: Session }) {
     <div className="flex items-center justify-between gap-8 glass rounded px-4 py-2">
       <div className="flex items-center gap-4">
         <SessionMentor name={name} />
-        <SessionTime startTime={startTime} />
+        <SessionTime timeStart={timeStart} />
       </div>
       <div className="flex items-center gap-8">
         <SessionPrice sessionPrice={sessionPrice} />
@@ -47,16 +47,16 @@ function SessionMentor({ name }: { name: string }) {
   )
 }
 
-function SessionTime({ startTime }: { startTime: number }) {
+function SessionTime({ timeStart }: { timeStart: number }) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2 text-small">
         <CalendarDays className="w-5 h-5" />
-        <span className="text-dim">{formatDate(startTime)}</span>
+        <span className="text-dim">{formatDate(timeStart)}</span>
       </div>
       <div className="flex items-center gap-2 text-small">
         <Clock className="w-5 h-5" />
-        <span className="text-dim">{formatTime(startTime)}</span>
+        <span className="text-dim">{formatTime(timeStart)}</span>
       </div>
     </div>
   )

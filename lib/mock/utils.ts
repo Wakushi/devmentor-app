@@ -21,18 +21,18 @@ export function generateMockTimeslots(
 
     for (let hour = 10; hour < 18; hour++) {
       d.setHours(hour)
-      const startTime = d.getTime()
+      const timeStart = d.getTime()
       d.setHours(hour + 1)
-      const endTime = d.getTime()
+      const timeEnd = d.getTime()
 
       const isBooked = Math.random() < 0.5
 
       timeslots.push({
         id: uuidv4(),
-        mentorId,
+        mentorAddress: "0x",
         date,
-        startTime,
-        endTime,
+        timeStart,
+        timeEnd,
         isBooked,
         studentId: isBooked ? uuidv4() : undefined,
       })

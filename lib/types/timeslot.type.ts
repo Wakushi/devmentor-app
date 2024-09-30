@@ -1,9 +1,24 @@
+import { Address } from "viem"
+
 export type Timeslot = {
-  id: string
-  mentorId: string
+  id?: string
+  mentorAddress: Address
   date: number
-  startTime: number
-  endTime: number
+  timeStart: number
+  timeEnd: number
   isBooked: boolean
   studentId?: string
+}
+
+export type DaySlot = {
+  timeStart: number
+  timeEnd: number
+  dayOfWeek?: number
+}
+
+export type DayOfWeek = {
+  index: number
+  name: string
+  slots: DaySlot[]
+  active: boolean
 }

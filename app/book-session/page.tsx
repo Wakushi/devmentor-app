@@ -229,7 +229,7 @@ export default function BookSessionPage({
       mentorAddress: mentor.address,
       studentAddress: user?.address,
       objectives: sessionGoals,
-      startTime: getStartTime(confirmedTimeslot),
+      timeStart: getStartTime(confirmedTimeslot),
       valueLocked: mentor.hourlyRate,
       cancelled: false,
     }

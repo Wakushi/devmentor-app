@@ -16,10 +16,10 @@ export default function SessionBookedScreen({
   confirmedTimeslot: Timeslot
   createdSession: Session
 }) {
-  const { startTime, endTime, date } = confirmedTimeslot
+  const { timeStart, timeEnd, date } = confirmedTimeslot
 
-  const startHours = new Date(startTime).getHours()
-  const endHours = new Date(endTime).getHours()
+  const startHours = new Date(timeStart).getHours()
+  const endHours = new Date(timeEnd).getHours()
 
   const startDate = new Date(date)
   startDate.setHours(startHours)

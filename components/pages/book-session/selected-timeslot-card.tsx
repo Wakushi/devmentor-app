@@ -25,7 +25,7 @@ export default function SelectedTimeslotCard({
         <p className="font-normal w-[550px]">
           <span>{formatDate(timeslot.date)}</span>,{" "}
           <span>
-            {formatTime(timeslot.startTime)} to {formatTime(timeslot.endTime)}
+            {formatTime(timeslot.timeStart)} to {formatTime(timeslot.timeEnd)}
           </span>
         </p>
       </div>

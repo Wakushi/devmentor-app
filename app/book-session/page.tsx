@@ -1,5 +1,10 @@
 "use client"
 
+import {
+  ContractEvent,
+  watchForEvent,
+  writeBookSession,
+} from "@/lib/actions/web3/contract"
 import { MENTORS_MOCK } from "@/lib/mock/mentor-mocks"
 import AnimatedBackground from "@/components/ui/animated-background"
 import MentorDetails from "@/components/pages/book-session/mentor-details"
@@ -16,20 +21,18 @@ import Stepper from "@/components/pages/auth/stepper"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import SessionGoalInput from "@/components/pages/book-session/session-goal"
-import {
-  ContractEvent,
-  watchForEvent,
-  writeBookSession,
-} from "@/lib/actions/web3/contract"
 import { useUser } from "@/services/user.service"
 import { toast } from "@/hooks/use-toast"
 import Loader from "@/components/ui/loader"
 import { FaCircleCheck } from "react-icons/fa6"
-import { getStartTime } from "@/lib/utils"
+import { getStartTime, getTimeslotId } from "@/lib/utils"
 import SessionBookedScreen from "@/components/pages/book-session/session-booked-screen"
 import MentorNotFound from "@/components/pages/book-session/mentor-not-found"
 import BookSessionNavigation from "@/components/pages/book-session/book-session-navigation"
-import { getMentorTimeslots } from "@/lib/actions/client/pinata-actions"
+import {
+  getMentorTimeslots,
+  pinMentorTimeslots,
+} from "@/lib/actions/client/pinata-actions"
 import { BookStep } from "@/lib/types/book-session-form.type"
 
 export default function BookSessionPage({
@@ -68,7 +71,10 @@ export default function BookSessionPage({
 
   useEffect(() => {
     async function fetchMentorTimeslots() {
-      if (!mentor?.timeslotsHash) return
+      if (!mentor?.timeslotsHash) {
+        setLoading(false)
+        return
+      }
 
       const mentorSlots = await getMentorTimeslots(mentor)
       const availableSlots = mentorSlots.filter((slot) => !slot.isBooked)
@@ -235,8 +241,30 @@ export default function BookSessionPage({
       body: JSON.stringify(sessionPayload),
     })
 
+    await updateTimeslots(confirmedTimeslot, timeslots)
+
     const { createdSession } = await response.json()
     return { ...createdSession, mentor }
+  }
+
+  async function updateTimeslots(
+    confirmedTimeslot: Timeslot,
+    allSlots: Timeslot[]
+  ): Promise<void> {
+    if (!mentor) return
+
+    const confirmedSlotId = getTimeslotId(confirmedTimeslot)
+    const confimedSlotIndex = timeslots.findIndex(
+      (slot) => getTimeslotId(slot) === confirmedSlotId
+    )
+
+    if (confimedSlotIndex === -1) {
+      throw new Error("Timeslot to update not found")
+    }
+
+    allSlots[confimedSlotIndex].isBooked = true
+
+    await pinMentorTimeslots(mentor, allSlots)
   }
 
   if (loading) {

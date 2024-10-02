@@ -8,6 +8,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { toast } from "@/hooks/use-toast"
 import {
   Form,
   FormControl,
@@ -37,17 +38,7 @@ import {
   StudentSignUpSteps,
   allSubjects,
 } from "@/lib/types/profile-form.type"
-import {
-  FaDiscord,
-  FaGithub,
-  FaLinkedin,
-  FaLongArrowAltRight,
-  FaTelegram,
-  FaTwitter,
-} from "react-icons/fa"
-import { Input } from "@/components/ui/input"
-import { MdAlternateEmail } from "react-icons/md"
-import { IoIosClose } from "react-icons/io"
+import { FaLongArrowAltRight } from "react-icons/fa"
 import Stepper from "@/components/pages/auth/stepper"
 import { Separator } from "@/components/ui/separator"
 import { useUser } from "@/services/user.service"
@@ -59,8 +50,15 @@ import SuccessScreen from "@/components/success-screen"
 import { useQueryClient } from "@tanstack/react-query"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { encryptForAddress } from "@/lib/crypto"
-import { registerStudent } from "@/lib/actions/web3/contract"
+import {
+  ContractEvent,
+  registerStudent,
+  watchForEvent,
+} from "@/lib/actions/web3/contract"
 import { BaseUser } from "@/lib/types/user.type"
+import ContactFields from "@/components/pages/auth/contact-fields"
+import { FaCircleCheck } from "react-icons/fa6"
+import { Address } from "viem"
 
 const learningFormSchema = z.object({
   learningFields: z
@@ -74,39 +72,6 @@ const languageFormSchema = z.object({
     .array(z.nativeEnum(Language))
     .min(1, "Please select at least one language"),
 })
-
-const contactOptions = [
-  {
-    placeholder: "Discord username",
-    field: ContactType.DISCORD,
-    icon: <FaDiscord />,
-  },
-  {
-    placeholder: "Email address",
-    field: ContactType.EMAIL,
-    icon: <MdAlternateEmail />,
-  },
-  {
-    placeholder: "Twitter handle",
-    field: ContactType.TWITTER,
-    icon: <FaTwitter />,
-  },
-  {
-    placeholder: "LinkedIn profile",
-    field: ContactType.LINKEDIN,
-    icon: <FaLinkedin />,
-  },
-  {
-    placeholder: "GitHub username",
-    field: ContactType.GITHUB,
-    icon: <FaGithub />,
-  },
-  {
-    placeholder: "Telegram username",
-    field: ContactType.TELEGRAM,
-    icon: <FaTelegram />,
-  },
-]
 
 export default function StudentSignUpPage() {
   const { user } = useUser()
@@ -179,10 +144,6 @@ export default function StudentSignUpPage() {
     })
   }
 
-  function getContactByField(field: ContactType): string {
-    return selectedContacts.get(field) || ""
-  }
-
   function currentStepIndex(): number {
     return steps.findIndex((s) => s === step)
   }
@@ -200,74 +161,119 @@ export default function StudentSignUpPage() {
   }
 
   async function onSubmit() {
-    if (!user || !user.account) return
-
     setLoading(true)
 
     try {
-      const { learningFields, experience } = learningForm.getValues()
-      const { languages } = languageForm.getValues()
-
-      const contacts = Array.from(selectedContacts, ([field, value]) => ({
-        type: field,
-        value,
-      })).filter((contact) => contact.value)
-
-      const getUsername = (): string => {
-        if (contacts.length === 1 && contacts[0].type === ContactType.EMAIL) {
-          return contacts[0].value.split("@")[0]
-        }
-        return contacts[0].value
+      if (!user || !user.account) {
+        throw new Error("Missing user")
       }
 
-      const contactHash = await encryptForAddress(
-        JSON.stringify(contacts),
-        user.account
-      )
+      const userPayload = await createUserPayload()
 
-      const languagesIds = languages.map((lang) => {
-        const langId = languages.findIndex((l) => l === lang)
-        return langId >= 0 ? langId : 0
+      if (!userPayload) {
+        throw new Error("Missing user payload")
+      }
+
+      toast({
+        title: "Pending account creation...",
+        action: <Loader fill="white" color="primary" size="4" />,
       })
-
-      const subjectsIds = learningFields.map((subject) => {
-        const subjectId = allSubjects.findIndex((s) => s === subject)
-        return subjectId >= 0 ? subjectId : 0
-      })
-
-      const experienceNumber = experiences.findIndex((xp) => xp === experience)
-
-      const baseUser: BaseUser = {
-        account: user.account,
-        userName: getUsername(),
-        languages: languagesIds,
-        subjects: subjectsIds,
-      }
-
-      const userPayload = {
-        account: user.account,
-        baseUser,
-        contactHash,
-        experience: experienceNumber >= 0 ? experienceNumber : 0,
-      }
 
       await registerStudent(userPayload)
 
-      await fetch("/api/user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userPayload, role: Role.STUDENT }),
+      toast({
+        title: "Creating account...",
+        action: <Loader fill="white" color="primary" size="4" />,
       })
 
-      queryClient.invalidateQueries({
-        queryKey: [QueryKeys.USER, user.account],
-      })
+      watchForEvent({
+        event: ContractEvent.STUDENT_REGISTERED,
+        args: { account: user.account },
+        handler: async () => {
+          toast({
+            title: "Success",
+            description: "Account created successfully !",
+            action: <FaCircleCheck className="text-white" />,
+          })
 
-      setLoading(false)
-      setSuccess(true)
+          await fetch("/api/user", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userPayload, role: Role.STUDENT }),
+          })
+
+          queryClient.invalidateQueries({
+            queryKey: [QueryKeys.USER, user.account],
+          })
+
+          setLoading(false)
+          setSuccess(true)
+        },
+      })
     } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          "Error submitting account. Please try again." + JSON.stringify(error),
+        variant: "destructive",
+      })
       setLoading(false)
       setSuccess(false)
+    }
+  }
+
+  async function createUserPayload(): Promise<{
+    account: Address
+    baseUser: BaseUser
+    contactHash: string
+    experience: number
+  } | null> {
+    if (!user) return null
+
+    const { learningFields, experience } = learningForm.getValues()
+    const { languages } = languageForm.getValues()
+
+    const contacts = Array.from(selectedContacts, ([field, value]) => ({
+      type: field,
+      value,
+    })).filter((contact) => contact.value)
+
+    const getUsername = (): string => {
+      if (contacts.length === 1 && contacts[0].type === ContactType.EMAIL) {
+        return contacts[0].value.split("@")[0]
+      }
+      return contacts[0].value
+    }
+
+    const contactHash = await encryptForAddress(
+      JSON.stringify(contacts),
+      user.account
+    )
+
+    const languagesIds = languages.map((lang) => {
+      const langId = languages.findIndex((l) => l === lang)
+      return langId >= 0 ? langId : 0
+    })
+
+    const subjectsIds = learningFields.map((subject) => {
+      const subjectId = allSubjects.findIndex((s) => s === subject)
+      return subjectId >= 0 ? subjectId : 0
+    })
+
+    const experienceNumber = experiences.findIndex((xp) => xp === experience)
+
+    const baseUser: BaseUser = {
+      account: user.account,
+      userName: getUsername(),
+      languages: languagesIds,
+      subjects: subjectsIds,
+    }
+
+    return {
+      account: user.account,
+      baseUser,
+      contactHash,
+      experience: experienceNumber >= 0 ? experienceNumber : 0,
     }
   }
 
@@ -470,40 +476,10 @@ export default function StudentSignUpPage() {
                     Provide at least one way for your mentor to reach out to you
                   </p>
                 </div>
-                <div className="flex flex-col gap-2">
-                  {contactOptions.map(({ placeholder, field, icon }) => {
-                    return (
-                      <div
-                        key={field}
-                        className={clsx("flex gap-2", {
-                          "opacity-60": !!!getContactByField(field),
-                          "opacity-100": !!getContactByField(field),
-                        })}
-                      >
-                        <div className="border glass rounded-lg p-2">
-                          {icon}
-                        </div>
-                        <div className="relative w-full">
-                          <Input
-                            className="w-full"
-                            placeholder={placeholder}
-                            id={field}
-                            value={getContactByField(field)}
-                            onChange={(e) =>
-                              handleContactChange(e.target.value, field)
-                            }
-                          ></Input>
-                          {!!getContactByField(field) && (
-                            <IoIosClose
-                              onClick={() => handleContactChange("", field)}
-                              className="text-2xl opacity-70 hover:opacity-100 cursor-pointer absolute right-2 top-1/2 -translate-y-1/2"
-                            />
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
+                <ContactFields
+                  selectedContacts={selectedContacts}
+                  handleContactChange={handleContactChange}
+                />
               </div>
             )}
 

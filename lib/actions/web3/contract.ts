@@ -19,7 +19,9 @@ import { Role } from "@/lib/types/role.type"
 import { getMentorReviews } from "../client/pinata-actions"
 
 export enum ContractEvent {
-  SESSION_BOOKED = "SessionBooked",
+  STUDENT_REGISTERED = "StudentRegistered",
+  MENTOR_REGISTERED = "MentorRegistered",
+  SESSION_CREATED = "SessionCreated",
   FUNDS_SENT_TO_MENTOR = "FundsSentToMentor",
 }
 

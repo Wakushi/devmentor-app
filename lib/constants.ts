@@ -1,7 +1,20 @@
 const PINATA_GATEWAY_BASE_URL = "https://tan-key-moth-8.mypinata.cloud/ipfs"
 
-const DEVMENTOR_CONTRACT_ADDRESS = "0x07D91454EF167c9db31a41da7700198f52951059"
+const DEVMENTOR_CONTRACT_ADDRESS = "0xF6CeDF73b743888411d76734AB1cb85936F915fd"
 const DEVMENTOR_CONTRACT_ABI = [
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_sessionId",
+        type: "uint256",
+      },
+    ],
+    name: "cancelSession",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
   {
     inputs: [
       {
@@ -117,7 +130,7 @@ const DEVMENTOR_CONTRACT_ABI = [
   },
   {
     inputs: [],
-    name: "Devmentor__NotEnoughFundsLocked",
+    name: "Devmentor__NotEnoughFundsSent",
     type: "error",
   },
   {
@@ -186,6 +199,19 @@ const DEVMENTOR_CONTRACT_ABI = [
       },
     ],
     name: "FundsSentToMentor",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+    ],
+    name: "MentorRegistered",
     type: "event",
   },
   {
@@ -414,6 +440,51 @@ const DEVMENTOR_CONTRACT_ABI = [
     type: "event",
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "studentAccount",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "sessionId",
+        type: "uint256",
+      },
+    ],
+    name: "SessionCreated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+    ],
+    name: "StudentRegistered",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+    ],
+    name: "UpdatedTimeslot",
+    type: "event",
+  },
+  {
     inputs: [
       {
         internalType: "string",
@@ -442,6 +513,25 @@ const DEVMENTOR_CONTRACT_ABI = [
   {
     inputs: [],
     name: "getEthPrice",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_hourlyRateUsd",
+        type: "uint256",
+      },
+    ],
+    name: "getHourlyRateInWei",
     outputs: [
       {
         internalType: "uint256",
@@ -627,6 +717,25 @@ const DEVMENTOR_CONTRACT_ABI = [
     inputs: [
       {
         internalType: "address",
+        name: "_account",
+        type: "address",
+      },
+    ],
+    name: "getSessionIdsByAccount",
+    outputs: [
+      {
+        internalType: "uint256[]",
+        name: "",
+        type: "uint256[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
         name: "_studentAddress",
         type: "address",
       },
@@ -770,5 +879,5 @@ export {
   SATURDAY,
   ONE_HOUR_IN_MS,
   SUNDAY,
-  ETH_DECIMALS
+  ETH_DECIMALS,
 }

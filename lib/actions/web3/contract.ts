@@ -259,6 +259,15 @@ export async function getSessionCounter() {
   })
 }
 
+export async function getSessionIdsByAccount(account: Address) {
+  return publicClient.readContract({
+    address: DEVMENTOR_CONTRACT_ADDRESS,
+    abi: DEVMENTOR_CONTRACT_ABI,
+    functionName: "getSessionIdsByAccount",
+    args: [account],
+  })
+}
+
 export async function getEthPrice(): Promise<number> {
   const price = (await publicClient.readContract({
     address: DEVMENTOR_CONTRACT_ADDRESS,

@@ -1,24 +1,19 @@
 import { Button } from "@/components/ui/button"
-import Loader from "@/components/ui/loader"
 import { MentorStruct } from "@/lib/types/user.type"
 import { FaDollarSign } from "react-icons/fa"
 import { IoIosFlash } from "react-icons/io"
 
 export default function CompleteSessionButton({
   mentor,
-  handlePayment,
-  processingPayment,
-  handleConfirmFreeSession,
+  handleCreateSession,
 }: {
   mentor: MentorStruct
-  handlePayment: () => void
-  processingPayment: boolean
-  handleConfirmFreeSession: () => void
+  handleCreateSession: () => void
 }) {
   if (mentor.hourlyRate === 0) {
     return (
       <Button
-        onClick={handleConfirmFreeSession}
+        onClick={handleCreateSession}
         variant="secondary"
         className="self-end"
       >
@@ -28,15 +23,9 @@ export default function CompleteSessionButton({
   }
 
   return (
-    <Button onClick={handlePayment}>
-      {processingPayment ? (
-        <Loader size="4" />
-      ) : (
-        <>
-          <FaDollarSign className="text-xl" />
-          Lock {mentor.hourlyRate} USD
-        </>
-      )}
+    <Button onClick={handleCreateSession}>
+      <FaDollarSign className="text-xl" />
+      Lock {mentor.hourlyRate} USD
     </Button>
   )
 }

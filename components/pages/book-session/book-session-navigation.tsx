@@ -12,9 +12,7 @@ interface BookSessionNavigationProps {
   handlePrevStep: () => void
   handleNextStep: () => void
   mentor: MentorStruct
-  handlePayment: () => void
-  processingPayment: boolean
-  handleConfirmFreeSession: () => void
+  handleCreateSession: () => void
 }
 
 export default function BookSessionNavigation({
@@ -25,9 +23,7 @@ export default function BookSessionNavigation({
   handlePrevStep,
   handleNextStep,
   mentor,
-  handlePayment,
-  processingPayment,
-  handleConfirmFreeSession,
+  handleCreateSession,
 }: BookSessionNavigationProps) {
   return (
     <div className="flex items-center gap-2 ml-auto">
@@ -53,9 +49,7 @@ export default function BookSessionNavigation({
       {currentStepIndex === steps.length - 1 && (
         <CompleteSessionButton
           mentor={mentor}
-          handlePayment={handlePayment}
-          processingPayment={processingPayment}
-          handleConfirmFreeSession={handleConfirmFreeSession}
+          handleCreateSession={handleCreateSession}
         />
       )}
     </div>

@@ -37,7 +37,7 @@ export function getInitials(name: string) {
 
 export function getAverageRating(reviews: Review[]) {
   if (!reviews.length) return 0
-  
+
   const sum = reviews.reduce((acc, review) => acc + review.rate, 0)
   return (sum / reviews.length).toFixed(1)
 }
@@ -90,14 +90,28 @@ export const formatTime = (timestamp: number) => {
   })
 }
 
-export function getStartTime(timeslot: Timeslot): number {
+export function getTimeslotStartTime(timeslot: Timeslot): number {
   const { timeStart, date } = timeslot
+  return computeTimeAndDateTimestamps(timeStart, date).getTime()
+}
 
-  const startHours = new Date(timeStart).getHours()
-  const startDate = new Date(date)
-  startDate.setHours(startHours)
+export function getTimeslotEndTime(timeslot: Timeslot): number {
+  const { timeEnd, date } = timeslot
+  return computeTimeAndDateTimestamps(timeEnd, date).getTime()
+}
 
-  return startDate.getTime()
+export function computeTimeAndDateTimestamps(time: number, date: number): Date {
+  const timeAsDate = new Date(time)
+
+  const hours = timeAsDate.getHours()
+  const minutes = timeAsDate.getMinutes()
+
+  const completeDate = new Date(date)
+
+  completeDate.setHours(hours)
+  completeDate.setMinutes(minutes)
+
+  return completeDate
 }
 
 export function getWeekdayName(

@@ -246,12 +246,35 @@ export async function getStudent(studentAddress: Address) {
 }
 
 export async function getSession(sessionId: number): Promise<Session> {
-  return publicClient.readContract({
+  const data: any = await publicClient.readContract({
     address: DEVMENTOR_CONTRACT_ADDRESS,
     abi: DEVMENTOR_CONTRACT_ABI,
     functionName: "getSession",
     args: [sessionId],
-  }) as unknown as Session
+  })
+
+  const {
+    mentor,
+    student,
+    startTime,
+    endTime,
+    studentContactHash,
+    valueLocked,
+    mentorConfirmed,
+    studentConfirmed,
+  } = data
+
+  return {
+    mentorAddress: mentor,
+    studentAddress: student,
+    startTime: Number(startTime),
+    endTime: Number(endTime),
+    valueLocked: Number(valueLocked),
+    objectives: "",
+    studentContactHash,
+    mentorConfirmed,
+    studentConfirmed,
+  }
 }
 
 export async function getAllMentors(): Promise<Address[]> {

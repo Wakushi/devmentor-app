@@ -2,15 +2,15 @@
 
 import {
   ContractEvent,
+  createSession,
+  getSession,
+  usdToWei,
   watchForEvent,
-  writeBookSession,
 } from "@/lib/actions/web3/contract"
-import { MENTORS_MOCK } from "@/lib/mock/mentor-mocks"
 import AnimatedBackground from "@/components/ui/animated-background"
 import MentorDetails from "@/components/pages/book-session/mentor-details"
 import SessionCalendar from "@/components/pages/book-session/session-calendar"
 import { useEffect, useState } from "react"
-import { Mentor } from "@/lib/types/user.type"
 import { Timeslot } from "@/lib/types/timeslot.type"
 import LoadingScreen from "@/components/ui/loading-screen"
 import SessionRecap from "@/components/pages/book-session/session-recap"
@@ -25,7 +25,11 @@ import { useUser } from "@/services/user.service"
 import { toast } from "@/hooks/use-toast"
 import Loader from "@/components/ui/loader"
 import { FaCircleCheck } from "react-icons/fa6"
-import { getStartTime, getTimeslotId } from "@/lib/utils"
+import {
+  getTimeslotEndTime,
+  getTimeslotId,
+  getTimeslotStartTime,
+} from "@/lib/utils"
 import SessionBookedScreen from "@/components/pages/book-session/session-booked-screen"
 import MentorNotFound from "@/components/pages/book-session/mentor-not-found"
 import BookSessionNavigation from "@/components/pages/book-session/book-session-navigation"
@@ -34,6 +38,9 @@ import {
   pinMentorTimeslots,
 } from "@/lib/actions/client/pinata-actions"
 import { BookStep } from "@/lib/types/book-session-form.type"
+import { MentorStruct } from "@/lib/types/user.type"
+import useMentorsQuery from "@/hooks/queries/mentors-query"
+import useEthPriceQuery from "@/hooks/queries/eth-price-query"
 
 export default function BookSessionPage({
   searchParams,
@@ -41,24 +48,33 @@ export default function BookSessionPage({
   searchParams?: { [key: string]: string | string[] | undefined }
 }) {
   const { user } = useUser()
+  const mentorsQuery = useMentorsQuery()
+  const ethPriceQuery = useEthPriceQuery()
 
-  const [mentor, setMentor] = useState<Mentor>()
+  const { data: ethPriceUsd } = ethPriceQuery
+  const { data: mentors } = mentorsQuery
+
+  const [mentor, setMentor] = useState<MentorStruct>()
   const [timeslots, setTimeslots] = useState<Timeslot[]>([])
-  const [confirmedTimeslot, setConfirmedTimeslot] = useState<Timeslot>()
-  const [loading, setLoading] = useState<boolean>(true)
-  const [createdSession, setCreatedSession] = useState<Session | null>(null)
-  const [sessionGoals, setSessionGoals] = useState<string>("")
-  const [processingPayment, setProcessingPayment] = useState<boolean>(false)
-  const [editedStep, setEditedStep] = useState<BookStep | null>(null)
 
   const [bookStep, setBookStep] = useState<BookStep>(BookStep.SCHEDULE)
+  const [sessionGoals, setSessionGoals] = useState<string>("")
+  const [editedStep, setEditedStep] = useState<BookStep | null>(null)
+
+  const [confirmedTimeslot, setConfirmedTimeslot] = useState<Timeslot>()
+  const [createdSession, setCreatedSession] = useState<Session | null>(null)
+
+  const [loading, setLoading] = useState<boolean>(true)
+  const [loadingMessage, setLoadingMessage] = useState<string>("")
 
   const steps = Array.from(Object.keys(BookStep) as BookStep[])
 
   useEffect(() => {
     async function fetchMentor() {
-      const matchingMentor = MENTORS_MOCK.find(
-        (m) => m.address === searchParams?.mentor
+      if (!mentors) return
+
+      const matchingMentor = mentors.find(
+        (m) => m.account === searchParams?.mentor
       )
 
       if (!matchingMentor) return
@@ -67,7 +83,7 @@ export default function BookSessionPage({
     }
 
     fetchMentor()
-  }, [])
+  }, [mentors])
 
   useEffect(() => {
     async function fetchMentorTimeslots() {
@@ -154,97 +170,99 @@ export default function BookSessionPage({
     setBookStep(step)
   }
 
-  async function handlePayment(): Promise<void> {
-    if (!user?.address || !mentor) return
-
-    setProcessingPayment(true)
-
-    // Determine the ETH / USDC amount to be paid from the mentor's hourly rate
-    const usdAmountDue = mentor.hourlyRate
-    const ethAmount = 0.001
-
-    toast({
-      title: "Processing payment...",
-      action: <Loader fill="white" color="primary" size="4" />,
-    })
-
-    try {
-      await writeBookSession({
-        studentAddress: user?.address,
-        mentorAddress: mentor.address,
-        ethPayment: ethAmount.toString(),
-      })
-
-      toast({
-        title: "Locking funds...",
-        action: <Loader fill="white" color="primary" size="4" />,
-      })
-
-      watchForEvent({
-        event: ContractEvent.SESSION_BOOKED,
-        args: { student: user.address },
-        handler: async () => {
-          const session = await createSession()
-
-          if (!session) return
-
-          setProcessingPayment(false)
-          setCreatedSession(session)
-
-          toast({
-            title: "Success",
-            description: "Payment processed successfully !",
-            action: <FaCircleCheck className="text-white" />,
-          })
-        },
-      })
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Payment cancelled, please try again",
-      })
-
-      setProcessingPayment(false)
-    }
-  }
-
-  async function handleConfirmFreeSession(): Promise<void> {
-    if (mentor?.hourlyRate && mentor?.hourlyRate > 0) return
-
-    const session = await createSession()
-
-    if (!session) return
-
-    setCreatedSession(session)
-  }
-
   function handleEditStep(step: BookStep): void {
     setEditedStep(step)
     setBookStep(step)
   }
 
-  async function createSession(): Promise<Session | null> {
-    if (!user?.address || !mentor || !confirmedTimeslot) return null
-
-    const sessionPayload: Session = {
-      mentorAddress: mentor.address,
-      studentAddress: user?.address,
-      objectives: sessionGoals,
-      timeStart: getStartTime(confirmedTimeslot),
-      valueLocked: mentor.hourlyRate,
-      cancelled: false,
+  async function handleCreateSession(): Promise<void> {
+    if (!user?.account || !mentor) {
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: "User not found, please try again later.",
+      })
+      return
     }
 
-    const response = await fetch("/api/session", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(sessionPayload),
+    if (!confirmedTimeslot) {
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: "Please select a valid time slot.",
+      })
+      return
+    }
+
+    if (mentor.hourlyRate && !ethPriceUsd) {
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description:
+          "Unable to fetch current ETH price, please try again later.",
+      })
+      return
+    }
+
+    let ethAmount = BigInt(0)
+
+    if (mentor.hourlyRate && ethPriceUsd) {
+      const usdAmountDue = mentor.hourlyRate
+      ethAmount = usdToWei(usdAmountDue, ethPriceUsd)
+    }
+
+    toast({
+      title: "Awaiting session validation...",
+      action: <Loader fill="white" color="primary" size="4" />,
     })
 
-    await updateTimeslots(confirmedTimeslot, timeslots)
+    setLoadingMessage("Creating session")
+    setLoading(true)
 
-    const { createdSession } = await response.json()
-    return { ...createdSession, mentor }
+    try {
+      await createSession({
+        account: user.account,
+        mentorAddress: mentor.account,
+        startTime: getTimeslotStartTime(confirmedTimeslot),
+        endTime: getTimeslotEndTime(confirmedTimeslot),
+        studentContactHash: "",
+        value: ethAmount,
+      })
+
+      toast({
+        title: "Creating session...",
+        action: <Loader fill="white" color="primary" size="4" />,
+      })
+
+      watchForEvent({
+        event: ContractEvent.SESSION_CREATED,
+        args: { studentAccount: user.account },
+        handler: async (logs) => {
+          const session: any = await getSession(logs[0].args.sessionId)
+
+          if (!session) return
+
+          setLoading(false)
+          setCreatedSession(session)
+
+          toast({
+            title: "Success",
+            description: "Session created successfully !",
+            action: <FaCircleCheck className="text-white" />,
+          })
+        },
+      })
+    } catch (error: any) {
+      console.log("error: ", error)
+
+      setLoading(false)
+
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: "Something wrong happened !",
+      })
+    }
   }
 
   async function updateTimeslots(
@@ -268,7 +286,7 @@ export default function BookSessionPage({
   }
 
   if (loading) {
-    return <LoadingScreen />
+    return <LoadingScreen message={loadingMessage} />
   }
 
   if (!searchParams?.mentor || !mentor) {
@@ -280,7 +298,6 @@ export default function BookSessionPage({
       <SessionBookedScreen
         mentor={mentor}
         confirmedTimeslot={confirmedTimeslot}
-        createdSession={createdSession}
       />
     )
   }
@@ -346,9 +363,7 @@ export default function BookSessionPage({
                 handlePrevStep={handlePrevStep}
                 handleNextStep={handleNextStep}
                 mentor={mentor}
-                handlePayment={handlePayment}
-                processingPayment={processingPayment}
-                handleConfirmFreeSession={handleConfirmFreeSession}
+                handleCreateSession={handleCreateSession}
               />
             </CardContent>
           </Card>

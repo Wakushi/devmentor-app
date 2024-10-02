@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Session } from "@/lib/types/session.type"
 import { MentorStruct, Student } from "@/lib/types/user.type"
 import { QueryKeys } from "@/lib/types/query-keys.type"
+import { getSession, getSessionIdsByAccount } from "@/lib/actions/web3/contract"
 
 export default function useSessionsQuery(
   user: Student | MentorStruct | null | undefined
@@ -9,10 +10,16 @@ export default function useSessionsQuery(
   const sessionsQuery = useQuery<Session[], Error>({
     queryKey: [QueryKeys.SESSIONS, user?.account],
     queryFn: async () => {
-      const response = await fetch(
-        `/api/session?studentAddress=${user?.account}`
-      )
-      const { sessions } = await response.json()
+      if (!user?.account) return []
+
+      const sessions: Session[] = []
+      const sessionsIds = await getSessionIdsByAccount(user?.account)
+
+      for (let sessionId of sessionsIds) {
+        const session = await getSession(sessionId)
+        sessions.push(session)
+      }
+
       return sessions
     },
   })

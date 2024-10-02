@@ -1,8 +1,8 @@
+"use client"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Session } from "@/lib/types/session.type"
 import { formatDate, formatTime, getInitials } from "@/lib/utils"
 import { CalendarDays, Clock } from "lucide-react"
-import { CiDollar } from "react-icons/ci"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,21 +12,20 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { BsThreeDots } from "react-icons/bs"
 import HourlyRate from "@/components/hourly-rate"
+import useEthPriceQuery from "@/hooks/queries/eth-price-query"
+import { weiToUsd } from "@/lib/actions/web3/contract"
 
 export function SessionCard({ session }: { session: Session }) {
-  const { timeStart } = session
-
-  const name = "John Doe"
-  const sessionPrice = session.mentor ? session.mentor.hourlyRate : null
+  const { startTime, valueLocked, mentor } = session
 
   return (
     <div className="flex items-center justify-between gap-8 glass rounded px-4 py-2">
       <div className="flex items-center gap-4">
-        <SessionMentor name={name} />
-        <SessionTime timeStart={timeStart} />
+        <SessionMentor name={mentor?.baseUser?.userName ?? "?"} />
+        <SessionTime startTime={startTime} />
       </div>
       <div className="flex items-center gap-8">
-        <SessionPrice sessionPrice={sessionPrice} />
+        <SessionPrice sessionPriceWei={valueLocked} />
         <SessionOptions />
       </div>
     </div>
@@ -35,7 +34,7 @@ export function SessionCard({ session }: { session: Session }) {
 
 function SessionMentor({ name }: { name: string }) {
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex flex-col justify-center items-center gap-1">
       <Avatar className="w-10 h-10">
         <AvatarImage
           src={`https://api.dicebear.com/9.x/notionists/svg?seed=${name}`}
@@ -48,25 +47,29 @@ function SessionMentor({ name }: { name: string }) {
   )
 }
 
-function SessionTime({ timeStart }: { timeStart: number }) {
+function SessionTime({ startTime }: { startTime: number }) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2 text-small">
         <CalendarDays className="w-5 h-5" />
-        <span className="text-dim">{formatDate(timeStart)}</span>
+        <span className="text-dim">{formatDate(startTime)}</span>
       </div>
       <div className="flex items-center gap-2 text-small">
         <Clock className="w-5 h-5" />
-        <span className="text-dim">{formatTime(timeStart)}</span>
+        <span className="text-dim">{formatTime(startTime)}</span>
       </div>
     </div>
   )
 }
 
-function SessionPrice({ sessionPrice }: { sessionPrice: number | null }) {
+function SessionPrice({ sessionPriceWei }: { sessionPriceWei: number }) {
+  const ethPriceQuery = useEthPriceQuery()
+  const { data: ethPrice } = ethPriceQuery
+  const sessionPriceUsd = weiToUsd(sessionPriceWei, ethPrice ?? 0)
+
   return (
     <div className="flex items-center text-sm text-gray-300">
-      <HourlyRate hourlyRate={sessionPrice ?? 0} />
+      <HourlyRate hourlyRate={sessionPriceUsd} />
     </div>
   )
 }

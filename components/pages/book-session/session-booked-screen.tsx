@@ -1,6 +1,5 @@
 import SuccessScreen from "@/components/success-screen"
 import NavLinkButton from "@/components/ui/nav-link"
-import { Session } from "@/lib/types/session.type"
 import { Timeslot } from "@/lib/types/timeslot.type"
 import { MentorStruct } from "@/lib/types/user.type"
 import { createGoogleCalendarLink } from "@/lib/utils"
@@ -10,11 +9,9 @@ import { FcGoogle } from "react-icons/fc"
 export default function SessionBookedScreen({
   mentor,
   confirmedTimeslot,
-  createdSession,
 }: {
   mentor: MentorStruct
   confirmedTimeslot: Timeslot
-  createdSession: Session
 }) {
   const { timeStart, timeEnd, date } = confirmedTimeslot
 
@@ -29,9 +26,7 @@ export default function SessionBookedScreen({
 
   const googleCalendarLink = createGoogleCalendarLink({
     title: "Mentoring session",
-    description: `Mentoring session with ${
-      createdSession.mentor?.baseUser.userName || mentor.baseUser.userName
-    }`,
+    description: `Mentoring session with ${mentor.baseUser.userName}`,
     startDate,
     endDate,
   })
@@ -39,9 +34,7 @@ export default function SessionBookedScreen({
   return (
     <div className="flex flex-col items-center justify-center p-4 min-h-screen">
       <SuccessScreen
-        title={`Session booked with ${
-          createdSession.mentor?.baseUser.userName || mentor.baseUser.userName
-        } !`}
+        title={`Session booked with ${mentor.baseUser.userName} !`}
         subtitle="You can find all your session detail in the dashboard"
       >
         <div className="max-w-[300px] flex flex-col gap-2 w-full">

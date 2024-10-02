@@ -17,6 +17,7 @@ import {
 import { BaseUser, MentorStruct } from "@/lib/types/user.type"
 import { Role } from "@/lib/types/role.type"
 import { getMentorReviews } from "../client/pinata-actions"
+import { Session } from "@/lib/types/session.type"
 
 export enum ContractEvent {
   STUDENT_REGISTERED = "StudentRegistered",
@@ -168,6 +169,14 @@ export async function deleteAccount(account: Address) {
   return executeContractWrite({
     account,
     functionName: "deleteAccount",
+    args: [account],
+  })
+}
+
+export async function resetMentors(account: Address) {
+  return executeContractWrite({
+    account,
+    functionName: "resetMentors",
     args: [],
   })
 }
@@ -236,13 +245,13 @@ export async function getStudent(studentAddress: Address) {
   })
 }
 
-export async function getSession(sessionId: number) {
+export async function getSession(sessionId: number): Promise<Session> {
   return publicClient.readContract({
     address: DEVMENTOR_CONTRACT_ADDRESS,
     abi: DEVMENTOR_CONTRACT_ABI,
     functionName: "getSession",
     args: [sessionId],
-  })
+  }) as unknown as Session
 }
 
 export async function getAllMentors(): Promise<Address[]> {
@@ -261,13 +270,17 @@ export async function getSessionCounter() {
   })
 }
 
-export async function getSessionIdsByAccount(account: Address) {
-  return publicClient.readContract({
+export async function getSessionIdsByAccount(
+  account: Address
+): Promise<number[]> {
+  const ids: any = await publicClient.readContract({
     address: DEVMENTOR_CONTRACT_ADDRESS,
     abi: DEVMENTOR_CONTRACT_ABI,
     functionName: "getSessionIdsByAccount",
     args: [account],
   })
+
+  return ids.map((id: bigint) => Number(id))
 }
 
 export async function getEthPrice(): Promise<number> {

@@ -41,13 +41,15 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     Visitor | Student | MentorStruct | null,
     Error
   >({
-    queryKey: [QueryKeys.USER, address ?? "0x"],
+    queryKey: [QueryKeys.USER],
     queryFn: () => fetchUser(),
   })
 
   useEffect(() => {
-    queryClient.refetchQueries({ queryKey: [QueryKeys.USER, address ?? "0x"] })
-  }, [web3AuthInstance.connected])
+    if (!isConnected && !web3AuthInstance.connected) return
+
+    queryClient.refetchQueries({ queryKey: [QueryKeys.USER] })
+  }, [web3AuthInstance.connected, isConnected])
 
   async function fetchUser(): Promise<Visitor | Student | MentorStruct | null> {
     if (!isConnected) return null
@@ -139,7 +141,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
 
       disconnectAsync().then(() => {
         queryClient.resetQueries({
-          queryKey: [QueryKeys.USER, address],
+          queryKey: [QueryKeys.USER],
         })
       })
     } catch (error) {

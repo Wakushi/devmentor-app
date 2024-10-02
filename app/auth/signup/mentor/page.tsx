@@ -8,6 +8,7 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { toast } from "@/hooks/use-toast"
 import {
   Form,
   FormControl,
@@ -51,8 +52,15 @@ import SuccessScreen from "@/components/success-screen"
 import { useQueryClient } from "@tanstack/react-query"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { IoIosClose } from "react-icons/io"
-import { registerMentor } from "@/lib/actions/web3/contract"
+import {
+  ContractEvent,
+  registerMentor,
+  watchForEvent,
+} from "@/lib/actions/web3/contract"
 import { BaseUser } from "@/lib/types/user.type"
+import { Address } from "viem"
+import { FaCircleCheck } from "react-icons/fa6"
+import { Role } from "@/lib/types/role.type"
 
 const identityFormSchema = z.object({
   name: z.string().min(3, "Minimum length is 3"),
@@ -204,52 +212,98 @@ export default function MentorSignUpPage() {
     setLoading(true)
 
     try {
-      const { name, learningFields, yearsOfExperience } =
-        identityForm.getValues()
-      const { languages } = languageForm.getValues()
-      const { hourlyRate } = rateAndLinksForm.getValues()
-
-      const languagesIds = languages.map((lang) => {
-        const langId = languages.findIndex((l) => l === lang)
-        return langId >= 0 ? langId : 0
-      })
-
-      const subjectsIds = learningFields.map((subject) => {
-        const subjectId = allSubjects.findIndex((s) => s === subject)
-        return subjectId >= 0 ? subjectId : 0
-      })
-
-      const baseUser: BaseUser = {
-        account: user.account,
-        userName: name,
-        languages: languagesIds,
-        subjects: subjectsIds,
+      if (!user || !user.account) {
+        throw new Error("Missing user")
       }
 
-      const userPayload = {
-        account: user.account,
-        baseUser,
-        yearsOfExperience: +yearsOfExperience,
-        hourlyRate: +hourlyRate,
+      const userPayload = await createUserPayload()
+
+      if (!userPayload) {
+        throw new Error("Missing user payload")
       }
+
+      toast({
+        title: "Pending account creation...",
+        action: <Loader fill="white" color="primary" size="4" />,
+      })
 
       await registerMentor(userPayload)
 
-      await fetch("/api/user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userPayload),
+      toast({
+        title: "Creating account...",
+        action: <Loader fill="white" color="primary" size="4" />,
       })
 
-      queryClient.invalidateQueries({
-        queryKey: [QueryKeys.USER, user.account],
-      })
+      watchForEvent({
+        event: ContractEvent.MENTOR_REGISTERED,
+        args: { account: user.account },
+        handler: async () => {
+          queryClient.invalidateQueries({
+            queryKey: [QueryKeys.USER],
+          })
 
-      setLoading(false)
-      setSuccess(true)
+          toast({
+            title: "Success",
+            description: "Account created successfully !",
+            action: <FaCircleCheck className="text-white" />,
+          })
+
+          await fetch("/api/user", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userPayload, role: Role.MENTOR }),
+          })
+
+          setLoading(false)
+          setSuccess(true)
+        },
+      })
     } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          "Error submitting account. Please try again." + JSON.stringify(error),
+        variant: "destructive",
+      })
       setLoading(false)
       setSuccess(false)
+    }
+  }
+
+  async function createUserPayload(): Promise<{
+    account: Address
+    baseUser: BaseUser
+    yearsOfExperience: number
+    hourlyRate: number
+  } | null> {
+    if (!user) return null
+
+    const { name, learningFields, yearsOfExperience } = identityForm.getValues()
+    const { languages } = languageForm.getValues()
+    const { hourlyRate } = rateAndLinksForm.getValues()
+
+    const languagesIds = languages.map((lang) => {
+      const langId = languages.findIndex((l) => l === lang)
+      return langId >= 0 ? langId : 0
+    })
+
+    const subjectsIds = learningFields.map((subject) => {
+      const subjectId = allSubjects.findIndex((s) => s === subject)
+      return subjectId >= 0 ? subjectId : 0
+    })
+
+    const baseUser: BaseUser = {
+      account: user.account,
+      userName: name,
+      languages: languagesIds,
+      subjects: subjectsIds,
+    }
+
+    return {
+      account: user.account,
+      baseUser,
+      yearsOfExperience: +yearsOfExperience,
+      hourlyRate: +hourlyRate,
     }
   }
 

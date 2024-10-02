@@ -1,6 +1,6 @@
 const PINATA_GATEWAY_BASE_URL = "https://tan-key-moth-8.mypinata.cloud/ipfs"
 
-const DEVMENTOR_CONTRACT_ADDRESS = "0xF6CeDF73b743888411d76734AB1cb85936F915fd"
+const DEVMENTOR_CONTRACT_ADDRESS = "0xD0674521B1B217fD097cC0bE56f63A5C27d66538"
 const DEVMENTOR_CONTRACT_ABI = [
   {
     inputs: [
@@ -63,7 +63,13 @@ const DEVMENTOR_CONTRACT_ABI = [
     type: "function",
   },
   {
-    inputs: [],
+    inputs: [
+      {
+        internalType: "address",
+        name: "_account",
+        type: "address",
+      },
+    ],
     name: "deleteAccount",
     outputs: [],
     stateMutability: "nonpayable",
@@ -411,6 +417,13 @@ const DEVMENTOR_CONTRACT_ABI = [
         type: "tuple",
       },
     ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "resetMentors",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },

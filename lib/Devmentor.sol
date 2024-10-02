@@ -164,12 +164,15 @@ contract Devmentor {
         return newStudent;
     }
 
-    function deleteAccount() external {
-        delete s_studentByAccount[msg.sender];
-        delete s_mentorByAccount[msg.sender];
-        s_roleByAccount[msg.sender] = Role.VISITOR;
+    function deleteAccount(address _account) external {
+        delete s_studentByAccount[_account];
+        delete s_mentorByAccount[_account];
+        s_roleByAccount[_account] = Role.VISITOR;
     }
 
+    function resetMentors() external {
+        delete s_mentors;
+    }
     // studentContactHash is encrypted so that only the signature from the mentorAddress can decrypt it
     function createSession(
         address _mentorAddress,

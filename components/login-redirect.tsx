@@ -1,4 +1,5 @@
 "use client"
+import { Role } from "@/lib/types/role.type"
 import { useUser } from "@/services/user.service"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect } from "react"
@@ -9,7 +10,7 @@ export default function LoginRedirect() {
   const { user, isConnected } = useUser()
 
   useEffect(() => {
-    if (user?.registered || !isConnected) return
+    if (user?.role !== Role.VISITOR || !isConnected) return
 
     const choice = searchParams.get("role")
     router.push(choice ? `/auth/signup/${choice}` : "/auth/signup/choice")

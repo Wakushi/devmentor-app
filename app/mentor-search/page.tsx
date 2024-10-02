@@ -9,8 +9,12 @@ import AnimatedBackground from "@/components/ui/animated-background"
 import useMentorsQuery from "@/hooks/queries/mentors-query"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
 import { Language, LearningField } from "@/lib/types/profile-form.type"
-import { Mentor } from "@/lib/types/user.type"
-import { getAverageRating } from "@/lib/utils"
+import { MentorStruct } from "@/lib/types/user.type"
+import {
+  getAverageRating,
+  getLanguagesFromIds,
+  getSubjectsFromIds,
+} from "@/lib/utils"
 import { useEffect, useState } from "react"
 
 const MENTORS_PER_PAGE = 5
@@ -20,13 +24,13 @@ export default function MentorSearch() {
   const { data: mentors } = mentorsQuery
 
   const [currentPage, setCurrentPage] = useState(1)
-  const [filteredMentors, setFilteredMentors] = useState<Mentor[]>([])
+  const [filteredMentors, setFilteredMentors] = useState<MentorStruct[]>([])
   const [filters, setFilters] = useState({
     expertise: "All",
     language: "All",
     maxHourlyRate: "",
     freeSessionsOnly: false,
-    minRating: 4,
+    minRating: 0,
   })
 
   useEffect(() => {
@@ -35,11 +39,15 @@ export default function MentorSearch() {
     const filtered = mentors.filter((mentor) => {
       const expertiseMatch =
         filters.expertise === "All" ||
-        mentor.learningFields?.includes(filters.expertise as LearningField)
+        getSubjectsFromIds(mentor.baseUser.subjects)?.includes(
+          filters.expertise as LearningField
+        )
 
       const langMatch =
         filters.language === "All" ||
-        mentor.languages?.includes(filters.language as Language)
+        getLanguagesFromIds(mentor.baseUser.languages)?.includes(
+          filters.language as Language
+        )
 
       const hourlyRateMatch =
         filters.maxHourlyRate === "" ||
@@ -49,7 +57,7 @@ export default function MentorSearch() {
         !filters.freeSessionsOnly || mentor.hourlyRate === 0
 
       const minRatingMatch =
-        +getAverageRating(mentor.reviews) > filters.minRating
+        +getAverageRating(mentor.reviews) >= filters.minRating
 
       return (
         expertiseMatch &&
@@ -129,11 +137,11 @@ export default function MentorSearch() {
   )
 }
 
-function MentorList({ mentors }: { mentors: Mentor[] }) {
+function MentorList({ mentors }: { mentors: MentorStruct[] }) {
   return (
     <div className="flex flex-col gap-4">
-      {mentors.map((mentor: Mentor) => (
-        <MentorCard key={mentor.id} mentor={mentor} />
+      {mentors.map((mentor: MentorStruct) => (
+        <MentorCard key={mentor.account} mentor={mentor} />
       ))}
     </div>
   )

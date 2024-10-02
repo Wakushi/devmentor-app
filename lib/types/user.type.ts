@@ -1,39 +1,60 @@
-import { OpenloginUserInfo } from "@web3auth/openlogin-adapter"
-import {
-  ContactType,
-  Experience,
-  Language,
-  LearningField,
-} from "./profile-form.type"
-import { Role } from "./role.type"
 import { Review } from "./review.type"
+import { Role } from "./role.type"
+import { Address } from "viem"
 
-type Contact = {
-  type: ContactType
-  value: string
+export type BaseUser = {
+  account: Address
+  userName: string
+  languages: number[]
+  subjects: number[]
 }
 
-export type User = {
-  id?: string
-  address: `0x${string}`
-  name?: string
-  registered?: boolean
-  role?: Role
-  languages?: Language[]
-  learningFields?: LearningField[]
-  web3AuthData?: Partial<OpenloginUserInfo> | null
+export type Visitor = {
+  account: Address
+  role: Role
 }
 
-export type Student = User & {
-  experience?: Experience
-  contacts?: Contact[]
+export type Student = {
+  account: Address
+  baseUser: BaseUser
+  contactHash: string
+  experience: number
+  role: Role
 }
 
-export type Mentor = User & {
+export type MentorStruct = {
+  account: Address
+  baseUser: BaseUser
   validated: boolean
   yearsOfExperience: number
-  reviews: Review[]
   sessionCount: number
   hourlyRate: number
-  timeslotsHash?: string
+  timeslotsHash: string
+  reviewsHash: string
+  role: Role
+  reviews: Review[]
 }
+
+// Raw structs received from the contract
+export type RawBaseUser = [
+  Address, // account
+  string, // userName
+  bigint[], // languagesRaw
+  bigint[] // subjectsRaw
+]
+
+export type RawStudent = [
+  RawBaseUser,
+  string, // contactHash
+  bigint // experience
+]
+
+export type RawMentor = [
+  RawBaseUser,
+  boolean, // validated
+  bigint, // yearsOfExperience
+  bigint, // sessionCount
+  bigint, // hourlyRate
+  string, // timeslotsHash
+  string // reviewsHash
+]

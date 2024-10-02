@@ -1,13 +1,21 @@
+import { getAllMentors, getMentor } from "@/lib/actions/web3/contract"
 import { QueryKeys } from "@/lib/types/query-keys.type"
-import { Mentor } from "@/lib/types/user.type"
+import { MentorStruct } from "@/lib/types/user.type"
 import { useQuery } from "@tanstack/react-query"
 
 export default function useMentorsQuery() {
-  const mentorsQuery = useQuery<Mentor[], Error>({
-    queryKey: [QueryKeys.SESSIONS],
+  const mentorsQuery = useQuery<MentorStruct[], Error>({
+    queryKey: [QueryKeys.MENTORS],
     queryFn: async () => {
-      const response = await fetch("/api/user/mentors")
-      const { mentors } = await response.json()
+      const mentorsAddresses = await getAllMentors()
+
+      const mentors: MentorStruct[] = []
+
+      for (let mentorAddress of mentorsAddresses) {
+        const mentor = await getMentor(mentorAddress)
+        mentors.push(mentor)
+      }
+
       return mentors
     },
   })

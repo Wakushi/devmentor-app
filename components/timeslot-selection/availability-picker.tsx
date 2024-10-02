@@ -6,7 +6,7 @@ import { useState } from "react"
 import { TimeValue } from "react-aria"
 import DayOfWeekCard from "./day-of-week-card"
 import { Button } from "../ui/button"
-import { Mentor } from "@/lib/types/user.type"
+import { MentorStruct } from "@/lib/types/user.type"
 import {
   DAYS_OF_WEEK,
   FIVE_PM,
@@ -16,7 +16,11 @@ import {
 } from "@/lib/constants"
 import { pinMentorTimeslots } from "@/lib/actions/client/pinata-actions"
 
-export default function AvailabilityPicker({ mentor }: { mentor: Mentor }) {
+export default function AvailabilityPicker({
+  mentor,
+}: {
+  mentor: MentorStruct
+}) {
   const DEFAULT_SLOT: DaySlot = {
     timeStart: NINE_THIRTY_AM,
     timeEnd: FIVE_PM,
@@ -99,7 +103,7 @@ export default function AvailabilityPicker({ mentor }: { mentor: Mentor }) {
   }
 
   async function handleSaveTimeslots(): Promise<void> {
-    const timeslots = computeTimeslots(daysOfWeek, mentor.address)
+    const timeslots = computeTimeslots(daysOfWeek, mentor.account)
     const updatedMentor = await pinMentorTimeslots(mentor, timeslots)
     console.log("updatedMentor: ", updatedMentor)
   }

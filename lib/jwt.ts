@@ -1,5 +1,4 @@
 import * as jose from "jose"
-import { User } from "./types/user.type"
 import { Role } from "./types/role.type"
 import { Address } from "viem"
 
@@ -26,7 +25,7 @@ const CRYPTO_CONFIG: CryptoOptions = {
 }
 
 async function createUserJwtToken(
-  payload: User,
+  payload: { address: Address; role: Role },
   expiresIn = CRYPTO_CONFIG.jwtTokenDuration,
   jwtSecret = CRYPTO_CONFIG.jwtSecret
 ): Promise<string> {
@@ -34,7 +33,6 @@ async function createUserJwtToken(
   const alg = "HS256"
 
   return new jose.SignJWT({
-    id: payload.id,
     address: payload.address,
     role: payload.role,
   })

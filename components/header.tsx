@@ -10,13 +10,16 @@ import NavLinkButton from "./ui/nav-link"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { getInitials } from "@/lib/utils"
 import { Role } from "@/lib/types/role.type"
+import { deleteAccount } from "@/lib/actions/web3/contract"
+import { MdDelete } from "react-icons/md"
+import { MentorStruct, Student } from "@/lib/types/user.type"
 
 export default function Header() {
   const { user, isConnected, logOut, loadingUser } = useUser()
 
   const getUserBalance = async () => {
-    if (!web3AuthInstance.provider || !user?.address) return
-    const balance = await getBalance(web3AuthInstance.provider, user.address)
+    if (!web3AuthInstance.provider || !user?.account) return
+    const balance = await getBalance(web3AuthInstance.provider, user.account)
     console.log("Balance: ", balance, "User: ", user)
   }
 
@@ -35,7 +38,11 @@ export default function Header() {
     ))
 
   const Navigation = () => {
-    if (isConnected && user?.registered) {
+    if (
+      isConnected &&
+      user &&
+      (user.role === Role.MENTOR || user.role === Role.STUDENT)
+    ) {
       const navLinks = [
         { href: "/", label: "Home" },
         { href: `/dashboard/${user.role?.toLowerCase()}`, label: "Dashboard" },
@@ -51,22 +58,33 @@ export default function Header() {
           <div className="flex items-center gap-2">
             <Avatar className="w-[30px] h-[30px]" onClick={getUserBalance}>
               <AvatarImage
-                src={
-                  user?.web3AuthData?.profileImage ||
-                  `https://api.dicebear.com/9.x/notionists/svg?seed=${user.name}`
-                }
+                src={`https://api.dicebear.com/9.x/notionists/svg?seed=${
+                  (user as Student | MentorStruct).baseUser.userName
+                }`}
               />
               <AvatarFallback className="text-d1">
-                {getInitials(user.name || "")}
+                {getInitials(
+                  (user as Student | MentorStruct).baseUser.userName || ""
+                )}
               </AvatarFallback>
             </Avatar>
-            <p className="text-mid">{user.name}</p>
+            <p className="text-mid">
+              {(user as Student | MentorStruct).baseUser.userName}
+            </p>
             <TooltipWrapper message="Disconnect wallet">
               <IoMdLogOut
                 className="text-2xl text-brand cursor-pointer hover:opacity-80"
                 onClick={logOut}
               />
             </TooltipWrapper>
+            {/* <MdDelete
+              className="min-w-6 min-h-6 text-brand cursor-pointer hover:opacity-80"
+              onClick={() => {
+                if (user?.account) {
+                  deleteAccount(user?.account)
+                }
+              }}
+            /> */}
           </div>
         </nav>
       )

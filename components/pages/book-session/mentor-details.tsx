@@ -1,25 +1,24 @@
+"use client"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { getLanguageOption, LearningField } from "@/lib/types/profile-form.type"
+import {
+  allSubjects,
+  getLanguageOption,
+  LearningField,
+} from "@/lib/types/profile-form.type"
 import { getAverageRating, getInitials } from "@/lib/utils"
 import { ClockIcon, StarIcon } from "lucide-react"
-import { CiDollar } from "react-icons/ci"
 import Flag from "@/components/ui/flag"
-import { Mentor } from "@/lib/types/user.type"
+import { MentorStruct } from "@/lib/types/user.type"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import MentorReviews from "./mentor-reviews"
+import HourlyRate from "@/components/hourly-rate"
 
-export default function MentorDetails({ mentor }: { mentor: Mentor }) {
-  const {
-    name,
-    reviews,
-    learningFields,
-    languages,
-    yearsOfExperience,
-    hourlyRate,
-    address,
-  } = mentor
+export default function MentorDetails({ mentor }: { mentor: MentorStruct }) {
+  const { baseUser, yearsOfExperience, hourlyRate, account, reviews } = mentor
+  const { userName, languages, subjects } = baseUser
+  const learningFields = subjects.map((subject) => allSubjects[subject])
 
   return (
     <Card className="flex-1 min-h-[370px] h-fit glass text-white border-none fade-in-left">
@@ -34,14 +33,14 @@ export default function MentorDetails({ mentor }: { mentor: Mentor }) {
           <div className="flex items-center gap-2">
             <Avatar className="w-14 h-14">
               <AvatarImage
-                src={`https://api.dicebear.com/9.x/notionists/svg?seed=${name}`}
-                alt={name}
+                src={`https://api.dicebear.com/9.x/notionists/svg?seed=${userName}`}
+                alt={userName}
               />
-              <AvatarFallback>{getInitials(name || "")}</AvatarFallback>
+              <AvatarFallback>{getInitials(userName || "")}</AvatarFallback>
             </Avatar>
 
             <div>
-              <p className="text-lg font-semibold">{name}</p>
+              <p className="text-lg font-semibold">{userName}</p>
               <div className="flex items-center mt-1">
                 <StarIcon className="w-4 h-4 text-primary fill-primary mr-1" />
                 <span className="text-sm font-medium">
@@ -67,7 +66,7 @@ export default function MentorDetails({ mentor }: { mentor: Mentor }) {
               const langOption = getLanguageOption(lang)
               if (!langOption) return null
               return (
-                <Flag size="small" key={address + lang} lang={langOption} />
+                <Flag size="small" key={account + lang} lang={langOption} />
               )
             })}
           </div>
@@ -78,12 +77,7 @@ export default function MentorDetails({ mentor }: { mentor: Mentor }) {
           </div>
 
           <div className="flex flex-1 items-center text-sm text-gray-300">
-            <CiDollar className="w-4 h-4 mr-2" />
-            {hourlyRate > 0 ? (
-              <span>${hourlyRate}/hour</span>
-            ) : (
-              <span>Free</span>
-            )}
+            <HourlyRate hourlyRate={hourlyRate} />
           </div>
         </div>
         <Separator orientation="vertical" className="h-auto bg-stone-800" />

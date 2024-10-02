@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import {
+  allSubjects,
   ContactType,
   Language,
   languageOptions,
@@ -42,16 +43,16 @@ import {
 import { Input } from "@/components/ui/input"
 import Stepper from "@/components/pages/auth/stepper"
 import { Separator } from "@/components/ui/separator"
-import { Mentor } from "@/lib/types/user.type"
 import { useUser } from "@/services/user.service"
 import Loader from "@/components/ui/loader"
 import NavLinkButton from "@/components/ui/nav-link"
-import { Role } from "@/lib/types/role.type"
 import Flag from "@/components/ui/flag"
 import SuccessScreen from "@/components/success-screen"
 import { useQueryClient } from "@tanstack/react-query"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { IoIosClose } from "react-icons/io"
+import { registerMentor } from "@/lib/actions/web3/contract"
+import { BaseUser } from "@/lib/types/user.type"
 
 const identityFormSchema = z.object({
   name: z.string().min(3, "Minimum length is 3"),
@@ -198,7 +199,7 @@ export default function MentorSignUpPage() {
   }
 
   async function onSubmit() {
-    if (!user || !user.address) return
+    if (!user || !user.account) return
 
     setLoading(true)
 
@@ -208,29 +209,40 @@ export default function MentorSignUpPage() {
       const { languages } = languageForm.getValues()
       const { hourlyRate } = rateAndLinksForm.getValues()
 
-      const mentorPayload: Mentor = {
-        ...user,
-        name,
-        yearsOfExperience,
-        learningFields,
-        languages,
-        hourlyRate: +hourlyRate,
-        sessionCount: 0,
-        validated: false,
-        reviews: [],
-        role: Role.MENTOR,
-      }
-
-      const response = await fetch("/api/user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(mentorPayload),
+      const languagesIds = languages.map((lang) => {
+        const langId = languages.findIndex((l) => l === lang)
+        return langId >= 0 ? langId : 0
       })
 
-      const { createdUser } = await response.json()
+      const subjectsIds = learningFields.map((subject) => {
+        const subjectId = allSubjects.findIndex((s) => s === subject)
+        return subjectId >= 0 ? subjectId : 0
+      })
+
+      const baseUser: BaseUser = {
+        account: user.account,
+        userName: name,
+        languages: languagesIds,
+        subjects: subjectsIds,
+      }
+
+      const userPayload = {
+        account: user.account,
+        baseUser,
+        yearsOfExperience: +yearsOfExperience,
+        hourlyRate: +hourlyRate,
+      }
+
+      await registerMentor(userPayload)
+
+      await fetch("/api/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userPayload),
+      })
 
       queryClient.invalidateQueries({
-        queryKey: [QueryKeys.USER, createdUser.address],
+        queryKey: [QueryKeys.USER, user.account],
       })
 
       setLoading(false)

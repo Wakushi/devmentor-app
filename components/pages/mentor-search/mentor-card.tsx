@@ -2,41 +2,39 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { StarIcon, ClockIcon } from "lucide-react"
-import { Mentor } from "@/lib/types/user.type"
-import { getLanguageOption, LearningField } from "@/lib/types/profile-form.type"
-import { CiDollar } from "react-icons/ci"
+import { MentorStruct } from "@/lib/types/user.type"
+import {
+  allSubjects,
+  getLanguageOption,
+  LearningField,
+} from "@/lib/types/profile-form.type"
 import { FaLongArrowAltRight } from "react-icons/fa"
 import Flag from "@/components/ui/flag"
 import { getAverageRating, getInitials } from "@/lib/utils"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import HourlyRate from "@/components/hourly-rate"
 
-export default function MentorCard({ mentor }: { mentor: Mentor }) {
-  const {
-    name,
-    reviews,
-    learningFields,
-    languages,
-    yearsOfExperience,
-    hourlyRate,
-    address,
-  } = mentor
+export default function MentorCard({ mentor }: { mentor: MentorStruct }) {
+  const { baseUser, reviews, yearsOfExperience, hourlyRate, account } = mentor
+  const { userName, languages, subjects } = baseUser
+  const learningFields = subjects.map((subject) => allSubjects[subject])
 
   return (
     <Card className="bg-primary-faded rounded-md border border-primary-faded text-white overflow-hidden transition-all duration-300 hover:border-white cursor-pointer hover:-translate-y-1 hover:shadow-xl">
-      <Link href={`/book-session?mentor=${address}`}>
+      <Link href={`/book-session?mentor=${account}`}>
         <CardContent className="flex items-center justify-between gap-4 p-4">
           <div className="flex items-center gap-2">
             <Avatar className="w-14 h-14">
               <AvatarImage
-                src={`https://api.dicebear.com/9.x/notionists/svg?seed=${name}`}
-                alt={mentor.name}
+                src={`https://api.dicebear.com/9.x/notionists/svg?seed=${userName}`}
+                alt={userName}
               />
-              <AvatarFallback>{getInitials(name || "")}</AvatarFallback>
+              <AvatarFallback>{getInitials(userName || "")}</AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-lg font-semibold">{name}</p>
+              <p className="text-lg font-semibold">{userName}</p>
               <div className="flex items-center mt-1">
                 <StarIcon className="w-4 h-4 text-primary fill-primary mr-1" />
                 <span className="text-sm font-medium">
@@ -56,7 +54,7 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
               if (!langOption) return null
 
               return (
-                <Flag size="small" key={address + lang} lang={langOption} />
+                <Flag size="small" key={account + lang} lang={langOption} />
               )
             })}
           </div>
@@ -75,12 +73,7 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
           </div>
 
           <div className="flex flex-1 items-center text-sm text-gray-300">
-            <CiDollar className="w-4 h-4 mr-2" />
-            {hourlyRate > 0 ? (
-              <span>${hourlyRate}/hour</span>
-            ) : (
-              <span>Free</span>
-            )}
+            <HourlyRate hourlyRate={hourlyRate} />
           </div>
 
           <div>

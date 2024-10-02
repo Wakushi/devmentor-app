@@ -9,9 +9,13 @@ import useSessionsQuery from "@/hooks/queries/sessions-query"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
 import Loader from "@/components/ui/loader"
 import Image from "next/image"
+import { Student } from "@/lib/types/user.type"
 
 export default function DashboardPage() {
-  const { user, loadingUser } = useUser()
+  const { user, loadingUser } = useUser() as {
+    user: Student | null
+    loadingUser: boolean
+  }
   const sessionsQuery = useSessionsQuery(user)
 
   if (loadingUser) {
@@ -34,7 +38,7 @@ export default function DashboardPage() {
           <div className="min-h-screen flex flex-col gap-6 max-w-[95%] mx-auto w-full pt-header-distance">
             <div className="flex w-full items-center gap-8">
               <h1 className="text-2xl font-bold">
-                Welcome back, {user.name} !
+                Welcome back, {user.baseUser.userName} !
               </h1>
               <div>
                 <NavLinkButton variant="filled-secondary" href="/mentor-search">
@@ -62,6 +66,7 @@ function EmptyDashboard() {
         height={300}
         src="/assets/search.gif"
         alt="Search icon"
+        unoptimized
       />
       <div className="flex flex-col text-center mb-8">
         <h3>No upcoming sessions</h3>

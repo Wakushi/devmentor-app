@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { Mentor } from "@/lib/types/user.type"
+import { MentorStruct } from "@/lib/types/user.type"
 import clsx from "clsx"
 import CompleteSessionButton from "./complete-session-button"
 import { BookStep } from "@/lib/types/book-session-form.type"
@@ -11,7 +11,7 @@ interface BookSessionNavigationProps {
   currentStepValid: boolean
   handlePrevStep: () => void
   handleNextStep: () => void
-  mentor: Mentor
+  mentor: MentorStruct
   handlePayment: () => void
   processingPayment: boolean
   handleConfirmFreeSession: () => void

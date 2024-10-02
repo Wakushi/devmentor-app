@@ -5,6 +5,12 @@ import { Review } from "./types/review.type"
 import { DayOfWeek, DaySlot, Timeslot } from "./types/timeslot.type"
 import { Matcher } from "react-day-picker"
 import { NINETY_DAYS, ONE_HOUR_IN_MS } from "./constants"
+import {
+  allLanguages,
+  allSubjects,
+  Language,
+  LearningField,
+} from "./types/profile-form.type"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -30,6 +36,8 @@ export function getInitials(name: string) {
 }
 
 export function getAverageRating(reviews: Review[]) {
+  if (!reviews.length) return 0
+  
   const sum = reviews.reduce((acc, review) => acc + review.rate, 0)
   return (sum / reviews.length).toFixed(1)
 }
@@ -215,4 +223,12 @@ export function getTimeslotId(slot: Timeslot): number {
   const { mentorAddress, date, timeStart, timeEnd } = slot
   const concatenatedString = `${mentorAddress}${date}${timeStart}${timeEnd}`
   return hashCode(concatenatedString)
+}
+
+export function getSubjectsFromIds(subjectsIds: number[]): LearningField[] {
+  return subjectsIds.map((subjectId) => allSubjects[subjectId])
+}
+
+export function getLanguagesFromIds(langIds: number[]): Language[] {
+  return langIds.map((langId) => allLanguages[langId])
 }

@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { BsThreeDots } from "react-icons/bs"
+import HourlyRate from "@/components/hourly-rate"
 
 export function SessionCard({ session }: { session: Session }) {
   const { timeStart } = session
@@ -65,12 +66,7 @@ function SessionTime({ timeStart }: { timeStart: number }) {
 function SessionPrice({ sessionPrice }: { sessionPrice: number | null }) {
   return (
     <div className="flex items-center text-sm text-gray-300">
-      <CiDollar className="w-4 h-4 mr-2" />
-      {sessionPrice && sessionPrice > 0 ? (
-        <span>${sessionPrice}/hour</span>
-      ) : (
-        <span>Free</span>
-      )}
+      <HourlyRate hourlyRate={sessionPrice ?? 0} />
     </div>
   )
 }

@@ -17,6 +17,8 @@ export enum Experience {
   ADEPT = "ADEPT",
 }
 
+export const experiences = Array.from(Object.keys(Experience) as Experience[])
+
 export enum ContactType {
   DISCORD = "DISCORD",
   EMAIL = "EMAIL",
@@ -65,6 +67,10 @@ export enum LearningField {
   DAO = "DAO",
 }
 
+export const allSubjects = Array.from(
+  Object.keys(LearningField) as LearningField[]
+)
+
 export const learningFieldOptions = [
   { value: LearningField.BLOCKCHAIN, label: "Blockchain" },
   { value: LearningField.SMART_CONTRACTS, label: "Smart Contracts" },
@@ -89,6 +95,8 @@ export enum Language {
   JAPANESE = "ja",
 }
 
+export const allLanguages = Array.from(Object.keys(Language) as Language[])
+
 export interface LanguageOption {
   value: Language
   label: string
@@ -108,9 +116,6 @@ export const languageOptions: LanguageOption[] = [
   { value: Language.JAPANESE, label: "Japanese", code: "JP" },
 ]
 
-export function getLanguageOption(code: string): LanguageOption | null {
-  const lang = languageOptions.find(
-    (l) => l.value.toLowerCase() === code.toLowerCase()
-  )
-  return lang || null
+export function getLanguageOption(langId: number): LanguageOption {
+  return languageOptions[langId]
 }

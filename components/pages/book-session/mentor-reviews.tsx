@@ -2,6 +2,10 @@ import { Review } from "@/lib/types/review.type"
 import { StarIcon } from "lucide-react"
 
 export default function MentorReviews({ reviews }: { reviews: Review[] }) {
+  if (!reviews || !reviews.length) {
+    return <span>No reviews yet.</span>
+  }
+
   const lastTwoReviews = reviews.slice(-2).reverse()
 
   return (

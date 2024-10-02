@@ -37,8 +37,10 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "crypto-js": "^4.2.0",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
+    "ethers": "^6.13.2",
     "firebase-admin": "^12.5.0",
     "framer-motion": "^11.5.6",
     "jose": "^5.9.3",
@@ -59,6 +61,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

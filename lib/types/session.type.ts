@@ -1,5 +1,5 @@
 import { Address } from "viem"
-import { Mentor } from "./user.type"
+import { MentorStruct } from "./user.type"
 
 export type Session = {
   id?: string
@@ -9,5 +9,5 @@ export type Session = {
   valueLocked: number
   objectives: string
   cancelled?: boolean
-  mentor?: Mentor
+  mentor?: MentorStruct
 }

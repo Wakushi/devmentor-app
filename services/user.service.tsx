@@ -2,12 +2,9 @@
 import { createContext, ReactNode, useContext, useEffect } from "react"
 import { useAccount, useDisconnect } from "wagmi"
 import { web3AuthInstance } from "@/lib/Web3AuthConnectorInstance"
-import { usePathname, useRouter } from "next/navigation"
-import { Mentor, Student, User } from "@/lib/types/user.type"
-import { IProvider } from "@web3auth/base"
-import { createWalletClient, custom } from "viem"
-import { baseSepolia } from "viem/chains"
-import { OpenloginUserInfo } from "@web3auth/openlogin-adapter"
+import { useRouter } from "next/navigation"
+import { MentorStruct, Student, Visitor } from "@/lib/types/user.type"
+import { Address } from "viem"
 import { Role } from "@/lib/types/role.type"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { QueryKeys } from "@/lib/types/query-keys.type"
@@ -17,7 +14,7 @@ interface UserContextProviderProps {
 }
 
 interface UserContextProps {
-  user: Student | Mentor | null | undefined
+  user: Visitor | Student | MentorStruct | null | undefined
   loadingUser: boolean
   isConnected: boolean
   logOut: () => void
@@ -38,11 +35,10 @@ export default function UserContextProvider(props: UserContextProviderProps) {
   const { address, connector, isConnected } = useAccount()
   const { disconnectAsync } = useDisconnect()
   const router = useRouter()
-  const pathname = usePathname()
   const queryClient = useQueryClient()
 
   const { data: user, isLoading: loadingUser } = useQuery<
-    Student | Mentor | null,
+    Visitor | Student | MentorStruct | null,
     Error
   >({
     queryKey: [QueryKeys.USER, address ?? "0x"],
@@ -53,82 +49,72 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     queryClient.refetchQueries({ queryKey: [QueryKeys.USER, address ?? "0x"] })
   }, [web3AuthInstance.connected])
 
-  async function fetchUser(): Promise<Student | Mentor | null> {
+  async function fetchUser(): Promise<Visitor | Student | MentorStruct | null> {
     if (!isConnected) return null
 
     try {
-      let registeredUser: User | null = null
-      let web3AuthData: Partial<OpenloginUserInfo> | null = null
+      let user: Visitor | Student | MentorStruct | null = null
 
       switch (connector?.name) {
         case Connectors.WEB3AUTH:
-          if (!web3AuthInstance.connected) return null
-          if (!address) return null
+          if (!web3AuthInstance.connected || !address) return null
 
-          registeredUser = await getRegisteredUser(address)
-          web3AuthData = await web3AuthInstance.getUserInfo()
+          user = await getUserByAddress(address)
           break
 
         default:
           if (!address) return null
 
-          registeredUser = await getRegisteredUser(address)
-
+          user = await getUserByAddress(address)
           break
       }
 
-      routeUser(registeredUser)
+      routeUser(user)
 
-      return registeredUser
-        ? registeredUser
-        : {
-            address,
-            web3AuthData,
-          }
+      return user
     } catch (error) {
       console.log("Error while connecting user: ", error)
       return null
     }
   }
 
-  async function getUserAddress(): Promise<`0x${string}` | null> {
-    if (!web3AuthInstance?.provider) {
-      return null
-    }
-
-    const accounts: any[] = await getAccounts(web3AuthInstance.provider)
-    return accounts && accounts.length ? accounts[0] : null
-  }
-
-  async function getRegisteredUser(
-    address: string
-  ): Promise<Student | Mentor | null> {
+  async function getUserByAddress(
+    address: Address
+  ): Promise<Visitor | Student | MentorStruct> {
     try {
       const response = await fetch(`/api/user?address=${address}`)
-      const { registeredUser } = await response.json()
+      const { user } = await response.json()
 
-      if (registeredUser.role === Role.MENTOR) {
-        return registeredUser as Mentor
+      switch (user.role) {
+        case Role.VISITOR:
+          return user as Visitor
+        case Role.STUDENT:
+          return user as Student
+        case Role.MENTOR:
+          return user as MentorStruct
+        default:
+          return user as Visitor
       }
-
-      return registeredUser as Student
     } catch (error: any) {
-      return null
+      console.log("Error getting user: ", error)
+      return { account: address, role: Role.VISITOR }
     }
   }
 
-  async function getAccounts(provider: IProvider): Promise<any> {
-    try {
-      const walletClient = createWalletClient({
-        chain: baseSepolia,
-        transport: custom(provider),
-      })
+  function routeUser(user: Visitor | Student | MentorStruct): void {
+    const url = new URL(window.location.href)
+    const pathname = url.pathname
+    const role = url.searchParams.get("role")
 
-      const address = await walletClient.getAddresses()
-
-      return address
-    } catch (error) {
-      return error
+    switch (pathname) {
+      case "/auth/signup":
+      case "/auth/login":
+        router.push(
+          user.role !== Role.VISITOR
+            ? `/dashboard/${user.role?.toLowerCase()}`
+            : `/auth/signup/${role || "choice"}`
+        )
+        break
     }
   }
 
@@ -158,23 +144,6 @@ export default function UserContextProvider(props: UserContextProviderProps) {
       })
     } catch (error) {
       console.error(error)
-    }
-  }
-
-  function routeUser(registeredUser: Student | Mentor | null): void {
-    const url = new URL(window.location.href)
-    const pathname = url.pathname
-    const role = url.searchParams.get("role")
-
-    switch (pathname) {
-      case "/auth/signup":
-      case "/auth/login":
-        router.push(
-          registeredUser
-            ? `/dashboard/${registeredUser.role?.toLowerCase()}`
-            : `/auth/signup/${role || "choice"}`
-        )
-        break
     }
   }
 

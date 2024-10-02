@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import Loader from "@/components/ui/loader"
-import { Mentor } from "@/lib/types/user.type"
+import { MentorStruct } from "@/lib/types/user.type"
 import { FaDollarSign } from "react-icons/fa"
 import { IoIosFlash } from "react-icons/io"
 
@@ -10,7 +10,7 @@ export default function CompleteSessionButton({
   processingPayment,
   handleConfirmFreeSession,
 }: {
-  mentor: Mentor
+  mentor: MentorStruct
   handlePayment: () => void
   processingPayment: boolean
   handleConfirmFreeSession: () => void

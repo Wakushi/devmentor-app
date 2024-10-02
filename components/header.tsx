@@ -10,8 +10,6 @@ import NavLinkButton from "./ui/nav-link"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { getInitials } from "@/lib/utils"
 import { Role } from "@/lib/types/role.type"
-import { deleteAccount } from "@/lib/actions/web3/contract"
-import { MdDelete } from "react-icons/md"
 import { MentorStruct, Student } from "@/lib/types/user.type"
 
 export default function Header() {
@@ -77,14 +75,6 @@ export default function Header() {
                 onClick={logOut}
               />
             </TooltipWrapper>
-            {/* <MdDelete
-              className="min-w-6 min-h-6 text-brand cursor-pointer hover:opacity-80"
-              onClick={() => {
-                if (user?.account) {
-                  deleteAccount(user?.account)
-                }
-              }}
-            /> */}
           </div>
         </nav>
       )

@@ -3,7 +3,7 @@ import { StarIcon } from "lucide-react"
 
 export default function MentorReviews({ reviews }: { reviews: Review[] }) {
   if (!reviews || !reviews.length) {
-    return <span>No reviews yet.</span>
+    return <p className="text-small text-gray-400 px-6">No reviews yet.</p>
   }
 
   const lastTwoReviews = reviews.slice(-2).reverse()
@@ -33,7 +33,7 @@ export default function MentorReviews({ reviews }: { reviews: Review[] }) {
           </div>
         ))
       ) : (
-        <p className="text-sm text-gray-400">No reviews yet.</p>
+        <p className="text-small text-gray-400">No reviews yet.</p>
       )}
     </div>
   )

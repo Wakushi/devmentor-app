@@ -121,6 +121,8 @@ export default function UserContextProvider(props: UserContextProviderProps) {
   }
 
   async function logOut(): Promise<void> {
+    router.push("/")
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API_URL}/auth/logout`,
@@ -136,8 +138,6 @@ export default function UserContextProvider(props: UserContextProviderProps) {
       if (!response.ok) {
         throw new Error("Failed to log out")
       }
-
-      router.push("/")
 
       disconnectAsync().then(() => {
         queryClient.resetQueries({

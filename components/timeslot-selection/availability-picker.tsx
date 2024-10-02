@@ -1,6 +1,6 @@
 "use client"
 
-import { DayOfWeek, DaySlot } from "@/lib/types/timeslot.type"
+import { DayOfWeek, DaySlot, Timeslot } from "@/lib/types/timeslot.type"
 import { computeTimeslots, getWeekdayName } from "@/lib/utils"
 import { useState } from "react"
 import { TimeValue } from "react-aria"
@@ -14,12 +14,13 @@ import {
   SATURDAY,
   SUNDAY,
 } from "@/lib/constants"
-import { pinMentorTimeslots } from "@/lib/actions/client/pinata-actions"
 
 export default function AvailabilityPicker({
   mentor,
+  handleSaveTimeslots,
 }: {
   mentor: MentorStruct
+  handleSaveTimeslots: (timeslots: Timeslot[]) => void
 }) {
   const DEFAULT_SLOT: DaySlot = {
     timeStart: NINE_THIRTY_AM,
@@ -102,14 +103,13 @@ export default function AvailabilityPicker({
     )
   }
 
-  async function handleSaveTimeslots(): Promise<void> {
+  async function onSubmit(): Promise<void> {
     const timeslots = computeTimeslots(daysOfWeek, mentor.account)
-    const updatedMentor = await pinMentorTimeslots(mentor, timeslots)
-    console.log("updatedMentor: ", updatedMentor)
+    handleSaveTimeslots(timeslots)
   }
 
   return (
-    <section className="max-w-[500px] glass flex flex-col gap-4 p-4 rounded">
+    <section className="max-w-[500px] flex flex-col gap-4 p-4 rounded">
       <div className="flex flex-col gap-4">
         {daysOfWeek.map((day: DayOfWeek) => {
           return (
@@ -124,7 +124,7 @@ export default function AvailabilityPicker({
           )
         })}
       </div>
-      <Button onClick={handleSaveTimeslots}>Confirm</Button>
+      <Button onClick={onSubmit}>Confirm</Button>
     </section>
   )
 }

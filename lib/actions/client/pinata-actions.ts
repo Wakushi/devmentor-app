@@ -16,7 +16,7 @@ export async function getMentorTimeslots(
 export async function pinMentorTimeslots(
   mentor: MentorStruct,
   timeslots: Timeslot[]
-): Promise<MentorStruct> {
+): Promise<string> {
   if (mentor.timeslotsHash) {
     await unpinFile(mentor.timeslotsHash)
   }
@@ -30,8 +30,8 @@ export async function pinMentorTimeslots(
     }),
   })
 
-  const { IpfsHash } = await response.json()
-  return { ...mentor, timeslotsHash: IpfsHash }
+  const { IpfsHash: timeslotsHash } = await response.json()
+  return timeslotsHash
 }
 
 export async function unpinFile(hash: string): Promise<void> {

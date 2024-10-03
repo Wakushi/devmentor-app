@@ -9,9 +9,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     const body = await req.json()
     const { json, filename } = body
 
-    const IpfsHash = await pinJSONToIPFS(json, filename)
+    const ipfsHash = await pinJSONToIPFS(json, filename)
 
-    return new NextResponse(JSON.stringify({ IpfsHash }))
+    return new NextResponse(JSON.stringify({ ipfsHash }))
   } catch (error: any) {
     return new NextResponse(JSON.stringify({ error: error.message }), {
       status: 500,

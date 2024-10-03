@@ -14,14 +14,20 @@ import {
 import { Button } from "@/components/ui/button"
 import { CiCalendar } from "react-icons/ci"
 import { Timeslot } from "@/lib/types/timeslot.type"
-import { pinMentorTimeslots } from "@/lib/actions/client/pinata-actions"
-import { updateTimeslot } from "@/lib/actions/web3/contract"
+import useTimeslotsQuery from "@/hooks/queries/timeslots-query"
+import { registerTimeslots } from "@/lib/actions/client/firebase-actions"
+import { QueryKeys } from "@/lib/types/query-keys.type"
+import { useQueryClient } from "@tanstack/react-query"
+import { computeTimeslotsToDaysOfWeek } from "@/lib/utils"
 
 export default function DashboardPage() {
+  const queryClient = useQueryClient()
   const { user, loadingUser } = useUser() as {
     user: MentorStruct
     loadingUser: boolean
   }
+  const timeslotsQuery = useTimeslotsQuery(user?.account)
+  const { data: timeslots } = timeslotsQuery
 
   if (loadingUser) {
     return <LoadingScreen />
@@ -30,8 +36,10 @@ export default function DashboardPage() {
   if (!user) return
 
   async function handleSaveTimeslots(timeslots: Timeslot[]): Promise<void> {
-    const timeslotsHash = await pinMentorTimeslots(user, timeslots)
-    await updateTimeslot(user.account, timeslotsHash)
+    await registerTimeslots(timeslots, user.account)
+    queryClient.invalidateQueries({
+      queryKey: [QueryKeys.TIMESLOTS, user.account],
+    })
   }
 
   return (
@@ -48,14 +56,26 @@ export default function DashboardPage() {
               My availabilities
             </Button>
           </DialogTrigger>
-          <DialogContent>
-            <DialogTitle>My availabilities</DialogTitle>
+          <DialogContent className="border-transparent">
+            <DialogTitle>
+              <span className="text-2xl">Availabilities</span>
+              <p className="text-small font-sans text-dim">
+                Update your availabilities
+              </p>
+            </DialogTitle>
             <AvailabilityPicker
               mentor={user as MentorStruct}
+              timeslots={timeslots ?? []}
               handleSaveTimeslots={handleSaveTimeslots}
             />
           </DialogContent>
         </Dialog>
+        <Button onClick={() => console.log("Timeslots: ", timeslots)}>
+          Check
+        </Button>
+        <Button onClick={() => computeTimeslotsToDaysOfWeek(timeslots ?? [])}>
+          Compute
+        </Button>
       </div>
       <AnimatedBackground shader={false} />
     </div>

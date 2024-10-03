@@ -1,12 +1,12 @@
 import { Address } from "viem"
 
 export type Timeslot = {
+  id?: string
   mentorAddress: Address
   date: number
   timeStart: number
   timeEnd: number
   isBooked: boolean
-  studentId?: string
 }
 
 export type DaySlot = {

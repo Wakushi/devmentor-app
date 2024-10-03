@@ -30,7 +30,7 @@ export async function pinMentorTimeslots(
     }),
   })
 
-  const { IpfsHash: timeslotsHash } = await response.json()
+  const { ipfsHash: timeslotsHash } = await response.json()
   return timeslotsHash
 }
 

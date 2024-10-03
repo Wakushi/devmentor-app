@@ -1,7 +1,7 @@
 "use client"
 
 import { DayOfWeek, DaySlot, Timeslot } from "@/lib/types/timeslot.type"
-import { computeTimeslots, getWeekdayName } from "@/lib/utils"
+import { computeDaysOfWeekToTimeslots, getWeekdayName } from "@/lib/utils"
 import { useState } from "react"
 import { TimeValue } from "react-aria"
 import DayOfWeekCard from "./day-of-week-card"
@@ -17,9 +17,11 @@ import {
 
 export default function AvailabilityPicker({
   mentor,
+  timeslots,
   handleSaveTimeslots,
 }: {
   mentor: MentorStruct
+  timeslots: Timeslot[]
   handleSaveTimeslots: (timeslots: Timeslot[]) => void
 }) {
   const DEFAULT_SLOT: DaySlot = {
@@ -104,7 +106,7 @@ export default function AvailabilityPicker({
   }
 
   async function onSubmit(): Promise<void> {
-    const timeslots = computeTimeslots(daysOfWeek, mentor.account)
+    const timeslots = computeDaysOfWeekToTimeslots(daysOfWeek, mentor.account)
     handleSaveTimeslots(timeslots)
   }
 

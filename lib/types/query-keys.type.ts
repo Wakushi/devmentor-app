@@ -3,4 +3,5 @@ export enum QueryKeys {
   ETH_PRICE = "ETH_PRICE",
   MENTORS = "MENTORS",
   SESSIONS = "SESSIONS",
+  TIMESLOTS = "TIMESLOTS",
 }

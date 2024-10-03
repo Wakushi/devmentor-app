@@ -143,7 +143,7 @@ export function createGoogleCalendarLink(event: {
   return `${baseUrl}&${params.toString()}`
 }
 
-export function computeTimeslots(
+export function computeDaysOfWeekToTimeslots(
   daysOfWeek: DayOfWeek[],
   mentorAddress: Address
 ): Timeslot[] {
@@ -245,4 +245,41 @@ export function getSubjectsFromIds(subjectsIds: number[]): LearningField[] {
 
 export function getLanguagesFromIds(langIds: number[]): Language[] {
   return langIds.map((langId) => allLanguages[langId])
+}
+
+export function computeTimeslotsToDaysOfWeek(
+  timeslots: Timeslot[]
+): DayOfWeek[] {
+  // Timeslot :
+  // date: 1730070000000
+  // timeEnd: 1727695833688
+  // timeStart: 1727692233688
+
+  // DayOfWeek
+  // active: false
+  // index: 0
+  // name: "Sunday"
+  // slots: [{timeStart: 1727681433688, timeEnd: 1727708414510}]
+
+  // Sort timeslots by day
+  // For each group of timeslots sorted by day, find the earliest and the latest to build the slot range
+  // If there's an hour gap, create a separate slot for each hour gap, each one with its own start <-> end range
+
+  const timeslotByDayIndex: Map<number, Timeslot[]> = new Map()
+
+  timeslots.forEach((timeslot) => {
+    const date = new Date(timeslot.date)
+    const day = date.getDay()
+
+    if (timeslotByDayIndex.has(day)) {
+      const daySlots = timeslotByDayIndex.get(day) ?? []
+      timeslotByDayIndex.set(day, [...daySlots, timeslot])
+    } else {
+      timeslotByDayIndex.set(day, [timeslot])
+    }
+  })
+
+  console.log("timeslotByDayIndex: ", timeslotByDayIndex)
+
+  return []
 }

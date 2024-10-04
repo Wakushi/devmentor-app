@@ -59,7 +59,7 @@ export default function DashboardPage() {
           <DialogContent className="border-transparent">
             <DialogTitle>
               <span className="text-2xl">Availabilities</span>
-              <p className="text-small font-sans text-dim">
+              <p className="text-small font-normal font-sans text-dim">
                 Update your availabilities
               </p>
             </DialogTitle>

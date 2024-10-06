@@ -3,9 +3,9 @@ import { ReactNode } from "react"
 import { WagmiProvider, createConfig, http } from "wagmi"
 import { baseSepolia } from "wagmi/chains"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import Web3AuthConnectorInstance from "@/lib/Web3AuthConnectorInstance"
-import UserContextProvider from "./services/user.service"
+import UserContextProvider from "./stores/user.store"
 import { createPublicClient } from "viem"
+import Web3AuthConnectorInstance from "./lib/web3/Web3AuthConnectorInstance"
 
 export const config = createConfig({
   chains: [baseSepolia],

@@ -1,6 +1,6 @@
 "use client"
 import { Role } from "@/lib/types/role.type"
-import { useUser } from "@/services/user.service"
+import { useUser } from "@/stores/user.store"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect } from "react"
 

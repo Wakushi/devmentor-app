@@ -41,7 +41,7 @@ import {
 import { FaLongArrowAltRight } from "react-icons/fa"
 import Stepper from "@/components/pages/auth/stepper"
 import { Separator } from "@/components/ui/separator"
-import { useUser } from "@/services/user.service"
+import { useUser } from "@/stores/user.store"
 import Loader from "@/components/ui/loader"
 import NavLinkButton from "@/components/ui/nav-link"
 import { Role } from "@/lib/types/role.type"
@@ -49,16 +49,17 @@ import Flag from "@/components/ui/flag"
 import SuccessScreen from "@/components/success-screen"
 import { useQueryClient } from "@tanstack/react-query"
 import { QueryKeys } from "@/lib/types/query-keys.type"
-import { encryptForAddress } from "@/lib/crypto"
 import {
   ContractEvent,
   registerStudent,
   watchForEvent,
-} from "@/lib/actions/web3/contract"
+} from "@/services/contract.service"
 import { BaseUser } from "@/lib/types/user.type"
 import ContactFields from "@/components/pages/auth/contact-fields"
 import { FaCircleCheck } from "react-icons/fa6"
 import { Address } from "viem"
+import { BASE_USER_PATH } from "@/lib/constants"
+import { encryptForAddress } from "@/lib/crypto/crypto"
 
 const learningFormSchema = z.object({
   learningFields: z
@@ -200,7 +201,7 @@ export default function StudentSignUpPage() {
             action: <FaCircleCheck className="text-white" />,
           })
 
-          await fetch("/api/user", {
+          await fetch(BASE_USER_PATH, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userPayload, role: Role.STUDENT }),

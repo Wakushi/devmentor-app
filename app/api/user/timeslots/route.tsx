@@ -2,17 +2,16 @@ import { Address } from "viem"
 import { NextRequest, NextResponse } from "next/server"
 import { Timeslot } from "@/lib/types/timeslot.type"
 import {
-  addUserTimeslots,
-  deleteUserTimeslots,
-  getUserTimeslots,
-} from "@/lib/actions/server/firebase-actions"
+  getAllTimeslotsByAddress,
+  updateAllTimelots,
+} from "../../(services)/user.service"
 
-export async function POST(req: NextRequest): Promise<NextResponse> {
-  const { timeslots, mentorAddress } = await req.json()
+export async function GET(req: NextRequest): Promise<NextResponse> {
+  const { searchParams } = new URL(req.url)
+  const address = searchParams.get("address") as Address
 
   try {
-    await deleteUserTimeslots(mentorAddress)
-    await addUserTimeslots(mentorAddress, timeslots)
+    const timeslots: Timeslot[] = await getAllTimeslotsByAddress(address)
     return NextResponse.json({ timeslots })
   } catch (error) {
     console.error("API error:", error)
@@ -24,12 +23,11 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 }
 
-export async function GET(req: NextRequest): Promise<NextResponse> {
-  const { searchParams } = new URL(req.url)
-  const address = searchParams.get("address") as Address
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  const { timeslots, mentorAddress } = await req.json()
 
   try {
-    const timeslots: Timeslot[] = await getUserTimeslots(address)
+    await updateAllTimelots(mentorAddress, timeslots)
     return NextResponse.json({ timeslots })
   } catch (error) {
     console.error("API error:", error)

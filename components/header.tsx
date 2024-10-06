@@ -1,9 +1,7 @@
 "use client"
 import Link from "next/link"
 import { GiMountaintop } from "react-icons/gi"
-import { useUser } from "@/services/user.service"
-import { web3AuthInstance } from "@/lib/Web3AuthConnectorInstance"
-import { getBalance } from "@/lib/actions/web3/helpers"
+import { useUser } from "@/stores/user.store"
 import { IoMdLogOut } from "react-icons/io"
 import TooltipWrapper from "./ui/custom-tooltip"
 import NavLinkButton from "./ui/nav-link"
@@ -11,6 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { getInitials } from "@/lib/utils"
 import { Role } from "@/lib/types/role.type"
 import { MentorStruct, Student } from "@/lib/types/user.type"
+import { web3AuthInstance } from "@/lib/web3/Web3AuthConnectorInstance"
+import { getBalance } from "@/services/contract.service"
 
 export default function Header() {
   const { user, isConnected, logOut, loadingUser } = useUser()

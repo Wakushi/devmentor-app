@@ -44,7 +44,7 @@ import {
 import { Input } from "@/components/ui/input"
 import Stepper from "@/components/pages/auth/stepper"
 import { Separator } from "@/components/ui/separator"
-import { useUser } from "@/services/user.service"
+import { useUser } from "@/stores/user.store"
 import Loader from "@/components/ui/loader"
 import NavLinkButton from "@/components/ui/nav-link"
 import Flag from "@/components/ui/flag"
@@ -52,15 +52,16 @@ import SuccessScreen from "@/components/success-screen"
 import { useQueryClient } from "@tanstack/react-query"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { IoIosClose } from "react-icons/io"
-import {
-  ContractEvent,
-  registerMentor,
-  watchForEvent,
-} from "@/lib/actions/web3/contract"
 import { BaseUser } from "@/lib/types/user.type"
 import { Address } from "viem"
 import { FaCircleCheck } from "react-icons/fa6"
 import { Role } from "@/lib/types/role.type"
+import { BASE_USER_PATH } from "@/lib/constants"
+import {
+  ContractEvent,
+  registerMentor,
+  watchForEvent,
+} from "@/services/contract.service"
 
 const identityFormSchema = z.object({
   name: z.string().min(3, "Minimum length is 3"),
@@ -248,7 +249,7 @@ export default function MentorSignUpPage() {
             action: <FaCircleCheck className="text-white" />,
           })
 
-          await fetch("/api/user", {
+          await fetch(BASE_USER_PATH, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userPayload, role: Role.MENTOR }),

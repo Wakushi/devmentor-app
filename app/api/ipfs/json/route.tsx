@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import {
-  pinJSONToIPFS,
-  unpinFile,
-} from "../../../../lib/actions/server/pinata-actions"
+import { pinJSONToIPFS, unpinFile } from "../../(services)/ipfs.service"
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {

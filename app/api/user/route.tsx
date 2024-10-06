@@ -1,9 +1,8 @@
-import { getMentorReviews } from "@/lib/actions/client/pinata-actions"
 import {
   DEVMENTOR_CONTRACT_ABI,
   DEVMENTOR_CONTRACT_ADDRESS,
 } from "@/lib/constants"
-import { createUserJwtToken } from "@/lib/jwt"
+import { createUserJwtToken } from "@/lib/crypto/jwt"
 import { Role } from "@/lib/types/role.type"
 import {
   BaseUser,
@@ -13,6 +12,7 @@ import {
   Student,
   Visitor,
 } from "@/lib/types/user.type"
+import { getMentorReviews } from "@/services/ipfs.service"
 import { ethers } from "ethers"
 import { NextRequest, NextResponse } from "next/server"
 import { Address } from "viem"

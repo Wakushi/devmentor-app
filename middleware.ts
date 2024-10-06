@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { Role } from "./lib/types/role.type"
-import { JWTPayload, verifyJWT } from "./lib/jwt"
+import { JWTPayload, verifyJWT } from "./lib/crypto/jwt"
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl

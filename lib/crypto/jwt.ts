@@ -1,6 +1,6 @@
 import * as jose from "jose"
-import { Role } from "./types/role.type"
 import { Address } from "viem"
+import { Role } from "../types/role.type"
 
 export type JWTPayload = {
   id: string

@@ -2,11 +2,11 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { encryptForAddress, decryptWithSignature } from "@/lib/crypto"
 import { ethers } from "ethers"
 import { useState } from "react"
 import { useAccount, useSignMessage } from "wagmi"
 import useEthPriceQuery from "@/hooks/queries/eth-price-query"
+import { decryptWithSignature, encryptForAddress } from "@/lib/crypto/crypto"
 
 export default function DecryptPage() {
   const { address } = useAccount()

@@ -8,7 +8,7 @@ import NavLinkButton from "./ui/nav-link"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { getInitials } from "@/lib/utils"
 import { Role } from "@/lib/types/role.type"
-import { MentorStruct, Student } from "@/lib/types/user.type"
+import { Mentor, Student } from "@/lib/types/user.type"
 import { web3AuthInstance } from "@/lib/web3/Web3AuthConnectorInstance"
 import { getBalance } from "@/services/contract.service"
 
@@ -50,6 +50,13 @@ export default function Header() {
         navLinks.push({ href: "/mentor-search", label: "Mentors" })
       }
 
+      if (user.role === Role.MENTOR) {
+        navLinks.push({
+          href: "/dashboard/mentor/availability",
+          label: "Availability",
+        })
+      }
+
       return (
         <nav className="flex items-center gap-8">
           <div className="flex items-center">{renderNavLinks(navLinks)}</div>
@@ -57,17 +64,17 @@ export default function Header() {
             <Avatar className="w-[30px] h-[30px]" onClick={getUserBalance}>
               <AvatarImage
                 src={`https://api.dicebear.com/9.x/notionists/svg?seed=${
-                  (user as Student | MentorStruct).baseUser.userName
+                  (user as Student | Mentor).baseUser.userName
                 }`}
               />
               <AvatarFallback className="text-d1">
                 {getInitials(
-                  (user as Student | MentorStruct).baseUser.userName || ""
+                  (user as Student | Mentor).baseUser.userName || ""
                 )}
               </AvatarFallback>
             </Avatar>
             <p className="text-mid">
-              {(user as Student | MentorStruct).baseUser.userName}
+              {(user as Student | Mentor).baseUser.userName}
             </p>
             <TooltipWrapper message="Disconnect wallet">
               <IoMdLogOut

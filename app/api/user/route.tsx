@@ -6,9 +6,9 @@ import { createUserJwtToken, getRequestUser } from "@/lib/crypto/jwt"
 import { Role } from "@/lib/types/role.type"
 import {
   BaseUser,
-  MentorStruct,
-  RawMentor,
-  RawStudent,
+  Mentor,
+  ContractMentor,
+  ContractStudent,
   Student,
   Visitor,
 } from "@/lib/types/user.type"
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: "Role is required" }, { status: 400 })
     }
 
-    let user: Visitor | Student | MentorStruct
+    let user: Visitor | Student | Mentor
 
     switch (role) {
       case Role.VISITOR:
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         user = (await buildUser(
           await contract.getMentor(address),
           Role.MENTOR
-        )) as MentorStruct
+        )) as Mentor
         break
     }
 
@@ -123,9 +123,9 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 // When we make a call using ethers, we need to properly format the received data
 async function buildUser(
-  rawUser: RawStudent | RawMentor,
+  rawUser: ContractStudent | ContractMentor,
   role: Role
-): Promise<Student | MentorStruct> {
+): Promise<Student | Mentor> {
   const [baseUserRaw] = rawUser
   const [account, userName, languagesRaw, subjectsRaw] = baseUserRaw
 
@@ -137,7 +137,7 @@ async function buildUser(
   }
 
   if (role === Role.STUDENT) {
-    const [_, contactHash, experience] = rawUser as RawStudent
+    const [_, contactHash, experience] = rawUser as ContractStudent
 
     const baseUser: BaseUser = {
       account,
@@ -165,11 +165,11 @@ async function buildUser(
     hourlyRate,
     timeslotsHash,
     reviewsHash,
-  ] = rawUser as RawMentor
+  ] = rawUser as ContractMentor
 
   const reviews = await getMentorReviews(reviewsHash)
 
-  const mentor: MentorStruct = {
+  const mentor: Mentor = {
     account,
     baseUser,
     validated,

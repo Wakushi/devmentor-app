@@ -2,6 +2,7 @@ import { DaySlot } from "@/lib/types/timeslot.type"
 import { TimeValue } from "react-aria"
 import { TimePicker } from "../ui/time-picker"
 import { IoRemove } from "react-icons/io5"
+import { timeStampToTimeValue } from "@/lib/utils"
 
 interface TimeslotPickerProps {
   dayIndex: number
@@ -30,20 +31,11 @@ export default function TimeslotTimePicker({
   handleRemoveTimeslot,
   handleTimeslotValueChange,
 }: TimeslotPickerProps) {
-  function timeStampToTimeValue(timestamp: number): TimeValue {
-    const date = new Date(timestamp)
-    const hour = date.getHours()
-    const minute = date.getMinutes()
-
-    return {
-      hour,
-      minute,
-    } as TimeValue
-  }
+  
 
   return (
     <div className="relative">
-      <div className="flex items-center gap-1 glass rounded px-4 py-2">
+      <div className="flex items-center gap-1 glass rounded-md px-4 py-2">
         <TimePicker
           value={timeStampToTimeValue(slot.timeStart)}
           onChange={(value) =>

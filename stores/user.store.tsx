@@ -2,7 +2,7 @@
 import { createContext, ReactNode, useContext, useEffect } from "react"
 import { useAccount, useDisconnect } from "wagmi"
 import { useRouter } from "next/navigation"
-import { MentorStruct, Student, Visitor } from "@/lib/types/user.type"
+import { Mentor, Student, Visitor } from "@/lib/types/user.type"
 import { Address } from "viem"
 import { Role } from "@/lib/types/role.type"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
@@ -15,7 +15,7 @@ interface UserContextProviderProps {
 }
 
 interface UserContextProps {
-  user: Visitor | Student | MentorStruct | null | undefined
+  user: Visitor | Student | Mentor | null | undefined
   loadingUser: boolean
   isConnected: boolean
   logOut: () => void
@@ -39,7 +39,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
   const queryClient = useQueryClient()
 
   const { data: user, isLoading: loadingUser } = useQuery<
-    Visitor | Student | MentorStruct | null,
+    Visitor | Student | Mentor | null,
     Error
   >({
     queryKey: [QueryKeys.USER],
@@ -52,11 +52,11 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     queryClient.refetchQueries({ queryKey: [QueryKeys.USER] })
   }, [web3AuthInstance.connected, isConnected])
 
-  async function fetchUser(): Promise<Visitor | Student | MentorStruct | null> {
+  async function fetchUser(): Promise<Visitor | Student | Mentor | null> {
     if (!isConnected) return null
 
     try {
-      let user: Visitor | Student | MentorStruct | null = null
+      let user: Visitor | Student | Mentor | null = null
 
       switch (connector?.name) {
         case Connectors.WEB3AUTH:
@@ -83,7 +83,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
 
   async function getUserByAddress(
     address: Address
-  ): Promise<Visitor | Student | MentorStruct> {
+  ): Promise<Visitor | Student | Mentor> {
     try {
       const response = await fetch(`${BASE_USER_PATH}?address=${address}`)
       const { user } = await response.json()
@@ -94,7 +94,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
         case Role.STUDENT:
           return user as Student
         case Role.MENTOR:
-          return user as MentorStruct
+          return user as Mentor
         default:
           return user as Visitor
       }
@@ -104,7 +104,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     }
   }
 
-  function routeUser(user: Visitor | Student | MentorStruct): void {
+  function routeUser(user: Visitor | Student | Mentor): void {
     const url = new URL(window.location.href)
     const pathname = url.pathname
     const role = url.searchParams.get("role")

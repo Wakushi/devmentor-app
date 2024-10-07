@@ -6,7 +6,7 @@ const PreSessionReminder = () => {
     <div className="p-4 bg-gray-100 min-h-screen">
       <h1 className="text-2xl font-bold mb-6">Upcoming Session</h1>
 
-      <div className="bg-white p-6 rounded shadow max-w-2xl mx-auto">
+      <div className="bg-white p-6 rounded-md shadow max-w-2xl mx-auto">
         <div className="text-center mb-8">
           <h2 className="text-xl font-semibold mb-2">Your session starts in</h2>
           <div className="text-4xl font-bold text-blue-600">00:15:32</div>

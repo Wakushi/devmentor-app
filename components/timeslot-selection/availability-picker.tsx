@@ -2,54 +2,62 @@
 
 import { DayOfWeek, DaySlot, Timeslot } from "@/lib/types/timeslot.type"
 import { getWeekdayName } from "@/lib/utils"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { TimeValue } from "react-aria"
 import DayOfWeekCard from "./day-of-week-card"
 import { Button } from "../ui/button"
-import { MentorStruct } from "@/lib/types/user.type"
-import {
-  DAYS_OF_WEEK,
-  FIVE_PM,
-  NINE_THIRTY_AM,
-  SATURDAY,
-  SUNDAY,
-} from "@/lib/constants"
+import { Mentor } from "@/lib/types/user.type"
+import { DAYS_OF_WEEK, FIVE_PM, NINE_THIRTY_AM } from "@/lib/constants"
 import { Address } from "viem"
+import { updateTimeslots } from "@/services/user.service"
+import { QueryKeys } from "@/lib/types/query-keys.type"
+import { toast } from "@/hooks/use-toast"
+import { FaCircleCheck } from "react-icons/fa6"
+import { MdError } from "react-icons/md"
+import { useQueryClient } from "@tanstack/react-query"
+import useTimeslotsQuery from "@/hooks/queries/timeslots-query"
+import Loader from "../ui/loader"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { RiEditLine, RiCheckLine } from "react-icons/ri"
 
-export default function AvailabilityPicker({
-  mentor,
-  timeslots,
-  handleSaveAvailabilities,
-}: {
-  mentor: MentorStruct
-  timeslots: Timeslot[]
-  handleSaveAvailabilities: (availabilities: Timeslot[]) => void
-}) {
-  const DEFAULT_SLOT: DaySlot = {
-    timeStart: NINE_THIRTY_AM,
-    timeEnd: FIVE_PM,
-  }
+const DEFAULT_SLOT: DaySlot = {
+  timeStart: NINE_THIRTY_AM,
+  timeEnd: FIVE_PM,
+}
 
-  const [daysOfWeek, setDaysOfWeek] = useState<DayOfWeek[]>(initialDaysOfWeek())
+export default function AvailabilityPicker({ mentor }: { mentor: Mentor }) {
+  const queryClient = useQueryClient()
 
-  function initialDaysOfWeek(): DayOfWeek[] {
-    const baseDays = Array.from({ length: DAYS_OF_WEEK }, (_, i) => ({
-      index: i,
-      name: getWeekdayName(i),
-      slots: [],
-      active: false,
-    }))
+  const timeslotsQuery = useTimeslotsQuery(mentor.account)
+  const { data: timeslots, isLoading: loadingTimeslots } = timeslotsQuery
 
-    if (timeslots && timeslots.length) {
-      return computeDaysOfWeek(baseDays, timeslots)
+  const [daysOfWeek, setDaysOfWeek] = useState<DayOfWeek[]>([])
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false)
+  const [savedChanges, setSavedChanges] = useState<boolean>(false)
+
+  useEffect(() => {
+    function initialDaysOfWeek(): DayOfWeek[] {
+      const baseDays = Array.from({ length: DAYS_OF_WEEK }, (_, i) => ({
+        index: i,
+        name: getWeekdayName(i),
+        slots: [],
+        active: false,
+      }))
+
+      if (timeslots && timeslots.length) {
+        return computeDaysOfWeek(baseDays, timeslots)
+      }
+
+      return baseDays.map((day) => ({
+        ...day,
+        slots: [DEFAULT_SLOT],
+        active: false,
+      }))
     }
 
-    return baseDays.map((day, i) => ({
-      ...day,
-      slots: [DEFAULT_SLOT],
-      active: i > SUNDAY && i < SATURDAY,
-    }))
-  }
+    setDaysOfWeek(initialDaysOfWeek())
+    setHasUnsavedChanges(false)
+  }, [timeslots])
 
   function timeValueToTimestamp(timeValue: TimeValue): number {
     const { hour, minute } = timeValue
@@ -86,6 +94,8 @@ export default function AvailabilityPicker({
           : day
       )
     )
+
+    setHasUnsavedChanges(true)
   }
 
   function handleToggleDayChange(index: number, checked: boolean): void {
@@ -94,6 +104,7 @@ export default function AvailabilityPicker({
         day.index === index ? { ...day, active: checked } : day
       )
     )
+    setHasUnsavedChanges(true)
   }
 
   function handleAddTimeslot(dayIndex: number): void {
@@ -104,6 +115,7 @@ export default function AvailabilityPicker({
           : day
       )
     )
+    setHasUnsavedChanges(true)
   }
 
   function handleRemoveTimeslot(dayIndex: number, slotIndex: number) {
@@ -114,6 +126,7 @@ export default function AvailabilityPicker({
           : day
       )
     )
+    setHasUnsavedChanges(true)
   }
 
   async function onSubmit(): Promise<void> {
@@ -124,7 +137,34 @@ export default function AvailabilityPicker({
 
     if (!availabilityRanges.length) return
 
-    handleSaveAvailabilities(availabilityRanges)
+    try {
+      const { success, error } = await updateTimeslots(availabilityRanges)
+
+      if (success) {
+        toast({
+          title: "Success",
+          description: "Your availabilities are up to date!",
+          action: <FaCircleCheck className="text-white" />,
+        })
+
+        queryClient.invalidateQueries({
+          queryKey: [QueryKeys.TIMESLOTS, mentor.account],
+        })
+
+        setSavedChanges(true)
+        setHasUnsavedChanges(false)
+      } else {
+        throw new Error(error)
+      }
+    } catch (error) {
+      console.error("Failed to update timeslots:", error)
+
+      toast({
+        title: "Error",
+        description: "Failed to update availabilities. Please try again.",
+        action: <MdError className="text-white" />,
+      })
+    }
   }
 
   function computeAvailabilityRange(
@@ -171,22 +211,48 @@ export default function AvailabilityPicker({
   }
 
   return (
-    <section className="max-w-[500px] max-h-[500px] overflow-y-auto flex flex-col gap-4 p-4 rounded">
-      <div className="flex flex-col gap-4">
-        {daysOfWeek.map((day: DayOfWeek) => {
-          return (
-            <DayOfWeekCard
-              key={day.name}
-              day={day}
-              handleAddTimeslot={handleAddTimeslot}
-              handleRemoveTimeslot={handleRemoveTimeslot}
-              handleToggleDayChange={handleToggleDayChange}
-              handleTimeslotValueChange={handleTimeslotValueChange}
-            />
-          )
-        })}
-      </div>
-      <Button onClick={onSubmit}>Confirm</Button>
+    <section className="max-w-[500px] min-h-[300px] glass p-4 flex flex-col justify-center items-center gap-4 rounded">
+      {loadingTimeslots ? (
+        <Loader />
+      ) : (
+        <>
+          {hasUnsavedChanges && (
+            <Alert className="bg-yellow-100 w-full">
+              <AlertDescription className="flex items-center gap-2">
+                <RiEditLine className="text-yellow-500" />
+                <span>You have unsaved changes</span>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {savedChanges && (
+            <Alert className="bg-green-100 w-full">
+              <AlertDescription className="flex items-center gap-2">
+                <RiCheckLine className="text-green-500" />
+                <span>Your availabilities are up to date !</span>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <div className="flex flex-col gap-4 w-full">
+            {daysOfWeek.map((day: DayOfWeek) => {
+              return (
+                <DayOfWeekCard
+                  key={day.name}
+                  day={day}
+                  handleAddTimeslot={handleAddTimeslot}
+                  handleRemoveTimeslot={handleRemoveTimeslot}
+                  handleToggleDayChange={handleToggleDayChange}
+                  handleTimeslotValueChange={handleTimeslotValueChange}
+                />
+              )
+            })}
+          </div>
+          <Button onClick={onSubmit} disabled={!hasUnsavedChanges}>
+            {hasUnsavedChanges ? "Save Changes" : "No Changes to Save"}
+          </Button>
+        </>
+      )}
     </section>
   )
 }

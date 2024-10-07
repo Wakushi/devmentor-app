@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query"
 import { Session } from "@/lib/types/session.type"
-import { MentorStruct, Student } from "@/lib/types/user.type"
+import { Mentor, Student } from "@/lib/types/user.type"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { getSession, getSessionIdsByAccount } from "@/services/contract.service"
 
 export default function useSessionsQuery(
-  user: Student | MentorStruct | null | undefined
+  user: Student | Mentor | null | undefined
 ) {
   const sessionsQuery = useQuery<Session[], Error>({
     queryKey: [QueryKeys.SESSIONS, user?.account],

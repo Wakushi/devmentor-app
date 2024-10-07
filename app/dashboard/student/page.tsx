@@ -46,7 +46,7 @@ export default function DashboardPage() {
                 </NavLinkButton>
               </div>
             </div>
-            <section className="glass flex flex-col gap-2 p-4 rounded w-fit">
+            <section className="glass flex flex-col gap-2 p-4 rounded-md w-fit">
               <h2 className="text-xl font-semibold mb-4">Upcoming Sessions</h2>
               <SessionCardList sessions={sessions} />
             </section>

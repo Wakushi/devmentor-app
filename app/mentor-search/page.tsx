@@ -9,7 +9,7 @@ import AnimatedBackground from "@/components/ui/animated-background"
 import useMentorsQuery from "@/hooks/queries/mentors-query"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
 import { Language, LearningField } from "@/lib/types/profile-form.type"
-import { MentorStruct } from "@/lib/types/user.type"
+import { Mentor } from "@/lib/types/user.type"
 import {
   getAverageRating,
   getLanguagesFromIds,
@@ -24,7 +24,7 @@ export default function MentorSearch() {
   const { data: mentors } = mentorsQuery
 
   const [currentPage, setCurrentPage] = useState(1)
-  const [filteredMentors, setFilteredMentors] = useState<MentorStruct[]>([])
+  const [filteredMentors, setFilteredMentors] = useState<Mentor[]>([])
   const [filters, setFilters] = useState({
     expertise: "All",
     language: "All",
@@ -137,10 +137,10 @@ export default function MentorSearch() {
   )
 }
 
-function MentorList({ mentors }: { mentors: MentorStruct[] }) {
+function MentorList({ mentors }: { mentors: Mentor[] }) {
   return (
     <div className="flex flex-col gap-4">
-      {mentors.map((mentor: MentorStruct) => (
+      {mentors.map((mentor: Mentor) => (
         <MentorCard key={mentor.account} mentor={mentor} />
       ))}
     </div>

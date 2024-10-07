@@ -9,13 +9,13 @@ import {
 import { getAverageRating, getInitials } from "@/lib/utils"
 import { ClockIcon, StarIcon } from "lucide-react"
 import Flag from "@/components/ui/flag"
-import { MentorStruct } from "@/lib/types/user.type"
+import { Mentor } from "@/lib/types/user.type"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import MentorReviews from "./mentor-reviews"
 import HourlyRate from "@/components/hourly-rate"
 
-export default function MentorDetails({ mentor }: { mentor: MentorStruct }) {
+export default function MentorDetails({ mentor }: { mentor: Mentor }) {
   const { baseUser, yearsOfExperience, hourlyRate, account, reviews } = mentor
   const { userName, languages, subjects } = baseUser
   const learningFields = subjects.map((subject) => allSubjects[subject])

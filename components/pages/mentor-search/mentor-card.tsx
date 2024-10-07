@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { StarIcon, ClockIcon } from "lucide-react"
-import { MentorStruct } from "@/lib/types/user.type"
+import { Mentor } from "@/lib/types/user.type"
 import {
   allSubjects,
   getLanguageOption,
@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import HourlyRate from "@/components/hourly-rate"
 
-export default function MentorCard({ mentor }: { mentor: MentorStruct }) {
+export default function MentorCard({ mentor }: { mentor: Mentor }) {
   const { baseUser, reviews, yearsOfExperience, hourlyRate, account } = mentor
   const { userName, languages, subjects } = baseUser
   const learningFields = subjects.map((subject) => allSubjects[subject])
@@ -89,7 +89,7 @@ export default function MentorCard({ mentor }: { mentor: MentorStruct }) {
 
 export function MentorCardSkeleton() {
   return (
-    <div className="bg-primary-faded flex items-center justify-between border border-primary-faded text-white rounded px-4 py-2 min-h-[88px] min-w-[450px]">
+    <div className="bg-primary-faded flex items-center justify-between border border-primary-faded text-white rounded-md px-4 py-2 min-h-[88px] min-w-[450px]">
       <div className="flex items-center space-x-4">
         <Skeleton className="h-12 w-12 rounded-full bg-dim bg-opacity-15" />
         <div className="space-y-2">

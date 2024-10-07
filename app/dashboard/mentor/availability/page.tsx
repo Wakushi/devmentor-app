@@ -20,7 +20,7 @@ export default function AvailabilityPage() {
   if (!user) return
 
   return (
-    <div className="p-4 pt-40 min-h-screen m-auto w-[90%]">
+    <div className="p-4 pt-40 pb-8 min-h-screen m-auto w-[90%]">
       <div className="flex w-full gap-8">
         <div className="flex-1 flex flex-col gap-4">
           <div className="flex flex-col">

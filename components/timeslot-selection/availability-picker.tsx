@@ -171,7 +171,7 @@ export default function AvailabilityPicker({
   }
 
   return (
-    <section className="max-w-[500px] max-h-[500px] overflow-y-auto flex flex-col gap-4 p-4 rounded">
+    <section className="max-w-[500px] flex flex-col gap-4 rounded">
       <div className="flex flex-col gap-4">
         {daysOfWeek.map((day: DayOfWeek) => {
           return (

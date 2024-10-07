@@ -39,14 +39,24 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   try {
-    await updateAllTimelots(user.address, timeslots)
-    return NextResponse.json({ timeslots })
+    const updatedTimeslots = await updateAllTimelots(user.address, timeslots)
+
+    return NextResponse.json(
+      { success: true, data: updatedTimeslots },
+      { status: 200 }
+    )
   } catch (error) {
     console.error("API error:", error)
     if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 500 }
+      )
     } else {
-      return NextResponse.json({ error: "Unknown error" }, { status: 500 })
+      return NextResponse.json(
+        { success: false, error: "Unknown error" },
+        { status: 500 }
+      )
     }
   }
 }

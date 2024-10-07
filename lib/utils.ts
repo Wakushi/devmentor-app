@@ -164,3 +164,20 @@ export function getSubjectsFromIds(subjectsIds: number[]): LearningField[] {
 export function getLanguagesFromIds(langIds: number[]): Language[] {
   return langIds.map((langId) => allLanguages[langId])
 }
+
+export function msToReadableDuration(durationInMs: number): string {
+  if (!durationInMs) return "0min"
+
+  let duration = ""
+
+  const seconds = durationInMs / 1000
+  let minutes = seconds ? seconds / 60 : 0
+  let hours = minutes ? Math.floor(minutes / 60) : 0
+
+  minutes = Math.floor(minutes % 60)
+
+  duration += hours ? hours.toString() + "h" : ""
+  duration += minutes ? minutes.toString() + "min" : ""
+
+  return duration
+}

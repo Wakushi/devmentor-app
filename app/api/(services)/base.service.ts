@@ -26,6 +26,33 @@ export async function addDocument({
   }
 }
 
+export async function addSubDocument<T>({
+  parentCollectionPath,
+  childCollectionPath,
+  parentDocId,
+  data,
+}: {
+  parentCollectionPath: string
+  childCollectionPath: string
+  parentDocId: string
+  data: DocData
+}): Promise<T> {
+  try {
+    const docRef = adminDb
+      .collection(parentCollectionPath)
+      .doc(parentDocId)
+      .collection(childCollectionPath)
+
+    const addedDocRef = await docRef.add(data)
+    const doc = await addedDocRef.get()
+
+    return { id: doc.id, ...doc.data() } as T
+  } catch (error) {
+    console.error("Error adding document:", error)
+    throw error
+  }
+}
+
 export async function getDocument(
   collectionPath: string,
   docId: string
@@ -38,6 +65,37 @@ export async function getDocument(
     } else {
       return null
     }
+  } catch (error) {
+    console.error("Error getting document:", error)
+    throw error
+  }
+}
+
+export async function getSubCollection<T>({
+  parentCollectionPath,
+  childCollectionPath,
+  docId,
+}: {
+  parentCollectionPath: string
+  childCollectionPath: string
+  docId: string
+}): Promise<T[] | []> {
+  try {
+    const docSnapshot = await adminDb
+      .collection(parentCollectionPath)
+      .doc(docId)
+      .collection(childCollectionPath)
+      .get()
+
+    const documents = docSnapshot.docs.map(
+      (doc) =>
+        ({
+          ...doc.data(),
+          id: doc.id,
+        } as T)
+    )
+
+    return documents
   } catch (error) {
     console.error("Error getting document:", error)
     throw error
@@ -71,13 +129,62 @@ export async function getDocumentByField({
   }
 }
 
-export async function updateDocument(
-  collectionPath: string,
-  docId: string,
-  data: Partial<DocData>
-): Promise<void> {
+export async function updateDocument<T>({
+  collectionPath,
+  docId,
+  data,
+}: {
+  collectionPath: string
+  docId: string
+  data: Partial<T>
+}): Promise<T> {
+  const docRef = adminDb.collection(collectionPath).doc(docId)
+
   try {
-    await adminDb.collection(collectionPath).doc(docId).update(data)
+    await docRef.update(data)
+
+    const updatedDoc = await docRef.get()
+
+    if (!updatedDoc.exists) {
+      throw new Error("Document does not exist after update")
+    }
+
+    return updatedDoc.data() as T
+  } catch (error) {
+    console.error("Error updating document:", error)
+    throw error
+  }
+}
+
+export async function updateSubDocument<T>({
+  parentCollectionPath,
+  parentDocId,
+  childCollectionPath,
+  childDocId,
+  data,
+}: {
+  parentCollectionPath: string
+  parentDocId: string
+  childCollectionPath: string
+  childDocId: string
+  data: Partial<T>
+}): Promise<T> {
+  const docRef = adminDb
+    .collection(parentCollectionPath)
+    .doc(parentDocId)
+    .collection(childCollectionPath)
+    .doc(childDocId)
+
+  try {
+    await docRef.update(data)
+
+    const updatedDoc = await docRef.get()
+
+    if (!updatedDoc.exists) {
+      throw new Error("Document does not exist after update")
+    }
+
+    return updatedDoc.data() as T
   } catch (error) {
     console.error("Error updating document:", error)
     throw error
@@ -90,6 +197,30 @@ export async function deleteDocument(
 ): Promise<void> {
   try {
     await adminDb.collection(collectionPath).doc(docId).delete()
+  } catch (error) {
+    console.error("Error deleting document:", error)
+    throw error
+  }
+}
+
+export async function deleteSubDocument({
+  parentCollectionPath,
+  parentDocId,
+  childCollectionPath,
+  childDocId,
+}: {
+  parentCollectionPath: string
+  parentDocId: string
+  childCollectionPath: string
+  childDocId: string
+}): Promise<void> {
+  try {
+    await adminDb
+      .collection(parentCollectionPath)
+      .doc(parentDocId)
+      .collection(childCollectionPath)
+      .doc(childDocId)
+      .delete()
   } catch (error) {
     console.error("Error deleting document:", error)
     throw error

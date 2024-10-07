@@ -50,6 +50,13 @@ export default function Header() {
         navLinks.push({ href: "/mentor-search", label: "Mentors" })
       }
 
+      if (user.role === Role.MENTOR) {
+        navLinks.push({
+          href: "/dashboard/mentor/availability",
+          label: "Availability",
+        })
+      }
+
       return (
         <nav className="flex items-center gap-8">
           <div className="flex items-center">{renderNavLinks(navLinks)}</div>

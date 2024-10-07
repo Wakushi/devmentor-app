@@ -1,7 +1,7 @@
 "use client"
 
 import { DayOfWeek, DaySlot, Timeslot } from "@/lib/types/timeslot.type"
-import { computeDaysOfWeekToTimeslots, getWeekdayName } from "@/lib/utils"
+import { getWeekdayName } from "@/lib/utils"
 import { useState } from "react"
 import { TimeValue } from "react-aria"
 import DayOfWeekCard from "./day-of-week-card"
@@ -14,15 +14,16 @@ import {
   SATURDAY,
   SUNDAY,
 } from "@/lib/constants"
+import { Address } from "viem"
 
 export default function AvailabilityPicker({
   mentor,
   timeslots,
-  handleSaveTimeslots,
+  handleSaveAvailabilities,
 }: {
   mentor: MentorStruct
   timeslots: Timeslot[]
-  handleSaveTimeslots: (timeslots: Timeslot[]) => void
+  handleSaveAvailabilities: (availabilities: Timeslot[]) => void
 }) {
   const DEFAULT_SLOT: DaySlot = {
     timeStart: NINE_THIRTY_AM,
@@ -32,9 +33,19 @@ export default function AvailabilityPicker({
   const [daysOfWeek, setDaysOfWeek] = useState<DayOfWeek[]>(initialDaysOfWeek())
 
   function initialDaysOfWeek(): DayOfWeek[] {
-    return Array.from({ length: DAYS_OF_WEEK }, (_, i) => ({
+    const baseDays = Array.from({ length: DAYS_OF_WEEK }, (_, i) => ({
       index: i,
       name: getWeekdayName(i),
+      slots: [],
+      active: false,
+    }))
+
+    if (timeslots && timeslots.length) {
+      return computeDaysOfWeek(baseDays, timeslots)
+    }
+
+    return baseDays.map((day, i) => ({
+      ...day,
       slots: [DEFAULT_SLOT],
       active: i > SUNDAY && i < SATURDAY,
     }))
@@ -106,8 +117,57 @@ export default function AvailabilityPicker({
   }
 
   async function onSubmit(): Promise<void> {
-    const timeslots = computeDaysOfWeekToTimeslots(daysOfWeek, mentor.account)
-    handleSaveTimeslots(timeslots)
+    const availabilityRanges = computeAvailabilityRange(
+      daysOfWeek,
+      mentor.account
+    )
+
+    if (!availabilityRanges.length) return
+
+    handleSaveAvailabilities(availabilityRanges)
+  }
+
+  function computeAvailabilityRange(
+    days: DayOfWeek[],
+    mentorAddress: Address
+  ): Timeslot[] {
+    if (!days || !days.length || !mentorAddress) return []
+
+    const availabilities: Timeslot[] = []
+
+    days
+      .filter((d) => d.active && d.slots.length)
+      .forEach(({ slots, index }) => {
+        slots.forEach(({ timeStart, timeEnd }) => {
+          availabilities.push({
+            mentorAddress,
+            day: index,
+            timeStart,
+            timeEnd,
+            events: [],
+          })
+        })
+      })
+
+    return availabilities
+  }
+
+  function computeDaysOfWeek(
+    baseDays: DayOfWeek[],
+    timeslots: Timeslot[]
+  ): DayOfWeek[] {
+    timeslots.forEach(({ timeStart, timeEnd, day }) => {
+      baseDays[day].active = true
+      baseDays[day].slots.push({
+        timeStart,
+        timeEnd,
+      })
+    })
+
+    return baseDays.map((day) => ({
+      ...day,
+      slots: day.active ? day.slots : [DEFAULT_SLOT],
+    }))
   }
 
   return (

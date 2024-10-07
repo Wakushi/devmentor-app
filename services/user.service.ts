@@ -12,14 +12,11 @@ export async function getTimeslotsByAddress(
   return timeslots
 }
 
-export async function updateTimeslots(
-  timeslots: Timeslot[],
-  mentorAddress: Address
-): Promise<void> {
+export async function updateTimeslots(timeslots: Timeslot[]): Promise<void> {
   await fetch(`${BASE_USER_PATH}/timeslots`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ timeslots, mentorAddress }),
+    body: JSON.stringify({ timeslots }),
   })
 }
 

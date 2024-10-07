@@ -1,6 +1,7 @@
 import * as jose from "jose"
 import { Address } from "viem"
 import { Role } from "../types/role.type"
+import { NextRequest } from "next/server"
 
 export type JWTPayload = {
   id: string
@@ -47,4 +48,20 @@ async function verifyJWT(token: string): Promise<JWTPayload> {
   return payload as JWTPayload
 }
 
-export { createUserJwtToken, verifyJWT }
+async function getRequestUser(
+  request: NextRequest
+): Promise<JWTPayload | null> {
+  const authCookie = request.cookies.get(
+    process.env.NEXT_PUBLIC_TOKEN_COOKIE as string
+  )
+  const token = authCookie?.value
+  let decodedToken: JWTPayload | null = null
+
+  if (token) {
+    decodedToken = await verifyJWT(token)
+  }
+
+  return decodedToken
+}
+
+export { createUserJwtToken, verifyJWT, getRequestUser }

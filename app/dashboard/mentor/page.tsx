@@ -17,7 +17,6 @@ import { Timeslot } from "@/lib/types/timeslot.type"
 import useTimeslotsQuery from "@/hooks/queries/timeslots-query"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { useQueryClient } from "@tanstack/react-query"
-import { computeTimeslotsToDaysOfWeek } from "@/lib/utils"
 import {
   getTimeslotsByAddress,
   updateTimeslot,
@@ -39,8 +38,11 @@ export default function DashboardPage() {
 
   if (!user) return
 
-  async function handleSaveTimeslots(timeslots: Timeslot[]): Promise<void> {
-    await updateTimeslots(timeslots, user.account)
+  async function handleSaveAvailabilities(
+    availabilities: Timeslot[]
+  ): Promise<void> {
+    await updateTimeslots(availabilities)
+
     queryClient.invalidateQueries({
       queryKey: [QueryKeys.TIMESLOTS, user.account],
     })
@@ -88,15 +90,12 @@ export default function DashboardPage() {
             <AvailabilityPicker
               mentor={user as MentorStruct}
               timeslots={timeslots ?? []}
-              handleSaveTimeslots={handleSaveTimeslots}
+              handleSaveAvailabilities={handleSaveAvailabilities}
             />
           </DialogContent>
         </Dialog>
         <Button onClick={() => getTimeslots()}>Check</Button>
         <Button onClick={() => updateTimeslotById()}>Update</Button>
-        <Button onClick={() => computeTimeslotsToDaysOfWeek(timeslots ?? [])}>
-          Compute
-        </Button>
       </div>
       <AnimatedBackground shader={false} />
     </div>

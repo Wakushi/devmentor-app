@@ -11,7 +11,7 @@ import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { MentorStruct } from "@/lib/types/user.type"
+import { Mentor } from "@/lib/types/user.type"
 import { languageOptions } from "@/lib/types/profile-form.type"
 import {
   capitalizeFirstLetter,
@@ -29,7 +29,7 @@ interface FiltersProps {
     minRating: number
   }
   onFilterChange: (filterName: string, value: string | boolean | number) => void
-  mentors: MentorStruct[]
+  mentors: Mentor[]
 }
 
 export default function Filters({

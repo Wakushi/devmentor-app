@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-import { MentorStruct } from "@/lib/types/user.type"
+import { Mentor } from "@/lib/types/user.type"
 import { FaDollarSign } from "react-icons/fa"
 import { IoIosFlash } from "react-icons/io"
 
@@ -7,7 +7,7 @@ export default function CompleteSessionButton({
   mentor,
   handleCreateSession,
 }: {
-  mentor: MentorStruct
+  mentor: Mentor
   handleCreateSession: () => void
 }) {
   if (mentor.hourlyRate === 0) {

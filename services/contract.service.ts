@@ -14,7 +14,7 @@ import {
   DEVMENTOR_CONTRACT_ADDRESS,
   ETH_DECIMALS,
 } from "@/lib/constants"
-import { BaseUser, MentorStruct } from "@/lib/types/user.type"
+import { BaseUser, Mentor } from "@/lib/types/user.type"
 import { Role } from "@/lib/types/role.type"
 import { Session } from "@/lib/types/session.type"
 import { IProvider } from "@web3auth/base"
@@ -184,7 +184,7 @@ export async function resetMentors(account: Address) {
 }
 
 // Read-only functions
-export async function getMentor(mentorAddress: Address): Promise<MentorStruct> {
+export async function getMentor(mentorAddress: Address): Promise<Mentor> {
   const data: any = await publicClient.readContract({
     address: DEVMENTOR_CONTRACT_ADDRESS,
     abi: DEVMENTOR_CONTRACT_ABI,
@@ -213,7 +213,7 @@ export async function getMentor(mentorAddress: Address): Promise<MentorStruct> {
 
   const reviews = reviewsHash ? await getMentorReviews(reviewsHash) : []
 
-  const mentor: MentorStruct = {
+  const mentor: Mentor = {
     account,
     baseUser,
     validated,

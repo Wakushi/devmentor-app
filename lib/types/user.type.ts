@@ -22,7 +22,7 @@ export type Student = {
   role: Role
 }
 
-export type MentorStruct = {
+export type Mentor = {
   account: Address
   baseUser: BaseUser
   validated: boolean

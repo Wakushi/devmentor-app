@@ -6,7 +6,7 @@ import { useState } from "react"
 import { TimeValue } from "react-aria"
 import DayOfWeekCard from "./day-of-week-card"
 import { Button } from "../ui/button"
-import { MentorStruct } from "@/lib/types/user.type"
+import { Mentor } from "@/lib/types/user.type"
 import {
   DAYS_OF_WEEK,
   FIVE_PM,
@@ -21,7 +21,7 @@ export default function AvailabilityPicker({
   timeslots,
   handleSaveAvailabilities,
 }: {
-  mentor: MentorStruct
+  mentor: Mentor
   timeslots: Timeslot[]
   handleSaveAvailabilities: (availabilities: Timeslot[]) => void
 }) {

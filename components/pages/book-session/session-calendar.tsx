@@ -18,7 +18,7 @@ export default function SessionCalendar({
 }) {
   const [selectedSlot, setSelectedSlot] = useState<Timeslot | undefined>()
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    selectedTimeslot ? new Date(selectedTimeslot.date) : undefined
+    selectedTimeslot ? new Date(getSlotDate(selectedTimeslot)) : undefined
   )
   const [selectedDateAvailableSlots, setSelectedDateAvailableSlots] = useState<
     Timeslot[]
@@ -40,11 +40,7 @@ export default function SessionCalendar({
 
   function getTimeslotsByDate(date: Date): Timeslot[] {
     date.setHours(0, 0, 0, 0)
-    const selectedDateTimestamp = date.getTime()
-    const dayTimeslots = timeslots.filter(
-      (slot) => slot.date === selectedDateTimestamp
-    )
-    return dayTimeslots || []
+    return timeslots || []
   }
 
   const handleSlotSelect = (slot: Timeslot) => {

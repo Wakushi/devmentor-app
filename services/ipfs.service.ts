@@ -1,11 +1,9 @@
 import { PINATA_GATEWAY_BASE_URL } from "@/lib/constants"
 import { Review } from "@/lib/types/review.type"
 import { Timeslot } from "@/lib/types/timeslot.type"
-import { MentorStruct } from "@/lib/types/user.type"
+import { Mentor } from "@/lib/types/user.type"
 
-export async function getMentorTimeslots(
-  mentor: MentorStruct
-): Promise<Timeslot[]> {
+export async function getMentorTimeslots(mentor: Mentor): Promise<Timeslot[]> {
   const response = await fetch(
     `${PINATA_GATEWAY_BASE_URL}/${mentor.timeslotsHash}`
   )
@@ -14,7 +12,7 @@ export async function getMentorTimeslots(
 }
 
 export async function pinMentorTimeslots(
-  mentor: MentorStruct,
+  mentor: Mentor,
   timeslots: Timeslot[]
 ): Promise<string> {
   if (mentor.timeslotsHash) {

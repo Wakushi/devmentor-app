@@ -4,7 +4,7 @@ import AnimatedBackground from "@/components/ui/animated-background"
 import { useUser } from "@/stores/user.store"
 import LoadingScreen from "@/components/ui/loading-screen"
 import AvailabilityPicker from "@/components/timeslot-selection/availability-picker"
-import { MentorStruct } from "@/lib/types/user.type"
+import { Mentor } from "@/lib/types/user.type"
 import {
   Dialog,
   DialogContent,
@@ -17,18 +17,16 @@ import { Timeslot } from "@/lib/types/timeslot.type"
 import useTimeslotsQuery from "@/hooks/queries/timeslots-query"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { useQueryClient } from "@tanstack/react-query"
-import {
-  getTimeslotsByAddress,
-  updateTimeslot,
-  updateTimeslots,
-} from "@/services/user.service"
+import { updateTimeslots } from "@/services/user.service"
 
 export default function DashboardPage() {
   const queryClient = useQueryClient()
+
   const { user, loadingUser } = useUser() as {
-    user: MentorStruct
+    user: Mentor
     loadingUser: boolean
   }
+
   const timeslotsQuery = useTimeslotsQuery(user?.account)
   const { data: timeslots } = timeslotsQuery
 
@@ -45,24 +43,6 @@ export default function DashboardPage() {
 
     queryClient.invalidateQueries({
       queryKey: [QueryKeys.TIMESLOTS, user.account],
-    })
-  }
-
-  async function getTimeslots() {
-    const timelots = await getTimeslotsByAddress(user.account)
-    console.log("timelots: ", timelots)
-  }
-
-  async function updateTimeslotById() {
-    const timelots = await getTimeslotsByAddress(user.account)
-    const timeslotIndex = 1
-
-    const timeslot = { ...timelots[timeslotIndex], isBooked: true }
-
-    await updateTimeslot({
-      timeslot,
-      timeslotId: timeslotIndex,
-      mentorAddress: user.account,
     })
   }
 
@@ -88,19 +68,43 @@ export default function DashboardPage() {
               </p>
             </DialogTitle>
             <AvailabilityPicker
-              mentor={user as MentorStruct}
+              mentor={user as Mentor}
               timeslots={timeslots ?? []}
               handleSaveAvailabilities={handleSaveAvailabilities}
             />
           </DialogContent>
         </Dialog>
-        <Button onClick={() => getTimeslots()}>Check</Button>
-        <Button onClick={() => updateTimeslotById()}>Update</Button>
       </div>
       <AnimatedBackground shader={false} />
     </div>
   )
 }
+
+// function AvailabilityPickerDialog({}: { user: Mentor }) {
+//   return (
+//     <Dialog>
+//       <DialogTrigger asChild>
+//         <Button>
+//           <CiCalendar />
+//           My availabilities
+//         </Button>
+//       </DialogTrigger>
+//       <DialogContent className="border-transparent">
+//         <DialogTitle>
+//           <span className="text-2xl">Availabilities</span>
+//           <p className="text-small font-normal font-sans text-dim">
+//             Update your availabilities
+//           </p>
+//         </DialogTitle>
+//         <AvailabilityPicker
+//           mentor={user as Mentor}
+//           timeslots={timeslots ?? []}
+//           handleSaveAvailabilities={handleSaveAvailabilities}
+//         />
+//       </DialogContent>
+//     </Dialog>
+//   )
+// }
 
 function PlannedSessions() {
   return (
@@ -108,4 +112,8 @@ function PlannedSessions() {
       <p>No sessions planned yet.</p>
     </section>
   )
+}
+
+function MeetingEvents() {
+  return <div></div>
 }

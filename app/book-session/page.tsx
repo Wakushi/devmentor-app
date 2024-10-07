@@ -27,7 +27,7 @@ import SessionBookedScreen from "@/components/pages/book-session/session-booked-
 import MentorNotFound from "@/components/pages/book-session/mentor-not-found"
 import BookSessionNavigation from "@/components/pages/book-session/book-session-navigation"
 import { BookStep } from "@/lib/types/book-session-form.type"
-import { MentorStruct } from "@/lib/types/user.type"
+import { Mentor } from "@/lib/types/user.type"
 import useMentorsQuery from "@/hooks/queries/mentors-query"
 import useEthPriceQuery from "@/hooks/queries/eth-price-query"
 import {
@@ -51,7 +51,7 @@ export default function BookSessionPage({
   const { data: ethPriceUsd } = ethPriceQuery
   const { data: mentors } = mentorsQuery
 
-  const [mentor, setMentor] = useState<MentorStruct>()
+  const [mentor, setMentor] = useState<Mentor>()
   const [timeslots, setTimeslots] = useState<Timeslot[]>([])
 
   const [bookStep, setBookStep] = useState<BookStep>(BookStep.SCHEDULE)
@@ -90,9 +90,9 @@ export default function BookSessionPage({
       }
 
       const mentorSlots = await getMentorTimeslots(mentor)
-      const availableSlots = mentorSlots.filter((slot) => !slot.isBooked)
+      // const availableSlots = mentorSlots.filter((slot) => !slot.isBooked)
 
-      setTimeslots(availableSlots)
+      setTimeslots(mentorSlots)
       setLoading(false)
     }
 
@@ -277,7 +277,7 @@ export default function BookSessionPage({
       throw new Error("Timeslot to update not found")
     }
 
-    allSlots[confimedSlotIndex].isBooked = true
+    // allSlots[confimedSlotIndex].isBooked = true
 
     await pinMentorTimeslots(mentor, allSlots)
   }

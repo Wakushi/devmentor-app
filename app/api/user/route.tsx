@@ -6,7 +6,7 @@ import { createUserJwtToken, getRequestUser } from "@/lib/crypto/jwt"
 import { Role } from "@/lib/types/role.type"
 import {
   BaseUser,
-  MentorStruct,
+  Mentor,
   RawMentor,
   RawStudent,
   Student,
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ error: "Role is required" }, { status: 400 })
     }
 
-    let user: Visitor | Student | MentorStruct
+    let user: Visitor | Student | Mentor
 
     switch (role) {
       case Role.VISITOR:
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         user = (await buildUser(
           await contract.getMentor(address),
           Role.MENTOR
-        )) as MentorStruct
+        )) as Mentor
         break
     }
 
@@ -125,7 +125,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 async function buildUser(
   rawUser: RawStudent | RawMentor,
   role: Role
-): Promise<Student | MentorStruct> {
+): Promise<Student | Mentor> {
   const [baseUserRaw] = rawUser
   const [account, userName, languagesRaw, subjectsRaw] = baseUserRaw
 
@@ -169,7 +169,7 @@ async function buildUser(
 
   const reviews = await getMentorReviews(reviewsHash)
 
-  const mentor: MentorStruct = {
+  const mentor: Mentor = {
     account,
     baseUser,
     validated,

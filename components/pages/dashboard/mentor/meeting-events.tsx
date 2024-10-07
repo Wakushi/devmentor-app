@@ -1,18 +1,12 @@
-import React, { useEffect, useState } from "react"
+"use client"
+
+import { useEffect, useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -22,21 +16,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { toast } from "@/hooks/use-toast"
 import { MeetingEvent } from "@/lib/types/timeslot.type"
 import { Mentor } from "@/lib/types/user.type"
-import { msToReadableDuration } from "@/lib/utils"
 import { FaCircleCheck } from "react-icons/fa6"
 import {
   createMeetingEvent,
@@ -46,35 +36,36 @@ import {
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { MdError } from "react-icons/md"
 import { useQueryClient } from "@tanstack/react-query"
+import useMeetingEventsQuery from "@/hooks/queries/meeting-event-query"
+import MeetingEventCard from "./meeting-event-card"
 
 const meetingEventSchema = z.object({
   name: z.string().min(1, "Name is required"),
   duration: z.number().min(1, "Duration must be greater than 0"),
   description: z.string().optional(),
+  durationUnit: z.enum(["min", "hrs"]),
 })
 
-export function MeetingEvents({
-  mentor,
-  meetingEvents,
-}: {
-  mentor: Mentor
-  meetingEvents: MeetingEvent[]
-}) {
+export function MeetingEvents({ mentor }: { mentor: Mentor }) {
   const queryClient = useQueryClient()
+
+  const meetingEventsQuery = useMeetingEventsQuery(mentor.account)
+  const { data: meetingEvents } = meetingEventsQuery
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState<MeetingEvent | null>(null)
-  const [events, setEvents] = useState<MeetingEvent[]>(meetingEvents)
+  const [events, setEvents] = useState<MeetingEvent[]>([])
 
   useEffect(() => {
-    setEvents(meetingEvents)
-  }, [meetingEvents])
+    setEvents(meetingEvents ?? [])
+  }, [meetingEventsQuery.data, meetingEventsQuery.isLoading])
 
   const form = useForm<z.infer<typeof meetingEventSchema>>({
     resolver: zodResolver(meetingEventSchema),
     defaultValues: {
       name: "",
-      duration: 0,
+      duration: 30,
+      durationUnit: "min",
       description: "",
     },
   })
@@ -83,20 +74,22 @@ export function MeetingEvents({
 
   async function onSubmit(data: z.infer<typeof meetingEventSchema>) {
     try {
+      const durationInMs = convertDurationToMs(data.duration, data.durationUnit)
+
       if (editingEvent) {
         await handleUpdateMeetingEvent({
           ...editingEvent,
           ...data,
+          duration: durationInMs,
         })
-      } else {
-        await handleCreateMeetingEvent({
-          ...data,
-          mentorAddress: mentor.account,
-        })
+        return
       }
 
-      setIsDialogOpen(false)
-      form.reset()
+      await handleCreateMeetingEvent({
+        ...data,
+        duration: durationInMs,
+        mentorAddress: mentor.account,
+      })
     } catch (error) {
       toast({
         title: "Error",
@@ -119,7 +112,9 @@ export function MeetingEvents({
           action: <FaCircleCheck className="text-white" />,
         })
 
+        setIsDialogOpen(false)
         refreshList()
+        form.reset()
       } else {
         throw new Error(error)
       }
@@ -138,7 +133,7 @@ export function MeetingEvents({
     meetingEvent: Omit<MeetingEvent, "id">
   ): Promise<void> {
     try {
-      const { success, data, error } = await updateMeetingEvent(meetingEvent)
+      const { success, error } = await updateMeetingEvent(meetingEvent)
 
       if (success) {
         toast({
@@ -147,7 +142,9 @@ export function MeetingEvents({
           action: <FaCircleCheck className="text-white" />,
         })
 
+        setIsDialogOpen(false)
         refreshList()
+        form.reset()
       } else {
         throw new Error(error)
       }
@@ -189,15 +186,36 @@ export function MeetingEvents({
   }
 
   async function handleEdit(event: MeetingEvent) {
+    const { duration, unit } = convertMsToDuration(event.duration)
     setEditingEvent(event)
-    form.reset(event)
+    form.reset({
+      ...event,
+      duration: duration,
+      durationUnit: unit,
+    })
     setIsDialogOpen(true)
   }
 
   function refreshList() {
     queryClient.refetchQueries({
-      queryKey: [QueryKeys.MEETING_EVENTS],
+      queryKey: [QueryKeys.MEETING_EVENTS, mentor.account],
     })
+  }
+
+  function convertDurationToMs(duration: number, unit: "min" | "hrs"): number {
+    return unit === "min" ? duration * 60 * 1000 : duration * 60 * 60 * 1000
+  }
+
+  function convertMsToDuration(ms: number): {
+    duration: number
+    unit: "min" | "hrs"
+  } {
+    const minutes = ms / (60 * 1000)
+    if (minutes < 60) {
+      return { duration: minutes, unit: "min" }
+    } else {
+      return { duration: minutes / 60, unit: "hrs" }
+    }
   }
 
   return (
@@ -232,18 +250,40 @@ export function MeetingEvents({
                   <Input placeholder="Event Name" {...field} />
                 )}
               />
-              <Controller
-                name="duration"
-                control={form.control}
-                render={({ field }) => (
-                  <Input
-                    type="number"
-                    placeholder="Duration (ms)"
-                    {...field}
-                    onChange={(e) => field.onChange(parseInt(e.target.value))}
-                  />
-                )}
-              />
+              <div className="flex space-x-2">
+                <Controller
+                  name="duration"
+                  control={form.control}
+                  render={({ field }) => (
+                    <Input
+                      placeholder="Duration"
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(parseFloat(e.target.value || "0"))
+                      }
+                      className="w-2/3"
+                    />
+                  )}
+                />
+                <Controller
+                  name="durationUnit"
+                  control={form.control}
+                  render={({ field }) => (
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger className="w-1/3">
+                        <SelectValue placeholder="Unit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="min">Minutes</SelectItem>
+                        <SelectItem value="hrs">Hours</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
               <Controller
                 name="description"
                 control={form.control}
@@ -263,46 +303,12 @@ export function MeetingEvents({
 
       <div className="flex flex-wrap gap-2">
         {events.map((event) => (
-          <Card key={event.id} className="glass text-white w-[45%]">
-            <CardHeader>
-              <CardTitle className="text-xl">{event.name}</CardTitle>
-              <CardDescription>
-                Duration: {msToReadableDuration(event.duration)}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-small">{event.description}</p>
-            </CardContent>
-            <CardFooter className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => handleEdit(event)}>
-                Edit
-              </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive">Delete</Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Are you absolutely sure?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete
-                      the meeting event "{event.name}".
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction asChild>
-                      <Button onClick={() => handleDelete(event)}>
-                        Confirm
-                      </Button>
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </CardFooter>
-          </Card>
+          <MeetingEventCard
+            key={event.id}
+            event={event}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+          />
         ))}
       </div>
     </div>

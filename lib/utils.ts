@@ -10,6 +10,7 @@ import {
   Language,
   LearningField,
 } from "./types/profile-form.type"
+import { TimeValue } from "react-aria"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -180,4 +181,15 @@ export function msToReadableDuration(durationInMs: number): string {
   duration += minutes ? minutes.toString() + "min" : ""
 
   return duration
+}
+
+export function timeStampToTimeValue(timestamp: number): TimeValue {
+  const date = new Date(timestamp)
+  const hour = date.getHours()
+  const minute = date.getMinutes()
+
+  return {
+    hour,
+    minute,
+  } as TimeValue
 }

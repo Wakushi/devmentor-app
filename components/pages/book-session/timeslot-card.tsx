@@ -18,7 +18,7 @@ export default function TimeslotCard({
     return (
       <div
         className={clsx(
-          "px-8 py-2 h-full font-semibold border-2 w-full text-center rounded cursor-pointer shadow-lg",
+          "px-8 py-2 h-full font-semibold border-2 w-full text-center rounded-md cursor-pointer shadow-lg",
           {
             "hover:bg-slate-600": !selected,
             "bg-white text-primary-shade": selected,
@@ -38,7 +38,7 @@ export default function TimeslotCard({
       {selected && (
         <Button
           onClick={() => handleConfirmTimeslot(timeslot)}
-          className="fade-in-right h-full text-base px-8 py-2 cursor-pointer rounded shadow-lg"
+          className="fade-in-right h-full text-base px-8 py-2 cursor-pointer rounded-md shadow-lg"
         >
           Confirm
         </Button>

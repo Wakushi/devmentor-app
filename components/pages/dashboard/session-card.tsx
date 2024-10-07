@@ -19,7 +19,7 @@ export function SessionCard({ session }: { session: Session }) {
   const { startTime, valueLocked, mentor } = session
 
   return (
-    <div className="flex items-center justify-between gap-8 glass rounded px-4 py-2">
+    <div className="flex items-center justify-between gap-8 glass rounded-md px-4 py-2">
       <div className="flex items-center gap-4">
         <SessionMentor name={mentor?.baseUser?.userName ?? "?"} />
         <SessionTime startTime={startTime} />

@@ -47,7 +47,14 @@ export default function DayOfWeekCard({
         onCheckedChange={(checked) => handleToggleDayChange(index, checked)}
         className="flex-1 max-w-[36px]"
       />
-      <span className="flex-1 font-semibold text-base">{name}s</span>
+      <span
+        className="flex-1 font-semibold text-base cursor-pointer select-none"
+        onClick={() => {
+          handleToggleDayChange(index, !active)
+        }}
+      >
+        {name}s
+      </span>
       <div
         className={clsx("flex flex-col items-center gap-4", {
           "pointer-events-none": !active,
@@ -69,6 +76,7 @@ export default function DayOfWeekCard({
         onClick={() => handleAddTimeslot(index)}
         className={clsx("text-2xl cursor-pointer hover:text-primary", {
           "self-baseline mt-2": slots.length > 1,
+          "pointer-events-none": !active,
         })}
       />
     </div>

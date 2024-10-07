@@ -6,7 +6,7 @@ import { getMeetingEventsByAddress } from "@/services/user.service"
 
 export default function useMeetingEventsQuery(address: Address) {
   const meetingEventsQuery = useQuery<MeetingEvent[], Error>({
-    queryKey: [QueryKeys.MEETING_EVENTS],
+    queryKey: [QueryKeys.MEETING_EVENTS, address],
     queryFn: async () => {
       if (!address) return []
 

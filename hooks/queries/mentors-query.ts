@@ -1,6 +1,6 @@
-import { getAllMentors, getMentor } from "@/lib/actions/web3/contract"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { MentorStruct } from "@/lib/types/user.type"
+import { getAllMentors, getMentor } from "@/services/contract.service"
 import { useQuery } from "@tanstack/react-query"
 
 export default function useMentorsQuery() {

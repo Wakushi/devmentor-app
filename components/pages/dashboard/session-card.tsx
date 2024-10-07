@@ -13,7 +13,7 @@ import {
 import { BsThreeDots } from "react-icons/bs"
 import HourlyRate from "@/components/hourly-rate"
 import useEthPriceQuery from "@/hooks/queries/eth-price-query"
-import { weiToUsd } from "@/lib/actions/web3/contract"
+import { weiToUsd } from "@/services/contract.service"
 
 export function SessionCard({ session }: { session: Session }) {
   const { startTime, valueLocked, mentor } = session

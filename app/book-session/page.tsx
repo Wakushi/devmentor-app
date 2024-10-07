@@ -1,12 +1,5 @@
 "use client"
 
-import {
-  ContractEvent,
-  createSession,
-  getSession,
-  usdToWei,
-  watchForEvent,
-} from "@/lib/actions/web3/contract"
 import AnimatedBackground from "@/components/ui/animated-background"
 import MentorDetails from "@/components/pages/book-session/mentor-details"
 import SessionCalendar from "@/components/pages/book-session/session-calendar"
@@ -21,7 +14,7 @@ import Stepper from "@/components/pages/auth/stepper"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import SessionGoalInput from "@/components/pages/book-session/session-goal"
-import { useUser } from "@/services/user.service"
+import { useUser } from "@/stores/user.store"
 import { toast } from "@/hooks/use-toast"
 import Loader from "@/components/ui/loader"
 import { FaCircleCheck } from "react-icons/fa6"
@@ -33,14 +26,18 @@ import {
 import SessionBookedScreen from "@/components/pages/book-session/session-booked-screen"
 import MentorNotFound from "@/components/pages/book-session/mentor-not-found"
 import BookSessionNavigation from "@/components/pages/book-session/book-session-navigation"
-import {
-  getMentorTimeslots,
-  pinMentorTimeslots,
-} from "@/lib/actions/client/pinata-actions"
 import { BookStep } from "@/lib/types/book-session-form.type"
 import { MentorStruct } from "@/lib/types/user.type"
 import useMentorsQuery from "@/hooks/queries/mentors-query"
 import useEthPriceQuery from "@/hooks/queries/eth-price-query"
+import {
+  ContractEvent,
+  createSession,
+  getSession,
+  usdToWei,
+  watchForEvent,
+} from "@/services/contract.service"
+import { getMentorTimeslots, pinMentorTimeslots } from "@/services/ipfs.service"
 
 export default function BookSessionPage({
   searchParams,

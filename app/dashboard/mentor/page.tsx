@@ -1,7 +1,7 @@
 "use client"
 
 import AnimatedBackground from "@/components/ui/animated-background"
-import { useUser } from "@/services/user.service"
+import { useUser } from "@/stores/user.store"
 import LoadingScreen from "@/components/ui/loading-screen"
 import AvailabilityPicker from "@/components/timeslot-selection/availability-picker"
 import { MentorStruct } from "@/lib/types/user.type"
@@ -15,10 +15,13 @@ import { Button } from "@/components/ui/button"
 import { CiCalendar } from "react-icons/ci"
 import { Timeslot } from "@/lib/types/timeslot.type"
 import useTimeslotsQuery from "@/hooks/queries/timeslots-query"
-import { registerTimeslots } from "@/lib/actions/client/firebase-actions"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { useQueryClient } from "@tanstack/react-query"
-import { computeTimeslotsToDaysOfWeek } from "@/lib/utils"
+import {
+  getTimeslotsByAddress,
+  updateTimeslot,
+  updateTimeslots,
+} from "@/services/user.service"
 
 export default function DashboardPage() {
   const queryClient = useQueryClient()
@@ -35,10 +38,31 @@ export default function DashboardPage() {
 
   if (!user) return
 
-  async function handleSaveTimeslots(timeslots: Timeslot[]): Promise<void> {
-    await registerTimeslots(timeslots, user.account)
+  async function handleSaveAvailabilities(
+    availabilities: Timeslot[]
+  ): Promise<void> {
+    await updateTimeslots(availabilities)
+
     queryClient.invalidateQueries({
       queryKey: [QueryKeys.TIMESLOTS, user.account],
+    })
+  }
+
+  async function getTimeslots() {
+    const timelots = await getTimeslotsByAddress(user.account)
+    console.log("timelots: ", timelots)
+  }
+
+  async function updateTimeslotById() {
+    const timelots = await getTimeslotsByAddress(user.account)
+    const timeslotIndex = 1
+
+    const timeslot = { ...timelots[timeslotIndex], isBooked: true }
+
+    await updateTimeslot({
+      timeslot,
+      timeslotId: timeslotIndex,
+      mentorAddress: user.account,
     })
   }
 
@@ -59,23 +83,19 @@ export default function DashboardPage() {
           <DialogContent className="border-transparent">
             <DialogTitle>
               <span className="text-2xl">Availabilities</span>
-              <p className="text-small font-sans text-dim">
+              <p className="text-small font-normal font-sans text-dim">
                 Update your availabilities
               </p>
             </DialogTitle>
             <AvailabilityPicker
               mentor={user as MentorStruct}
               timeslots={timeslots ?? []}
-              handleSaveTimeslots={handleSaveTimeslots}
+              handleSaveAvailabilities={handleSaveAvailabilities}
             />
           </DialogContent>
         </Dialog>
-        <Button onClick={() => console.log("Timeslots: ", timeslots)}>
-          Check
-        </Button>
-        <Button onClick={() => computeTimeslotsToDaysOfWeek(timeslots ?? [])}>
-          Compute
-        </Button>
+        <Button onClick={() => getTimeslots()}>Check</Button>
+        <Button onClick={() => updateTimeslotById()}>Update</Button>
       </div>
       <AnimatedBackground shader={false} />
     </div>

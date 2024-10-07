@@ -4,7 +4,7 @@ import TypingAnimation from "@/components/magicui/typing-animation"
 import AnimatedBackground from "@/components/ui/animated-background"
 import NavLinkButton from "@/components/ui/nav-link"
 import { Role } from "@/lib/types/role.type"
-import { useUser } from "@/services/user.service"
+import { useUser } from "@/stores/user.store"
 import Image from "next/image"
 import { FaLongArrowAltRight } from "react-icons/fa"
 

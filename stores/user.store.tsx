@@ -1,13 +1,14 @@
 "use client"
 import { createContext, ReactNode, useContext, useEffect } from "react"
 import { useAccount, useDisconnect } from "wagmi"
-import { web3AuthInstance } from "@/lib/Web3AuthConnectorInstance"
 import { useRouter } from "next/navigation"
 import { MentorStruct, Student, Visitor } from "@/lib/types/user.type"
 import { Address } from "viem"
 import { Role } from "@/lib/types/role.type"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { QueryKeys } from "@/lib/types/query-keys.type"
+import { BASE_USER_PATH } from "@/lib/constants"
+import { web3AuthInstance } from "@/lib/web3/Web3AuthConnectorInstance"
 
 interface UserContextProviderProps {
   children: ReactNode
@@ -84,7 +85,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     address: Address
   ): Promise<Visitor | Student | MentorStruct> {
     try {
-      const response = await fetch(`/api/user?address=${address}`)
+      const response = await fetch(`${BASE_USER_PATH}?address=${address}`)
       const { user } = await response.json()
 
       switch (user.role) {

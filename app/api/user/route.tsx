@@ -1,9 +1,8 @@
-import { getMentorReviews } from "@/lib/actions/client/pinata-actions"
 import {
   DEVMENTOR_CONTRACT_ABI,
   DEVMENTOR_CONTRACT_ADDRESS,
 } from "@/lib/constants"
-import { createUserJwtToken } from "@/lib/jwt"
+import { createUserJwtToken, getRequestUser } from "@/lib/crypto/jwt"
 import { Role } from "@/lib/types/role.type"
 import {
   BaseUser,
@@ -13,35 +12,10 @@ import {
   Student,
   Visitor,
 } from "@/lib/types/user.type"
+import { getMentorReviews } from "@/services/ipfs.service"
 import { ethers } from "ethers"
 import { NextRequest, NextResponse } from "next/server"
 import { Address } from "viem"
-
-export async function POST(req: NextRequest): Promise<NextResponse> {
-  try {
-    const { userPayload, role } = await req.json()
-
-    const token = await createUserJwtToken({
-      address: userPayload.account,
-      role,
-    })
-
-    const response = NextResponse.json({ userPayload })
-
-    response.cookies.set({
-      name: process.env.NEXT_PUBLIC_TOKEN_COOKIE as string,
-      value: token,
-      httpOnly: true,
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",
-    })
-
-    return response
-  } catch (error) {
-    console.error("API error:", error)
-    return NextResponse.json({ error: "Failed to add user" }, { status: 500 })
-  }
-}
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(req.url)
@@ -108,6 +82,42 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     } else {
       return NextResponse.json({ error: "Unknown error" }, { status: 500 })
     }
+  }
+}
+
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  try {
+    const { userPayload, role } = await req.json()
+
+    const user = await getRequestUser(req)
+
+    if (!user || !user.address) {
+      return NextResponse.json({ error: "Unidentified user" }, { status: 400 })
+    }
+
+    if (user.role !== Role.VISITOR) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+    const token = await createUserJwtToken({
+      address: user.address,
+      role,
+    })
+
+    const response = NextResponse.json({ userPayload })
+
+    response.cookies.set({
+      name: process.env.NEXT_PUBLIC_TOKEN_COOKIE as string,
+      value: token,
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    })
+
+    return response
+  } catch (error) {
+    console.error("API error:", error)
+    return NextResponse.json({ error: "Failed to add user" }, { status: 500 })
   }
 }
 

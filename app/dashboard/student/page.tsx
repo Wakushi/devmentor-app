@@ -1,6 +1,6 @@
 "use client"
 import AnimatedBackground from "@/components/ui/animated-background"
-import { useUser } from "@/services/user.service"
+import { useUser } from "@/stores/user.store"
 import LoadingScreen from "@/components/ui/loading-screen"
 import NavLinkButton from "@/components/ui/nav-link"
 import { FaLongArrowAltRight } from "react-icons/fa"

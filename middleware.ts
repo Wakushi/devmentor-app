@@ -1,20 +1,12 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { Role } from "./lib/types/role.type"
-import { JWTPayload, verifyJWT } from "./lib/jwt"
+import { getRequestUser } from "./lib/crypto/jwt"
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  const authCookie = request.cookies.get(
-    process.env.NEXT_PUBLIC_TOKEN_COOKIE as string
-  )
-  const token = authCookie?.value
-  let decodedToken: JWTPayload | null = null
-
-  if (token) {
-    decodedToken = await verifyJWT(token)
-  }
+  const user = await getRequestUser(request)
 
   const protectedRoutes = {
     "/dashboard/student": [Role.STUDENT],
@@ -26,11 +18,11 @@ export async function middleware(request: NextRequest) {
     protectedRoutes[pathname as keyof typeof protectedRoutes]
 
   if (requiredRoles) {
-    if (!decodedToken) {
+    if (!user) {
       return NextResponse.redirect(new URL("/auth/login", request.url))
     }
 
-    if (!decodedToken.role || !requiredRoles.includes(decodedToken.role)) {
+    if (!user.role || !requiredRoles.includes(user.role)) {
       return NextResponse.redirect(new URL("/", request.url))
     }
   }

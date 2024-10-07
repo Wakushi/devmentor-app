@@ -4,11 +4,11 @@ import {
   Address,
   parseEther,
   formatUnits,
+  formatEther,
 } from "viem"
 import { simulateContract, writeContract } from "@wagmi/core"
 import { config, publicClient } from "@/providers"
 import { baseSepolia } from "viem/chains"
-import { web3AuthInstance } from "@/lib/Web3AuthConnectorInstance"
 import {
   DEVMENTOR_CONTRACT_ABI,
   DEVMENTOR_CONTRACT_ADDRESS,
@@ -16,8 +16,10 @@ import {
 } from "@/lib/constants"
 import { BaseUser, MentorStruct } from "@/lib/types/user.type"
 import { Role } from "@/lib/types/role.type"
-import { getMentorReviews } from "../client/pinata-actions"
 import { Session } from "@/lib/types/session.type"
+import { IProvider } from "@web3auth/base"
+import { getMentorReviews } from "@/services/ipfs.service"
+import { web3AuthInstance } from "@/lib/web3/Web3AuthConnectorInstance"
 
 export enum ContractEvent {
   STUDENT_REGISTERED = "StudentRegistered",
@@ -326,4 +328,25 @@ export function weiToUsd(weiAmount: number, ethPriceUsd: number): number {
   const ethAmount = formatUnits(BigInt(weiAmount), ETH_DECIMALS)
   const usdAmount = +ethAmount * +ethPriceUsd
   return Number(usdAmount.toFixed(2))
+}
+
+export const getBalance = async (
+  provider: IProvider,
+  userAddress?: Address
+): Promise<string> => {
+  try {
+    const walletClient = createWalletClient({
+      chain: baseSepolia,
+      transport: custom(provider),
+    })
+
+    const accounts = userAddress
+      ? [userAddress]
+      : await walletClient.getAddresses()
+
+    const balance = await publicClient.getBalance({ address: accounts[0] })
+    return formatEther(balance)
+  } catch (error) {
+    return error as string
+  }
 }

@@ -881,6 +881,8 @@ const ONE_HOUR_IN_MS = 60 * 60 * 1000
 const NINETY_DAYS = 90
 const ETH_DECIMALS = 18
 
+const BASE_USER_PATH = "/api/user"
+
 export {
   PINATA_GATEWAY_BASE_URL,
   DEVMENTOR_CONTRACT_ABI,
@@ -893,4 +895,5 @@ export {
   ONE_HOUR_IN_MS,
   SUNDAY,
   ETH_DECIMALS,
+  BASE_USER_PATH,
 }

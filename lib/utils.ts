@@ -2,9 +2,8 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Address } from "viem"
 import { Review } from "./types/review.type"
-import { DayOfWeek, DaySlot, Timeslot } from "./types/timeslot.type"
+import { Timeslot } from "./types/timeslot.type"
 import { Matcher } from "react-day-picker"
-import { NINETY_DAYS, ONE_HOUR_IN_MS } from "./constants"
 import {
   allLanguages,
   allSubjects,
@@ -43,7 +42,7 @@ export function getAverageRating(reviews: Review[]) {
 }
 
 export function getSlotDate(timeslot: Timeslot): Date {
-  return new Date(timeslot.date)
+  return new Date(getTimeslotStartTime(timeslot))
 }
 
 export function getSlotStartHour(timeslot: Timeslot): string {
@@ -91,23 +90,24 @@ export const formatTime = (timestamp: number) => {
 }
 
 export function getTimeslotStartTime(timeslot: Timeslot): number {
-  const { timeStart, date } = timeslot
-  return computeTimeAndDateTimestamps(timeStart, date).getTime()
+  const { timeStart, day } = timeslot
+  return computeTimeAndDateTimestamps(timeStart, day).getTime()
 }
 
 export function getTimeslotEndTime(timeslot: Timeslot): number {
-  const { timeEnd, date } = timeslot
-  return computeTimeAndDateTimestamps(timeEnd, date).getTime()
+  const { timeEnd, day } = timeslot
+  return computeTimeAndDateTimestamps(timeEnd, day).getTime()
 }
 
-export function computeTimeAndDateTimestamps(time: number, date: number): Date {
+export function computeTimeAndDateTimestamps(time: number, day: number): Date {
   const timeAsDate = new Date(time)
 
   const hours = timeAsDate.getHours()
   const minutes = timeAsDate.getMinutes()
 
-  const completeDate = new Date(date)
+  const completeDate = new Date()
 
+  completeDate.setDate(day)
   completeDate.setHours(hours)
   completeDate.setMinutes(minutes)
 
@@ -143,88 +143,6 @@ export function createGoogleCalendarLink(event: {
   return `${baseUrl}&${params.toString()}`
 }
 
-export function computeDaysOfWeekToTimeslots(
-  daysOfWeek: DayOfWeek[],
-  mentorAddress: Address
-): Timeslot[] {
-  const activeDays = daysOfWeek.filter((day) => day.active)
-  const hourlySlotsByDay: Map<number, DaySlot[]> = new Map()
-
-  const isSameSlot = (slotA: DaySlot, slotB: DaySlot): boolean => {
-    return (
-      slotA.timeStart === slotB.timeStart && slotA.timeEnd === slotB.timeEnd
-    )
-  }
-
-  activeDays.forEach((day) => {
-    const savedDaySlots: DaySlot[] = []
-
-    day.slots.forEach((slot) => {
-      // Initially, the day slots produced by the DayOfWeekCard component have:
-      // - a timeStart to represents when the first slot of the day begins
-      // - a timeEnd to represent when the last slot of the day ends
-
-      // To have time slots divided by hour, we need to transform these into hourly divided
-      // slots so that reelAmountOfSlots = (timeEnd - timeStart) / 1h
-
-      const { timeStart, timeEnd } = slot
-      const durationInHours = Math.floor((timeEnd - timeStart) / ONE_HOUR_IN_MS)
-
-      for (let i = 0; i < durationInHours; i++) {
-        const startTimeDate = new Date(timeStart + ONE_HOUR_IN_MS * i)
-        const endTimeDate = new Date(timeStart + ONE_HOUR_IN_MS * (i + 1))
-
-        const newSlot = {
-          timeStart: startTimeDate.getTime(),
-          timeEnd: endTimeDate.getTime(),
-          dayOfWeek: day.index,
-        }
-
-        if (savedDaySlots.some((daySlot) => isSameSlot(daySlot, newSlot)))
-          continue
-
-        savedDaySlots.push({
-          timeStart: startTimeDate.getTime(),
-          timeEnd: endTimeDate.getTime(),
-          dayOfWeek: day.index,
-        })
-      }
-    })
-
-    hourlySlotsByDay.set(day.index, savedDaySlots)
-  })
-
-  const timeslots: Timeslot[] = []
-  const today = new Date()
-
-  for (let i = 0; i < NINETY_DAYS; i++) {
-    const slotDate = new Date(today)
-
-    slotDate.setDate(today.getDate() + i)
-    slotDate.setHours(0, 0, 0, 0)
-
-    const slotDateDay = slotDate.getDay()
-
-    if (!hourlySlotsByDay.has(slotDateDay)) continue
-
-    const slots = hourlySlotsByDay.get(slotDateDay)
-
-    if (!slots || !slots.length) continue
-
-    slots.forEach(({ timeStart, timeEnd }) => {
-      timeslots.push({
-        mentorAddress,
-        date: slotDate.getTime(),
-        timeStart,
-        timeEnd,
-        isBooked: false,
-      })
-    })
-  }
-
-  return timeslots
-}
-
 export function hashCode(str: string): number {
   let hash = 5381
   for (let i = 0; i < str.length; i++) {
@@ -234,8 +152,8 @@ export function hashCode(str: string): number {
 }
 
 export function getTimeslotId(slot: Timeslot): number {
-  const { mentorAddress, date, timeStart, timeEnd } = slot
-  const concatenatedString = `${mentorAddress}${date}${timeStart}${timeEnd}`
+  const { mentorAddress, day, timeStart, timeEnd } = slot
+  const concatenatedString = `${mentorAddress}${day}${timeStart}${timeEnd}`
   return hashCode(concatenatedString)
 }
 
@@ -245,41 +163,4 @@ export function getSubjectsFromIds(subjectsIds: number[]): LearningField[] {
 
 export function getLanguagesFromIds(langIds: number[]): Language[] {
   return langIds.map((langId) => allLanguages[langId])
-}
-
-export function computeTimeslotsToDaysOfWeek(
-  timeslots: Timeslot[]
-): DayOfWeek[] {
-  // Timeslot :
-  // date: 1730070000000
-  // timeEnd: 1727695833688
-  // timeStart: 1727692233688
-
-  // DayOfWeek
-  // active: false
-  // index: 0
-  // name: "Sunday"
-  // slots: [{timeStart: 1727681433688, timeEnd: 1727708414510}]
-
-  // Sort timeslots by day
-  // For each group of timeslots sorted by day, find the earliest and the latest to build the slot range
-  // If there's an hour gap, create a separate slot for each hour gap, each one with its own start <-> end range
-
-  const timeslotByDayIndex: Map<number, Timeslot[]> = new Map()
-
-  timeslots.forEach((timeslot) => {
-    const date = new Date(timeslot.date)
-    const day = date.getDay()
-
-    if (timeslotByDayIndex.has(day)) {
-      const daySlots = timeslotByDayIndex.get(day) ?? []
-      timeslotByDayIndex.set(day, [...daySlots, timeslot])
-    } else {
-      timeslotByDayIndex.set(day, [timeslot])
-    }
-  })
-
-  console.log("timeslotByDayIndex: ", timeslotByDayIndex)
-
-  return []
 }

@@ -7,8 +7,8 @@ import { Role } from "@/lib/types/role.type"
 import {
   BaseUser,
   Mentor,
-  RawMentor,
-  RawStudent,
+  ContractMentor,
+  ContractStudent,
   Student,
   Visitor,
 } from "@/lib/types/user.type"
@@ -123,7 +123,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
 // When we make a call using ethers, we need to properly format the received data
 async function buildUser(
-  rawUser: RawStudent | RawMentor,
+  rawUser: ContractStudent | ContractMentor,
   role: Role
 ): Promise<Student | Mentor> {
   const [baseUserRaw] = rawUser
@@ -137,7 +137,7 @@ async function buildUser(
   }
 
   if (role === Role.STUDENT) {
-    const [_, contactHash, experience] = rawUser as RawStudent
+    const [_, contactHash, experience] = rawUser as ContractStudent
 
     const baseUser: BaseUser = {
       account,
@@ -165,7 +165,7 @@ async function buildUser(
     hourlyRate,
     timeslotsHash,
     reviewsHash,
-  ] = rawUser as RawMentor
+  ] = rawUser as ContractMentor
 
   const reviews = await getMentorReviews(reviewsHash)
 

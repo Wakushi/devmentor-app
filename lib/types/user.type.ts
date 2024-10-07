@@ -36,21 +36,21 @@ export type Mentor = {
 }
 
 // Raw structs received from the contract
-export type RawBaseUser = [
+export type ContractBaseUser = [
   Address, // account
   string, // userName
   bigint[], // languagesRaw
   bigint[] // subjectsRaw
 ]
 
-export type RawStudent = [
-  RawBaseUser,
+export type ContractStudent = [
+  ContractBaseUser,
   string, // contactHash
   bigint // experience
 ]
 
-export type RawMentor = [
-  RawBaseUser,
+export type ContractMentor = [
+  ContractBaseUser,
   boolean, // validated
   bigint, // yearsOfExperience
   bigint, // sessionCount

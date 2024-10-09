@@ -2,49 +2,71 @@
 import { useState } from "react"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Timeslot } from "@/lib/types/timeslot.type"
-import { getSlotDate, getTimeslotMatcher } from "@/lib/utils"
+import { MeetingEvent, Timeslot } from "@/lib/types/timeslot.type"
+import { getTimeslotMatcher } from "@/lib/utils"
 import TimeslotCardList from "./timeslot-card-list"
 import { CalendarDays } from "lucide-react"
+import MeetingEventList from "./meeting-event-list"
 
 export default function SessionCalendar({
-  timeslots,
+  meetingEvents,
   handleConfirmTimeslot,
-  selectedTimeslot,
+  selectedMeetingEvent,
+  handleConfirmMeetingEvent,
+  selectedDate,
+  handleSelectDate,
 }: {
-  timeslots: Timeslot[]
-  handleConfirmTimeslot: (timeslot: Timeslot) => void
-  selectedTimeslot?: Timeslot
+  meetingEvents: MeetingEvent[]
+  handleConfirmTimeslot: (slot: number) => void
+  selectedMeetingEvent: MeetingEvent | null
+  handleConfirmMeetingEvent: (meetingEvent: MeetingEvent) => void
+  selectedDate: Date
+  handleSelectDate: (date: Date) => void
 }) {
-  const [selectedSlot, setSelectedSlot] = useState<Timeslot | undefined>()
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    selectedTimeslot ? new Date(getSlotDate(selectedTimeslot)) : undefined
-  )
+  const [selectedSlot, setSelectedSlot] = useState<number | undefined>()
   const [selectedDateAvailableSlots, setSelectedDateAvailableSlots] = useState<
-    Timeslot[]
-  >(selectedTimeslot ? getTimeslotsByDate(getSlotDate(selectedTimeslot)) : [])
+    number[]
+  >([])
 
-  const handleDateSelect = (date: Date | undefined) => {
+  function handleDateSelect(date: Date | undefined) {
     if (date) {
-      const timeslots = getTimeslotsByDate(date)
+      if (selectedMeetingEvent) {
+        const timeslots = getTimeslotsByDate(date)
+        const timeDividedSlots: number[] = []
+        const eventDurationInMs = selectedMeetingEvent.duration
 
-      if (timeslots.length) {
-        setSelectedDateAvailableSlots(timeslots)
+        timeslots.forEach(({ timeStart, timeEnd }) => {
+          let sessionStartTime = timeStart
+
+          while (sessionStartTime < timeEnd - eventDurationInMs) {
+            sessionStartTime += eventDurationInMs
+
+            timeDividedSlots.push(sessionStartTime)
+          }
+        })
+
+        handleSelectDate(date)
+        setSelectedDateAvailableSlots(timeDividedSlots)
       }
     } else {
       setSelectedDateAvailableSlots([])
     }
-
-    setSelectedDate(date)
   }
 
   function getTimeslotsByDate(date: Date): Timeslot[] {
-    date.setHours(0, 0, 0, 0)
-    return timeslots || []
+    if (!selectedMeetingEvent) return []
+
+    return selectedMeetingEvent.timeslots.filter(
+      (timeslot) => timeslot.day === date.getDay()
+    )
   }
 
-  const handleSlotSelect = (slot: Timeslot) => {
+  function handleSlotSelect(slot: number) {
     setSelectedSlot(slot)
+  }
+
+  function handleSelectEvent(meetingEvent: MeetingEvent): void {
+    handleConfirmMeetingEvent(meetingEvent)
   }
 
   return (
@@ -61,19 +83,29 @@ export default function SessionCalendar({
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="flex gap-8 items-center">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={handleDateSelect}
-            disabled={getTimeslotMatcher(timeslots)}
-            className="calendar rounded-md p-0 mb-4 mx-auto"
+          <MeetingEventList
+            meetingEvents={meetingEvents}
+            selectedMeetingEvent={selectedMeetingEvent}
+            handleSelectEvent={handleSelectEvent}
           />
-          <TimeslotCardList
-            selectedTimeslot={selectedSlot}
-            timeslots={selectedDateAvailableSlots}
-            handleSlotSelect={handleSlotSelect}
-            handleConfirmTimeslot={handleConfirmTimeslot}
-          />
+
+          {!!selectedMeetingEvent && (
+            <>
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={handleDateSelect}
+                disabled={getTimeslotMatcher(selectedMeetingEvent?.timeslots)}
+                className="calendar rounded-md p-0 mb-4 mx-auto"
+              />
+              <TimeslotCardList
+                selectedSlot={selectedSlot}
+                dividedSlots={selectedDateAvailableSlots}
+                handleSlotSelect={handleSlotSelect}
+                handleConfirmTimeslot={handleConfirmTimeslot}
+              />
+            </>
+          )}
         </div>
       </CardContent>
     </Card>

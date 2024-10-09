@@ -1,36 +1,34 @@
-import { Timeslot } from "@/lib/types/timeslot.type"
 import TimeslotCard from "./timeslot-card"
-import { getTimeslotId } from "@/lib/utils"
 
 export default function TimeslotCardList({
-  timeslots,
-  selectedTimeslot,
+  dividedSlots,
+  selectedSlot,
   handleSlotSelect,
   handleConfirmTimeslot,
 }: {
-  timeslots: Timeslot[]
-  selectedTimeslot?: Timeslot
-  handleSlotSelect: (timeslot: Timeslot) => void
-  handleConfirmTimeslot: (timeslot: Timeslot) => void
+  dividedSlots: number[]
+  selectedSlot?: number
+  handleSlotSelect: (slot: number) => void
+  handleConfirmTimeslot: (slot: number) => void
 }) {
-  if (!timeslots.length) {
+  if (!dividedSlots.length) {
     return null
   }
 
   return (
-    <div className="flex flex-col self-stretch h-full gap-2 min-w-[280px] fade-in-right">
-      {timeslots.map((slot) => (
-        <TimeslotCard
-          key={getTimeslotId(slot)}
-          timeslot={slot}
-          selected={
-            !!selectedTimeslot &&
-            getTimeslotId(slot) === getTimeslotId(selectedTimeslot)
-          }
-          handleSlotSelect={handleSlotSelect}
-          handleConfirmTimeslot={handleConfirmTimeslot}
-        />
-      ))}
+    <div className="relative flex flex-col self-stretch h-full min-w-[280px] fade-in-right">
+      <div className="flex flex-col gap-2 max-h-[250px] overflow-y-auto pr-2 pb-4">
+        {dividedSlots.map((slot) => (
+          <TimeslotCard
+            key={slot}
+            dividedSlot={slot}
+            selected={!!selectedSlot && slot === selectedSlot}
+            handleSlotSelect={handleSlotSelect}
+            handleConfirmTimeslot={handleConfirmTimeslot}
+          />
+        ))}
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#343434] to-transparent pointer-events-none"></div>
     </div>
   )
 }

@@ -1,18 +1,17 @@
 import { Button } from "@/components/ui/button"
-import { Timeslot } from "@/lib/types/timeslot.type"
-import { getSlotStartHour, getTimeslotId } from "@/lib/utils"
+import { getSlotStartHour } from "@/lib/utils"
 import clsx from "clsx"
 
 export default function TimeslotCard({
-  timeslot,
+  dividedSlot,
   selected,
   handleSlotSelect,
   handleConfirmTimeslot,
 }: {
-  timeslot: Timeslot
+  dividedSlot: number
   selected: boolean
-  handleSlotSelect: (timeslot: Timeslot) => void
-  handleConfirmTimeslot: (timeslot: Timeslot) => void
+  handleSlotSelect: (slot: number) => void
+  handleConfirmTimeslot: (slot: number) => void
 }) {
   function TimeDisplay() {
     return (
@@ -24,10 +23,10 @@ export default function TimeslotCard({
             "bg-white text-primary-shade": selected,
           }
         )}
-        key={getTimeslotId(timeslot)}
-        onClick={() => handleSlotSelect(timeslot)}
+        key={dividedSlot}
+        onClick={() => handleSlotSelect(dividedSlot)}
       >
-        <span className="text-base">{getSlotStartHour(timeslot)}</span>
+        <span className="text-base">{getSlotStartHour(dividedSlot)}</span>
       </div>
     )
   }
@@ -37,7 +36,7 @@ export default function TimeslotCard({
       <TimeDisplay />
       {selected && (
         <Button
-          onClick={() => handleConfirmTimeslot(timeslot)}
+          onClick={() => handleConfirmTimeslot(dividedSlot)}
           className="fade-in-right h-full text-base px-8 py-2 cursor-pointer rounded-md shadow-lg"
         >
           Confirm

@@ -19,6 +19,7 @@ export type MeetingEvent = {
   name: string
   duration: number
   description?: string
+  timeslots: Timeslot[]
 }
 
 export type Timeslot = {
@@ -27,14 +28,9 @@ export type Timeslot = {
   day: number
   timeStart: number
   timeEnd: number
-  events: MeetingEvent[]
 }
 
-// export type Timeslot = {
-//   id?: string
-//   mentorAddress: Address
-//   date: number
-//   timeStart: number
-//   timeEnd: number
-//   isBooked: boolean
-// }
+export type SessionSlot = {
+  timeStart: number
+  timeEnd: number
+}

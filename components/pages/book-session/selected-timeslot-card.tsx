@@ -1,15 +1,15 @@
 import { Button } from "@/components/ui/button"
 import { BookStep } from "@/lib/types/book-session-form.type"
-import { Timeslot } from "@/lib/types/timeslot.type"
+import { SessionSlot } from "@/lib/types/timeslot.type"
 import { formatDate, formatTime } from "@/lib/utils"
 import { CalendarDays } from "lucide-react"
 import { MdEdit } from "react-icons/md"
 
 export default function SelectedTimeslotCard({
-  timeslot,
+  confirmedSessionSlot,
   handleEditStep,
 }: {
-  timeslot: Timeslot
+  confirmedSessionSlot: SessionSlot
   handleEditStep: (step: BookStep) => void
 }) {
   return (
@@ -23,9 +23,10 @@ export default function SelectedTimeslotCard({
           <h3 className="text-body font-sans">Date and time</h3>
         </div>
         <p className="font-normal w-[550px]">
-          {/* <span>{formatDate(timeslot.date)}</span>,{" "} */}
+          <span>{formatDate(confirmedSessionSlot.timeStart)}</span>,{" "}
           <span>
-            {formatTime(timeslot.timeStart)} to {formatTime(timeslot.timeEnd)}
+            {formatTime(confirmedSessionSlot.timeStart)} to{" "}
+            {formatTime(confirmedSessionSlot.timeEnd)}
           </span>
         </p>
       </div>

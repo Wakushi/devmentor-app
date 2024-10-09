@@ -1,6 +1,6 @@
 const PINATA_GATEWAY_BASE_URL = "https://tan-key-moth-8.mypinata.cloud/ipfs"
 
-const DEVMENTOR_CONTRACT_ADDRESS = "0xD0674521B1B217fD097cC0bE56f63A5C27d66538"
+const DEVMENTOR_CONTRACT_ADDRESS = "0xc1172Cd2e186A6d49bB6f6258d7E7025a4C06c32"
 const DEVMENTOR_CONTRACT_ABI = [
   {
     inputs: [
@@ -23,7 +23,25 @@ const DEVMENTOR_CONTRACT_ABI = [
         type: "uint256",
       },
     ],
-    name: "confirmSession",
+    name: "confirmSessionAsMentor",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_sessionId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_rating",
+        type: "uint256",
+      },
+    ],
+    name: "confirmSessionAsStudent",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -85,6 +103,11 @@ const DEVMENTOR_CONTRACT_ABI = [
     ],
     stateMutability: "nonpayable",
     type: "constructor",
+  },
+  {
+    inputs: [],
+    name: "DEVMentor__WrongRating",
+    type: "error",
   },
   {
     inputs: [
@@ -312,14 +335,9 @@ const DEVMENTOR_CONTRACT_ABI = [
             type: "uint256",
           },
           {
-            internalType: "string",
-            name: "timeslotsHash",
-            type: "string",
-          },
-          {
-            internalType: "string",
-            name: "reviewsHash",
-            type: "string",
+            internalType: "uint256",
+            name: "totalRating",
+            type: "uint256",
           },
         ],
         internalType: "struct Devmentor.Mentor",
@@ -442,12 +460,6 @@ const DEVMENTOR_CONTRACT_ABI = [
         name: "confirmedBy",
         type: "address",
       },
-      {
-        indexed: false,
-        internalType: "bool",
-        name: "isMentor",
-        type: "bool",
-      },
     ],
     name: "SessionConfirmed",
     type: "event",
@@ -483,32 +495,6 @@ const DEVMENTOR_CONTRACT_ABI = [
     ],
     name: "StudentRegistered",
     type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "UpdatedTimeslot",
-    type: "event",
-  },
-  {
-    inputs: [
-      {
-        internalType: "string",
-        name: "_timeslotHash",
-        type: "string",
-      },
-    ],
-    name: "updateTimeslot",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
   },
   {
     inputs: [],
@@ -615,14 +601,9 @@ const DEVMENTOR_CONTRACT_ABI = [
             type: "uint256",
           },
           {
-            internalType: "string",
-            name: "timeslotsHash",
-            type: "string",
-          },
-          {
-            internalType: "string",
-            name: "reviewsHash",
-            type: "string",
+            internalType: "uint256",
+            name: "totalRating",
+            type: "uint256",
           },
         ],
         internalType: "struct Devmentor.Mentor",
@@ -882,7 +863,6 @@ const NINETY_DAYS = 90
 const ETH_DECIMALS = 18
 
 const BASE_USER_PATH = "/api/user"
-const TIMESLOT_PATH = "/timeslots"
 const MEETING_EVENTS_PATH = "/meeting-events"
 
 export {
@@ -898,6 +878,5 @@ export {
   SUNDAY,
   ETH_DECIMALS,
   BASE_USER_PATH,
-  TIMESLOT_PATH,
   MEETING_EVENTS_PATH,
 }

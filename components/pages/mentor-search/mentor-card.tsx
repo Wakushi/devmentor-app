@@ -17,7 +17,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import HourlyRate from "@/components/hourly-rate"
 
 export default function MentorCard({ mentor }: { mentor: Mentor }) {
-  const { baseUser, reviews, yearsOfExperience, hourlyRate, account } = mentor
+  const { baseUser, yearsOfExperience, hourlyRate, account, sessionCount } =
+    mentor
   const { userName, languages, subjects } = baseUser
   const learningFields = subjects.map((subject) => allSubjects[subject])
 
@@ -38,10 +39,10 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
               <div className="flex items-center mt-1">
                 <StarIcon className="w-4 h-4 text-primary fill-primary mr-1" />
                 <span className="text-sm font-medium">
-                  {getAverageRating(reviews)}
+                  {getAverageRating(mentor)}
                 </span>
                 <span className="text-sm text-gray-300 ml-1">
-                  ({reviews.length} reviews)
+                  ({sessionCount} sessions)
                 </span>
               </div>
             </div>

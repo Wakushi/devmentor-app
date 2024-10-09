@@ -1,4 +1,3 @@
-import { Review } from "./review.type"
 import { Role } from "./role.type"
 import { Address } from "viem"
 
@@ -28,11 +27,9 @@ export type Mentor = {
   validated: boolean
   yearsOfExperience: number
   sessionCount: number
+  totalRating: number
   hourlyRate: number
-  timeslotsHash: string
-  reviewsHash: string
   role: Role
-  reviews: Review[]
 }
 
 // Raw structs received from the contract
@@ -55,6 +52,5 @@ export type ContractMentor = [
   bigint, // yearsOfExperience
   bigint, // sessionCount
   bigint, // hourlyRate
-  string, // timeslotsHash
-  string // reviewsHash
+  bigint // totalRating;
 ]

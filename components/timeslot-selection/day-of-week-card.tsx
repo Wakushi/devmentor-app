@@ -36,7 +36,7 @@ export default function DayOfWeekCard({
     <div
       key={index}
       className={clsx(
-        "flex items-center border border-stone-800 gap-4 p-4 rounded",
+        "flex items-center border border-stone-800 gap-4 px-4 py-2 rounded",
         {
           "opacity-30": !active,
         }
@@ -48,7 +48,7 @@ export default function DayOfWeekCard({
         className="flex-1 max-w-[36px]"
       />
       <span
-        className="flex-1 font-semibold text-base cursor-pointer select-none"
+        className="flex-1 text-base cursor-pointer select-none"
         onClick={() => {
           handleToggleDayChange(index, !active)
         }}

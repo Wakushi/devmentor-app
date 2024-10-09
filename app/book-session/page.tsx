@@ -4,7 +4,7 @@ import AnimatedBackground from "@/components/ui/animated-background"
 import MentorDetails from "@/components/pages/book-session/mentor-details"
 import SessionCalendar from "@/components/pages/book-session/session-calendar"
 import { useEffect, useState } from "react"
-import { Timeslot } from "@/lib/types/timeslot.type"
+import { MeetingEvent, SessionSlot, Timeslot } from "@/lib/types/timeslot.type"
 import LoadingScreen from "@/components/ui/loading-screen"
 import SessionRecap from "@/components/pages/book-session/session-recap"
 import { IoIosArrowBack } from "react-icons/io"
@@ -18,11 +18,6 @@ import { useUser } from "@/stores/user.store"
 import { toast } from "@/hooks/use-toast"
 import Loader from "@/components/ui/loader"
 import { FaCircleCheck } from "react-icons/fa6"
-import {
-  getTimeslotEndTime,
-  getTimeslotId,
-  getTimeslotStartTime,
-} from "@/lib/utils"
 import SessionBookedScreen from "@/components/pages/book-session/session-booked-screen"
 import MentorNotFound from "@/components/pages/book-session/mentor-not-found"
 import BookSessionNavigation from "@/components/pages/book-session/book-session-navigation"
@@ -37,7 +32,9 @@ import {
   usdToWei,
   watchForEvent,
 } from "@/services/contract.service"
-import { getMentorTimeslots, pinMentorTimeslots } from "@/services/ipfs.service"
+import useMeetingEventsQuery from "@/hooks/queries/meeting-event-query"
+import { Address } from "viem"
+import { computeTimeAndDateTimestamps } from "@/lib/utils"
 
 export default function BookSessionPage({
   searchParams,
@@ -45,23 +42,31 @@ export default function BookSessionPage({
   searchParams?: { [key: string]: string | string[] | undefined }
 }) {
   const { user } = useUser()
+
   const mentorsQuery = useMentorsQuery()
   const ethPriceQuery = useEthPriceQuery()
+  const meetingEventsQuery = useMeetingEventsQuery(
+    searchParams?.mentor as Address
+  )
 
+  const { data: meetingEvents } = meetingEventsQuery
   const { data: ethPriceUsd } = ethPriceQuery
   const { data: mentors } = mentorsQuery
 
   const [mentor, setMentor] = useState<Mentor>()
-  const [timeslots, setTimeslots] = useState<Timeslot[]>([])
 
   const [bookStep, setBookStep] = useState<BookStep>(BookStep.SCHEDULE)
   const [sessionGoals, setSessionGoals] = useState<string>("")
   const [editedStep, setEditedStep] = useState<BookStep | null>(null)
 
-  const [confirmedTimeslot, setConfirmedTimeslot] = useState<Timeslot>()
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const [confirmedSessionSlot, setConfirmedSessionSlot] =
+    useState<SessionSlot>()
   const [createdSession, setCreatedSession] = useState<Session | null>(null)
+  const [selectedMeetingEvent, setSelectedMeetingEvent] =
+    useState<MeetingEvent | null>(null)
 
-  const [loading, setLoading] = useState<boolean>(true)
+  const [loading, setLoading] = useState<boolean>(false)
   const [loadingMessage, setLoadingMessage] = useState<string>("")
 
   const steps = Array.from(Object.keys(BookStep) as BookStep[])
@@ -82,27 +87,16 @@ export default function BookSessionPage({
     fetchMentor()
   }, [mentors])
 
-  useEffect(() => {
-    async function fetchMentorTimeslots() {
-      if (!mentor?.timeslotsHash) {
-        setLoading(false)
-        return
-      }
+  function handleConfirmTimeslot(selectedSlot: number): void {
+    if (!selectedSlot || !selectedMeetingEvent) return
 
-      const mentorSlots = await getMentorTimeslots(mentor)
-      // const availableSlots = mentorSlots.filter((slot) => !slot.isBooked)
+    const sessionDate = computeSessionSlot({
+      time: selectedSlot,
+      date: selectedDate,
+      duration: selectedMeetingEvent?.duration,
+    })
 
-      setTimeslots(mentorSlots)
-      setLoading(false)
-    }
-
-    fetchMentorTimeslots()
-  }, [mentor])
-
-  function handleConfirmTimeslot(selectedSlot: Timeslot): void {
-    if (!selectedSlot) return
-
-    setConfirmedTimeslot(selectedSlot)
+    setConfirmedSessionSlot(sessionDate)
 
     if (editedStep === BookStep.SCHEDULE) {
       setEditedStep(null)
@@ -111,6 +105,10 @@ export default function BookSessionPage({
     }
 
     setBookStep(BookStep.OBJECTIVES)
+  }
+
+  function handleConfirmMeetingEvent(meetingEvent: MeetingEvent) {
+    setSelectedMeetingEvent(meetingEvent)
   }
 
   function currentStepIndex(): number {
@@ -172,6 +170,10 @@ export default function BookSessionPage({
     setBookStep(step)
   }
 
+  function handleSelectDate(date: Date): void {
+    setSelectedDate(date)
+  }
+
   async function handleCreateSession(): Promise<void> {
     if (!user?.account || !mentor) {
       toast({
@@ -182,7 +184,7 @@ export default function BookSessionPage({
       return
     }
 
-    if (!confirmedTimeslot) {
+    if (!confirmedSessionSlot || !selectedMeetingEvent) {
       toast({
         title: "Error",
         variant: "destructive",
@@ -220,8 +222,8 @@ export default function BookSessionPage({
       await createSession({
         account: user.account,
         mentorAddress: mentor.account,
-        startTime: getTimeslotStartTime(confirmedTimeslot),
-        endTime: getTimeslotEndTime(confirmedTimeslot),
+        startTime: confirmedSessionSlot.timeStart,
+        endTime: confirmedSessionSlot.timeEnd,
         studentContactHash: "",
         value: ethAmount,
       })
@@ -262,24 +264,22 @@ export default function BookSessionPage({
     }
   }
 
-  async function updateTimeslots(
-    confirmedTimeslot: Timeslot,
-    allSlots: Timeslot[]
-  ): Promise<void> {
-    if (!mentor) return
+  function computeSessionSlot({
+    time,
+    date,
+    duration,
+  }: {
+    time: number
+    date: Date
+    duration: number
+  }): SessionSlot {
+    const sessionDate = computeTimeAndDateTimestamps(time, date)
+    const timeStart = sessionDate.getTime()
 
-    const confirmedSlotId = getTimeslotId(confirmedTimeslot)
-    const confimedSlotIndex = timeslots.findIndex(
-      (slot) => getTimeslotId(slot) === confirmedSlotId
-    )
-
-    if (confimedSlotIndex === -1) {
-      throw new Error("Timeslot to update not found")
+    return {
+      timeStart,
+      timeEnd: timeStart + duration,
     }
-
-    // allSlots[confimedSlotIndex].isBooked = true
-
-    await pinMentorTimeslots(mentor, allSlots)
   }
 
   if (loading) {
@@ -290,11 +290,11 @@ export default function BookSessionPage({
     return <MentorNotFound />
   }
 
-  if (!!createdSession && confirmedTimeslot) {
+  if (!!createdSession && confirmedSessionSlot) {
     return (
       <SessionBookedScreen
         mentor={mentor}
-        confirmedTimeslot={confirmedTimeslot}
+        confirmedSessionSlot={confirmedSessionSlot}
       />
     )
   }
@@ -331,9 +331,12 @@ export default function BookSessionPage({
             <CardContent className="flex flex-col items-center justify-center gap-6">
               {bookStep === BookStep.SCHEDULE && (
                 <SessionCalendar
-                  timeslots={timeslots}
-                  selectedTimeslot={confirmedTimeslot}
+                  meetingEvents={meetingEvents ?? []}
                   handleConfirmTimeslot={handleConfirmTimeslot}
+                  selectedMeetingEvent={selectedMeetingEvent}
+                  handleConfirmMeetingEvent={handleConfirmMeetingEvent}
+                  selectedDate={selectedDate}
+                  handleSelectDate={handleSelectDate}
                 />
               )}
 
@@ -344,9 +347,9 @@ export default function BookSessionPage({
                 />
               )}
 
-              {bookStep === BookStep.RECAP && confirmedTimeslot && (
+              {bookStep === BookStep.RECAP && confirmedSessionSlot && (
                 <SessionRecap
-                  timeslot={confirmedTimeslot}
+                  confirmedSessionSlot={confirmedSessionSlot}
                   sessionGoals={sessionGoals}
                   handleEditStep={handleEditStep}
                 />

@@ -25,7 +25,7 @@ import { msToReadableDuration } from "@/lib/utils"
 import clsx from "clsx"
 import { FaTrash } from "react-icons/fa"
 
-export default function MeetingEventCard({
+export default function MeetingEventEditCard({
   event,
   selected,
   handleEdit,

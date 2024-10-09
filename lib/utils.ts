@@ -43,12 +43,8 @@ export function getAverageRating(mentor: Mentor) {
   return totalRating / sessionCount
 }
 
-export function getSlotDate(timeslot: Timeslot): Date {
-  return new Date(getTimeslotStartTime(timeslot))
-}
-
-export function getSlotStartHour(timeslot: Timeslot): string {
-  const timeStart = new Date(timeslot.timeStart)
+export function getSlotStartHour(slot: number): string {
+  const timeStart = new Date(slot)
 
   const hours = timeStart.getHours()
   const minutes = timeStart.getMinutes()
@@ -62,13 +58,13 @@ export function getTimeslotMatcher(
   timeslotsPool: Timeslot[]
 ): (date: Date) => boolean {
   const timeslotMatcher: Matcher = (day: Date) => {
-    day.setHours(0, 0, 0, 0)
-
-    return !timeslotsPool.some((slot) => {
-      const timeslotDate = getSlotDate(slot)
-      timeslotDate.setHours(0, 0, 0, 0)
-      return timeslotDate.getTime() === day.getTime()
+    const now = Date.now()
+    const matchesDay = !timeslotsPool.some((slot) => {
+      const futureDate = day.getTime() >= now
+      return slot.day === day.getDay() && futureDate
     })
+
+    return matchesDay
   }
 
   return timeslotMatcher
@@ -91,25 +87,13 @@ export const formatTime = (timestamp: number) => {
   })
 }
 
-export function getTimeslotStartTime(timeslot: Timeslot): number {
-  const { timeStart, day } = timeslot
-  return computeTimeAndDateTimestamps(timeStart, day).getTime()
-}
-
-export function getTimeslotEndTime(timeslot: Timeslot): number {
-  const { timeEnd, day } = timeslot
-  return computeTimeAndDateTimestamps(timeEnd, day).getTime()
-}
-
-export function computeTimeAndDateTimestamps(time: number, day: number): Date {
+export function computeTimeAndDateTimestamps(time: number, date: Date): Date {
   const timeAsDate = new Date(time)
+  const completeDate = new Date(date)
 
   const hours = timeAsDate.getHours()
   const minutes = timeAsDate.getMinutes()
 
-  const completeDate = new Date()
-
-  completeDate.setDate(day)
   completeDate.setHours(hours)
   completeDate.setMinutes(minutes)
 

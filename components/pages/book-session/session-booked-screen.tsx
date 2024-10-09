@@ -1,23 +1,23 @@
 import SuccessScreen from "@/components/success-screen"
 import NavLinkButton from "@/components/ui/nav-link"
-import { Timeslot } from "@/lib/types/timeslot.type"
+import { SessionSlot } from "@/lib/types/timeslot.type"
 import { Mentor } from "@/lib/types/user.type"
-import { createGoogleCalendarLink, getTimeslotStartTime } from "@/lib/utils"
+import { createGoogleCalendarLink } from "@/lib/utils"
 import { FaLongArrowAltRight } from "react-icons/fa"
 import { FcGoogle } from "react-icons/fc"
 
 export default function SessionBookedScreen({
   mentor,
-  confirmedTimeslot,
+  confirmedSessionSlot,
 }: {
   mentor: Mentor
-  confirmedTimeslot: Timeslot
+  confirmedSessionSlot: SessionSlot
 }) {
   const googleCalendarLink = createGoogleCalendarLink({
     title: "Mentoring session",
     description: `Mentoring session with ${mentor.baseUser.userName}`,
-    startDate: new Date(getTimeslotStartTime(confirmedTimeslot)),
-    endDate: new Date(getTimeslotStartTime(confirmedTimeslot)),
+    startDate: new Date(confirmedSessionSlot.timeStart),
+    endDate: new Date(confirmedSessionSlot.timeEnd),
   })
 
   return (

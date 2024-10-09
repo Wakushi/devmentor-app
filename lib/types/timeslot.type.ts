@@ -29,3 +29,8 @@ export type Timeslot = {
   timeStart: number
   timeEnd: number
 }
+
+export type SessionSlot = {
+  timeStart: number
+  timeEnd: number
+}

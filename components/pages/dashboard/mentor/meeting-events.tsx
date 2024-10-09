@@ -36,7 +36,7 @@ import {
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { MdError } from "react-icons/md"
 import { useQueryClient } from "@tanstack/react-query"
-import MeetingEventCard from "./meeting-event-card"
+import MeetingEventEditCard from "./meeting-event-edit-card"
 
 const meetingEventSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -308,7 +308,7 @@ export function MeetingEvents({
       {!!meetingEvents && !!meetingEvents.length && (
         <div className="flex flex-wrap gap-2">
           {meetingEvents.map((event) => (
-            <MeetingEventCard
+            <MeetingEventEditCard
               key={event.id}
               event={event}
               selected={selectedEvent?.id === event.id}

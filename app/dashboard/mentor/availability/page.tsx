@@ -23,6 +23,8 @@ import { toast } from "@/hooks/use-toast"
 import { FaCircleCheck } from "react-icons/fa6"
 import { MdError } from "react-icons/md"
 import { useQueryClient } from "@tanstack/react-query"
+import { matchQueryStatus } from "@/lib/matchQueryStatus"
+import Loader from "@/components/ui/loader"
 
 export default function AvailabilityPage() {
   const queryClient = useQueryClient()
@@ -118,12 +120,18 @@ export default function AvailabilityPage() {
               Manage your events
             </p>
           </div>
-          <MeetingEvents
-            mentor={user}
-            meetingEvents={meetingEvents}
-            selectedEvent={selectedEvent}
-            handleSelectEvent={handleSelectEvent}
-          />
+          {matchQueryStatus(meetingEventsQuery, {
+            Loading: <Loader />,
+            Errored: <p>Something wrong happened</p>,
+            Success: ({ data }) => (
+              <MeetingEvents
+                mentor={user}
+                meetingEvents={data}
+                selectedEvent={selectedEvent}
+                handleSelectEvent={handleSelectEvent}
+              />
+            ),
+          })}
         </div>
         {!!selectedEvent && meetingEvents && (
           <div className="flex flex-col gap-4 w-full">

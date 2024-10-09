@@ -20,7 +20,7 @@ export default function DashboardPage() {
   if (!user) return
 
   return (
-    <div className="p-4 pt-40 min-h-screen m-auto w-[90%]">
+    <div className="p-4 pt-[8rem] min-h-screen m-auto w-[90%]">
       <h1 className="text-2xl font-bold mb-6">
         Welcome back, {user.baseUser.userName} !
       </h1>

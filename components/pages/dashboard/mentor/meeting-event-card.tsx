@@ -22,18 +22,32 @@ import {
 } from "@/components/ui/alert-dialog"
 import { MeetingEvent } from "@/lib/types/timeslot.type"
 import { msToReadableDuration } from "@/lib/utils"
+import clsx from "clsx"
+import { CiTrash } from "react-icons/ci"
 
 export default function MeetingEventCard({
   event,
+  selected,
   handleEdit,
   handleDelete,
+  handleSelectEvent,
 }: {
   event: MeetingEvent
+  selected: boolean
   handleEdit: (event: MeetingEvent) => void
   handleDelete: (event: MeetingEvent) => void
+  handleSelectEvent: (event: MeetingEvent) => void
 }) {
   return (
-    <Card className="glass text-white border-transparent rounded-md border-b-4 border-b-primary w-[45%]">
+    <Card
+      onClick={() => handleSelectEvent(event)}
+      className={clsx(
+        "glass z-[1] text-white border-transparent border-2 transition-all duration-200 cursor-pointer hover:-translate-y-1 hover:shadow-xl rounded-md border-b-primary w-[45%] max-w-[300px]",
+        {
+          "border-primary": selected,
+        }
+      )}
+    >
       <CardHeader>
         <CardTitle className="text-xl">{event.name}</CardTitle>
         <CardDescription>
@@ -49,7 +63,7 @@ export default function MeetingEventCard({
         </Button>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="destructive">Delete</Button>
+            <CiTrash className="border w-[36px] h-[36px] rounded-md p-2 hover:border-error hover:text-error" />
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>

@@ -882,7 +882,6 @@ const NINETY_DAYS = 90
 const ETH_DECIMALS = 18
 
 const BASE_USER_PATH = "/api/user"
-const TIMESLOT_PATH = "/timeslots"
 const MEETING_EVENTS_PATH = "/meeting-events"
 
 export {
@@ -898,6 +897,5 @@ export {
   SUNDAY,
   ETH_DECIMALS,
   BASE_USER_PATH,
-  TIMESLOT_PATH,
   MEETING_EVENTS_PATH,
 }

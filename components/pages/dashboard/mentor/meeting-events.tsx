@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -36,7 +36,6 @@ import {
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { MdError } from "react-icons/md"
 import { useQueryClient } from "@tanstack/react-query"
-import useMeetingEventsQuery from "@/hooks/queries/meeting-event-query"
 import MeetingEventCard from "./meeting-event-card"
 
 const meetingEventSchema = z.object({
@@ -46,19 +45,21 @@ const meetingEventSchema = z.object({
   durationUnit: z.enum(["min", "hrs"]),
 })
 
-export function MeetingEvents({ mentor }: { mentor: Mentor }) {
+export function MeetingEvents({
+  mentor,
+  meetingEvents,
+  selectedEvent,
+  handleSelectEvent,
+}: {
+  mentor: Mentor
+  meetingEvents?: MeetingEvent[]
+  selectedEvent: MeetingEvent | null
+  handleSelectEvent: (event: MeetingEvent | null) => void
+}) {
   const queryClient = useQueryClient()
-
-  const meetingEventsQuery = useMeetingEventsQuery(mentor.account)
-  const { data: meetingEvents } = meetingEventsQuery
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState<MeetingEvent | null>(null)
-  const [events, setEvents] = useState<MeetingEvent[]>([])
-
-  useEffect(() => {
-    setEvents(meetingEvents ?? [])
-  }, [meetingEventsQuery.data, meetingEventsQuery.isLoading])
 
   const form = useForm<z.infer<typeof meetingEventSchema>>({
     resolver: zodResolver(meetingEventSchema),
@@ -89,6 +90,7 @@ export function MeetingEvents({ mentor }: { mentor: Mentor }) {
         ...data,
         duration: durationInMs,
         mentorAddress: mentor.account,
+        timeslots: [],
       })
     } catch (error) {
       toast({
@@ -170,6 +172,8 @@ export function MeetingEvents({ mentor }: { mentor: Mentor }) {
           action: <FaCircleCheck className="text-white" />,
         })
 
+        handleSelectEvent(null)
+
         refreshList()
       } else {
         throw new Error(error)
@@ -197,7 +201,7 @@ export function MeetingEvents({ mentor }: { mentor: Mentor }) {
   }
 
   function refreshList() {
-    queryClient.refetchQueries({
+    queryClient.invalidateQueries({
       queryKey: [QueryKeys.MEETING_EVENTS, mentor.account],
     })
   }
@@ -301,16 +305,20 @@ export function MeetingEvents({ mentor }: { mentor: Mentor }) {
         </DialogContent>
       </Dialog>
 
-      <div className="flex flex-wrap gap-2">
-        {events.map((event) => (
-          <MeetingEventCard
-            key={event.id}
-            event={event}
-            handleEdit={handleEdit}
-            handleDelete={handleDelete}
-          />
-        ))}
-      </div>
+      {!!meetingEvents && !!meetingEvents.length && (
+        <div className="flex flex-wrap gap-2">
+          {meetingEvents.map((event) => (
+            <MeetingEventCard
+              key={event.id}
+              event={event}
+              selected={selectedEvent?.id === event.id}
+              handleSelectEvent={handleSelectEvent}
+              handleEdit={handleEdit}
+              handleDelete={handleDelete}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

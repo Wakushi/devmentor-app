@@ -1,7 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Address } from "viem"
-import { Review } from "./types/review.type"
 import { Timeslot } from "./types/timeslot.type"
 import { Matcher } from "react-day-picker"
 import {
@@ -11,6 +10,7 @@ import {
   LearningField,
 } from "./types/profile-form.type"
 import { TimeValue } from "react-aria"
+import { Mentor } from "./types/user.type"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -35,11 +35,12 @@ export function getInitials(name: string) {
     .toUpperCase()
 }
 
-export function getAverageRating(reviews: Review[]) {
-  if (!reviews.length) return 0
+export function getAverageRating(mentor: Mentor) {
+  const { sessionCount, totalRating } = mentor
 
-  const sum = reviews.reduce((acc, review) => acc + review.rate, 0)
-  return (sum / reviews.length).toFixed(1)
+  if (!sessionCount || !totalRating) return 0
+
+  return totalRating / sessionCount
 }
 
 export function getSlotDate(timeslot: Timeslot): Date {

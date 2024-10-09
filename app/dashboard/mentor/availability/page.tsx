@@ -121,7 +121,11 @@ export default function AvailabilityPage() {
             </p>
           </div>
           {matchQueryStatus(meetingEventsQuery, {
-            Loading: <Loader />,
+            Loading: (
+              <div className="w-[300px] h-[100px] flex justify-center items-center">
+                <Loader />
+              </div>
+            ),
             Errored: <p>Something wrong happened</p>,
             Success: ({ data }) => (
               <MeetingEvents

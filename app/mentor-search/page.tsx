@@ -56,8 +56,7 @@ export default function MentorSearch() {
       const freeSessionMatch =
         !filters.freeSessionsOnly || mentor.hourlyRate === 0
 
-      const minRatingMatch =
-        +getAverageRating(mentor.reviews) >= filters.minRating
+      const minRatingMatch = +getAverageRating(mentor) >= filters.minRating
 
       return (
         expertiseMatch &&

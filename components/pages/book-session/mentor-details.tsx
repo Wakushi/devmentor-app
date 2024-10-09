@@ -12,11 +12,11 @@ import Flag from "@/components/ui/flag"
 import { Mentor } from "@/lib/types/user.type"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import MentorReviews from "./mentor-reviews"
 import HourlyRate from "@/components/hourly-rate"
 
 export default function MentorDetails({ mentor }: { mentor: Mentor }) {
-  const { baseUser, yearsOfExperience, hourlyRate, account, reviews } = mentor
+  const { baseUser, yearsOfExperience, hourlyRate, account, sessionCount } =
+    mentor
   const { userName, languages, subjects } = baseUser
   const learningFields = subjects.map((subject) => allSubjects[subject])
 
@@ -44,10 +44,10 @@ export default function MentorDetails({ mentor }: { mentor: Mentor }) {
               <div className="flex items-center mt-1">
                 <StarIcon className="w-4 h-4 text-primary fill-primary mr-1" />
                 <span className="text-sm font-medium">
-                  {getAverageRating(reviews)}
+                  {getAverageRating(mentor)}
                 </span>
                 <span className="text-sm text-gray-300 ml-1">
-                  ({reviews.length} reviews)
+                  ({sessionCount} sessions)
                 </span>
               </div>
             </div>
@@ -81,7 +81,6 @@ export default function MentorDetails({ mentor }: { mentor: Mentor }) {
           </div>
         </div>
         <Separator orientation="vertical" className="h-auto bg-stone-800" />
-        <MentorReviews reviews={reviews} />
       </CardContent>
     </Card>
   )

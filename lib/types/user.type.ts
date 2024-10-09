@@ -1,4 +1,3 @@
-import { Review } from "./review.type"
 import { Role } from "./role.type"
 import { Address } from "viem"
 

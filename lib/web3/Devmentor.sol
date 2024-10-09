@@ -44,8 +44,7 @@ contract Devmentor {
         uint256 yearsOfExperience;
         uint256 sessionCount;
         uint256 hourlyRate;
-        string timeslotsHash;
-        string reviewsHash;
+        uint256 totalRating;
     }
 
     struct Student {
@@ -91,13 +90,13 @@ contract Devmentor {
     error Devmentor__NotAuthorizedToConfirm();
     error Devmentor__SessionNotCompleted();
     error Devmentor__FundsTransferFailed();
+    error DEVMentor__WrongRating();
 
     event MentorRegistered(address indexed account);
     event StudentRegistered(address indexed account);
     event SessionCreated(address indexed studentAccount, uint256 indexed sessionId);
-    event SessionConfirmed(uint256 indexed sessionId, address indexed confirmedBy, bool isMentor);
+    event SessionConfirmed(uint256 indexed sessionId, address indexed confirmedBy);
     event FundsSentToMentor(uint256 indexed sessionId, address indexed mentor, uint256 amount);
-    event UpdatedTimeslot(address indexed account);
 
     modifier ensureNotRegistered(){
         _ensureNotRegistered();
@@ -131,8 +130,7 @@ contract Devmentor {
             hourlyRate: _hourlyRate,
             validated: false,
             sessionCount: 0,
-            timeslotsHash: "",
-            reviewsHash: ""
+            totalRating:0
         });
 
         s_roleByAccount[msg.sender] = Role.MENTOR;
@@ -221,28 +219,57 @@ contract Devmentor {
 
     }
 
-    function confirmSession(uint256 _sessionId) external {
+    function confirmSessionAsStudent(uint256 _sessionId, uint256 _rating) external onlyRegisteredStudent {
         Session storage session = s_sessions[_sessionId];
-        if (session.mentor == address(0) && session.student == address(0)) {
+
+        if (session.student == address(0)) {
             revert Devmentor__SessionNotFound(_sessionId);
         }
 
-        if (msg.sender == session.mentor) {
-            if (session.mentorConfirmed) {
-                revert Devmentor__SessionAlreadyConfirmed();
-            }
-            session.mentorConfirmed = true;
-            emit SessionConfirmed(_sessionId, msg.sender, true);
-        } else if (msg.sender == session.student) {
-            if (session.studentConfirmed) {
-                revert Devmentor__SessionAlreadyConfirmed();
-            }
-            session.studentConfirmed = true;
-            emit SessionConfirmed(_sessionId, msg.sender, false);
-        } else {
+        if (msg.sender != session.student) {
             revert Devmentor__NotAuthorizedToConfirm();
         }
 
+        if (session.studentConfirmed) {
+            revert Devmentor__SessionAlreadyConfirmed();
+        }
+
+        if (_rating < 0 || _rating > 5) {
+            revert DEVMentor__WrongRating();
+        }
+
+        Mentor storage mentor = s_mentorByAccount[msg.sender];
+        mentor.totalRating += _rating;
+        ++mentor.sessionCount;
+
+        session.studentConfirmed = true;
+
+        emit SessionConfirmed(_sessionId, msg.sender);
+       
+        if (session.mentorConfirmed && session.studentConfirmed) {
+            _completeSession(_sessionId);
+        }
+    }
+
+    function confirmSessionAsMentor(uint256 _sessionId) external onlyRegisteredMentor {
+        Session storage session = s_sessions[_sessionId];
+
+        if (session.mentor == address(0)) {
+            revert Devmentor__SessionNotFound(_sessionId);
+        }
+
+        if (msg.sender != session.mentor) {
+            revert Devmentor__NotAuthorizedToConfirm();
+        }
+
+        if (session.mentorConfirmed) {
+            revert Devmentor__SessionAlreadyConfirmed();
+        }
+
+        session.mentorConfirmed = true;
+
+        emit SessionConfirmed(_sessionId, msg.sender);
+       
         if (session.mentorConfirmed && session.studentConfirmed) {
             _completeSession(_sessionId);
         }
@@ -269,12 +296,6 @@ contract Devmentor {
         }
 
         emit FundsSentToMentor(_sessionId, session.mentor, amountToSend);
-    }
-
-    function updateTimeslot(string memory _timeslotHash) onlyRegisteredMentor external {
-        s_mentorByAccount[msg.sender].timeslotsHash = _timeslotHash;
-
-        emit UpdatedTimeslot(msg.sender);
     }
 
     function getHourlyRateInWei(uint256 _hourlyRateUsd) public view returns(uint256) {

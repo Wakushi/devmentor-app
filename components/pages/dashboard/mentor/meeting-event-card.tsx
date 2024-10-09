@@ -23,7 +23,7 @@ import {
 import { MeetingEvent } from "@/lib/types/timeslot.type"
 import { msToReadableDuration } from "@/lib/utils"
 import clsx from "clsx"
-import { CiTrash } from "react-icons/ci"
+import { FaTrash } from "react-icons/fa"
 
 export default function MeetingEventCard({
   event,
@@ -42,7 +42,7 @@ export default function MeetingEventCard({
     <Card
       onClick={() => handleSelectEvent(event)}
       className={clsx(
-        "glass z-[1] text-white border-transparent border-2 transition-all duration-200 cursor-pointer hover:-translate-y-1 hover:shadow-xl rounded-md border-b-primary w-[45%] max-w-[300px]",
+        "glass z-[1] text-white border-transparent border-2 transition-all duration-200 cursor-pointer hover:-translate-y-1 hover:shadow-xl rounded-md border-b-secondary w-[45%] max-w-[300px]",
         {
           "border-primary": selected,
         }
@@ -55,15 +55,15 @@ export default function MeetingEventCard({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <p className="text-small">{event.description}</p>
+        <p className="text-small min-h-[21px]">{event.description}</p>
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
         <Button variant="outline-white" onClick={() => handleEdit(event)}>
           Edit
         </Button>
         <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <CiTrash className="border w-[36px] h-[36px] rounded-md p-2 hover:border-error hover:text-error" />
+          <AlertDialogTrigger>
+            <FaTrash className="border w-[36px] h-[36px] rounded-md p-2 hover:border-error hover:text-error" />
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>

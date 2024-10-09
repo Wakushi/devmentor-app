@@ -18,7 +18,6 @@ import { BaseUser, Mentor } from "@/lib/types/user.type"
 import { Role } from "@/lib/types/role.type"
 import { Session } from "@/lib/types/session.type"
 import { IProvider } from "@web3auth/base"
-import { getMentorReviews } from "@/services/ipfs.service"
 import { web3AuthInstance } from "@/lib/web3/Web3AuthConnectorInstance"
 
 export enum ContractEvent {
@@ -194,12 +193,11 @@ export async function getMentor(mentorAddress: Address): Promise<Mentor> {
 
   const {
     hourlyRate,
-    reviewsHash,
     sessionCount,
-    timeslotsHash,
     validated,
     yearsOfExperience,
     user,
+    totalRating,
   } = data
 
   const { account, userName, languages, subjects } = user
@@ -211,8 +209,6 @@ export async function getMentor(mentorAddress: Address): Promise<Mentor> {
     subjects,
   }
 
-  const reviews = reviewsHash ? await getMentorReviews(reviewsHash) : []
-
   const mentor: Mentor = {
     account,
     baseUser,
@@ -220,10 +216,8 @@ export async function getMentor(mentorAddress: Address): Promise<Mentor> {
     yearsOfExperience: Number(yearsOfExperience),
     sessionCount: Number(sessionCount),
     hourlyRate: Number(hourlyRate),
-    reviewsHash,
-    timeslotsHash,
+    totalRating: Number(totalRating),
     role: Role.MENTOR,
-    reviews,
   }
 
   return mentor

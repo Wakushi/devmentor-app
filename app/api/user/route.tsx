@@ -12,7 +12,6 @@ import {
   Student,
   Visitor,
 } from "@/lib/types/user.type"
-import { getMentorReviews } from "@/services/ipfs.service"
 import { ethers } from "ethers"
 import { NextRequest, NextResponse } from "next/server"
 import { Address } from "viem"
@@ -163,11 +162,8 @@ async function buildUser(
     yearsOfExperience,
     sessionCount,
     hourlyRate,
-    timeslotsHash,
-    reviewsHash,
+    totalRating,
   ] = rawUser as ContractMentor
-
-  const reviews = await getMentorReviews(reviewsHash)
 
   const mentor: Mentor = {
     account,
@@ -176,10 +172,8 @@ async function buildUser(
     yearsOfExperience: Number(yearsOfExperience),
     sessionCount: Number(sessionCount),
     hourlyRate: Number(hourlyRate),
-    timeslotsHash,
-    reviewsHash,
+    totalRating: Number(totalRating),
     role,
-    reviews,
   }
 
   return mentor

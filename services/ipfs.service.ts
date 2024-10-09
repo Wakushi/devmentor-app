@@ -43,11 +43,3 @@ export async function unpinFile(hash: string): Promise<void> {
 
   await response.json()
 }
-
-export async function getMentorReviews(reviewsHash: string): Promise<Review[]> {
-  if (!reviewsHash) return []
-
-  const response = await fetch(`${PINATA_GATEWAY_BASE_URL}/${reviewsHash}`)
-  const data = await response.json()
-  return (JSON.parse(data) as Review[]) || []
-}

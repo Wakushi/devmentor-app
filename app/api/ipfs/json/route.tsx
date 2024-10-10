@@ -19,6 +19,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     })
   }
 }
+
 export async function DELETE(req: NextRequest): Promise<NextResponse> {
   try {
     const body = await req.json()

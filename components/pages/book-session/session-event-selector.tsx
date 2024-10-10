@@ -13,7 +13,7 @@ export default function SessionEventSelector({
   handleSelectEvent: (meetingEvent: MeetingEvent) => void
 }) {
   return (
-    <Card className="glass border-stone-800 text-white max-w-fit fade-in-bottom">
+    <Card className="glass border-stone-800 text-white w-full fade-in-bottom">
       <CardHeader>
         <div className="flex items-center gap-2">
           <BookOpen className="w-5 h-5" />

@@ -20,7 +20,7 @@ export default function MeetingEventList({
             key={meetingEvent.id}
             onClick={() => handleSelectEvent(meetingEvent)}
             className={clsx(
-              "glass px-4 py-2 z-[1] text-white border-transparent border-2 transition-all duration-200 cursor-pointer hover:-translate-y-1 hover:shadow-xl rounded-md ",
+              "glass max-w-[300px] px-4 py-2 z-[1] text-white border-transparent border-2 transition-all duration-200 cursor-pointer hover:-translate-y-1 hover:shadow-xl rounded-md ",
               {
                 "border-white": selectedMeetingEvent?.id === meetingEvent.id,
                 "border-b-secondary":

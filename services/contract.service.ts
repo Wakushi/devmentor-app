@@ -10,6 +10,7 @@ import { simulateContract, writeContract } from "@wagmi/core"
 import { config, publicClient } from "@/providers"
 import { baseSepolia } from "viem/chains"
 import {
+  BASE_CONTRACT_PATH,
   DEVMENTOR_CONTRACT_ABI,
   DEVMENTOR_CONTRACT_ADDRESS,
   ETH_DECIMALS,
@@ -54,12 +55,19 @@ async function executeContractWrite({
   functionName,
   args,
   value,
+  gasless = false,
 }: {
   account: Address
   functionName: string
   args: any[]
   value?: bigint
+  gasless?: boolean
 }) {
+  if (gasless) {
+    await sendGaslessTransaction({ functionName, args })
+    return
+  }
+
   if (!web3AuthInstance.provider) {
     throw new Error(`Failed to execute ${functionName}: missing provider`)
   }
@@ -91,6 +99,20 @@ async function executeContractWrite({
   }
 }
 
+async function sendGaslessTransaction({
+  functionName,
+  args,
+}: {
+  functionName: string
+  args: any[]
+}): Promise<void> {
+  await fetch(BASE_CONTRACT_PATH, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ functionName, args }),
+  })
+}
+
 export async function registerMentor({
   account,
   baseUser,
@@ -102,10 +124,11 @@ export async function registerMentor({
   yearsOfExperience: number
   hourlyRate: number
 }) {
-  return executeContractWrite({
+  await executeContractWrite({
     account,
-    functionName: "registerMentor",
+    functionName: "registerMentorAdmin",
     args: [baseUser, yearsOfExperience, hourlyRate],
+    gasless: true,
   })
 }
 
@@ -120,10 +143,11 @@ export async function registerStudent({
   contactHash: string
   experience: number
 }) {
-  return executeContractWrite({
+  await executeContractWrite({
     account,
-    functionName: "registerStudent",
+    functionName: "registerStudentAdmin",
     args: [baseUser, contactHash, experience],
+    gasless: true,
   })
 }
 
@@ -142,19 +166,20 @@ export async function createSession({
   studentContactHash: string
   value: bigint
 }) {
-  return executeContractWrite({
-    account,
-    functionName: "createSession",
-    args: [mentorAddress, startTime, endTime, studentContactHash],
-    value,
-  })
-}
+  const args = [mentorAddress, startTime, endTime, studentContactHash]
 
-export async function updateTimeslot(account: Address, timeslotHash: string) {
+  const freeSession = Number(value) === 0
+
+  if (freeSession) {
+    args.unshift(account)
+  }
+
   return executeContractWrite({
     account,
-    functionName: "updateTimeslot",
-    args: [timeslotHash],
+    functionName: freeSession ? "createSessionAdmin" : "createSession",
+    args,
+    value,
+    gasless: freeSession,
   })
 }
 

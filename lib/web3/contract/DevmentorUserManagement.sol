@@ -20,6 +20,7 @@ contract DevmentorUserManagement is Ownable {
 
     event MentorRegistered(address indexed account);
     event StudentRegistered(address indexed account);
+    event UpdatedMentorInfo(address indexed account);
 
     modifier ensureNotRegistered() {
         _ensureNotRegistered();
@@ -48,45 +49,7 @@ contract DevmentorUserManagement is Ownable {
         uint256 _yearsOfExperience,
         uint256 _hourlyRate
     ) external ensureSameUser(_baseUser) returns (DevmentorLib.Mentor memory) {
-        if (_baseUser.account != msg.sender) {
-            revert Devmentor__AddressMismatch();
-        }
-
-        DevmentorLib.Mentor memory newMentor = DevmentorLib.Mentor({
-            user: _baseUser,
-            yearsOfExperience: _yearsOfExperience,
-            hourlyRate: _hourlyRate,
-            validated: false,
-            sessionCount: 0,
-            totalRating: 0
-        });
-
-        s_roleByAccount[msg.sender] = DevmentorLib.Role.MENTOR;
-        s_mentorByAccount[msg.sender] = newMentor;
-        s_mentors.push(msg.sender);
-
-        emit MentorRegistered(msg.sender);
-
-        return newMentor;
-    }
-
-    function registerStudent(
-        DevmentorLib.BaseUser memory _baseUser,
-        string memory _contactHash,
-        DevmentorLib.Experience _experience
-    ) external ensureSameUser(_baseUser) returns (DevmentorLib.Student memory) {
-        DevmentorLib.Student memory newStudent = DevmentorLib.Student({
-            user: _baseUser,
-            contactHash: _contactHash,
-            experience: _experience
-        });
-
-        s_roleByAccount[msg.sender] = DevmentorLib.Role.STUDENT;
-        s_studentByAccount[msg.sender] = newStudent;
-
-        emit StudentRegistered(msg.sender);
-
-        return newStudent;
+        return _registerMentor(_baseUser, _yearsOfExperience, _hourlyRate);
     }
 
     function registerMentorAdmin(
@@ -94,6 +57,59 @@ contract DevmentorUserManagement is Ownable {
         uint256 _yearsOfExperience,
         uint256 _hourlyRate
     ) external onlyOwner returns (DevmentorLib.Mentor memory) {
+        return _registerMentor(_baseUser, _yearsOfExperience, _hourlyRate);
+    }
+
+    function registerStudent(
+        DevmentorLib.BaseUser memory _baseUser,
+        string memory _contactHash,
+        DevmentorLib.Experience _experience
+    ) external ensureSameUser(_baseUser) returns (DevmentorLib.Student memory) {
+        return _registerStudent(_baseUser, _contactHash, _experience);
+    }
+
+    function registerStudentAdmin(
+        DevmentorLib.BaseUser memory _baseUser,
+        string memory _contactHash,
+        DevmentorLib.Experience _experience
+    ) external onlyOwner returns (DevmentorLib.Student memory) {
+        return _registerStudent(_baseUser, _contactHash, _experience);
+    }
+
+    function updateMentorInfo(
+        uint256 _yearsOfExperience,
+        uint256 _hourlyRate
+    ) external onlyRegisteredMentor {
+        s_mentorByAccount[msg.sender].yearsOfExperience = _yearsOfExperience;
+        s_mentorByAccount[msg.sender].hourlyRate = _hourlyRate;
+
+        emit UpdatedMentorInfo(msg.sender);
+    }
+
+    function _registerStudent(
+        DevmentorLib.BaseUser memory _baseUser,
+        string memory _contactHash,
+        DevmentorLib.Experience _experience
+    ) internal returns (DevmentorLib.Student memory) {
+        DevmentorLib.Student memory newStudent = DevmentorLib.Student({
+            user: _baseUser,
+            contactHash: _contactHash,
+            experience: _experience
+        });
+
+        s_roleByAccount[_baseUser.account] = DevmentorLib.Role.STUDENT;
+        s_studentByAccount[_baseUser.account] = newStudent;
+
+        emit StudentRegistered(_baseUser.account);
+
+        return newStudent;
+    }
+
+    function _registerMentor(
+        DevmentorLib.BaseUser memory _baseUser,
+        uint256 _yearsOfExperience,
+        uint256 _hourlyRate
+    ) internal returns (DevmentorLib.Mentor memory) {
         DevmentorLib.Mentor memory newMentor = DevmentorLib.Mentor({
             user: _baseUser,
             yearsOfExperience: _yearsOfExperience,
@@ -110,25 +126,6 @@ contract DevmentorUserManagement is Ownable {
         emit MentorRegistered(_baseUser.account);
 
         return newMentor;
-    }
-
-    function registerStudentAdmin(
-        DevmentorLib.BaseUser memory _baseUser,
-        string memory _contactHash,
-        DevmentorLib.Experience _experience
-    ) external onlyOwner returns (DevmentorLib.Student memory) {
-        DevmentorLib.Student memory newStudent = DevmentorLib.Student({
-            user: _baseUser,
-            contactHash: _contactHash,
-            experience: _experience
-        });
-
-        s_roleByAccount[_baseUser.account] = DevmentorLib.Role.STUDENT;
-        s_studentByAccount[_baseUser.account] = newStudent;
-
-        emit StudentRegistered(_baseUser.account);
-
-        return newStudent;
     }
 
     function _ensureNotRegistered() internal view {

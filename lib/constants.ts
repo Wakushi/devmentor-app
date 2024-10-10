@@ -1,6 +1,6 @@
 const PINATA_GATEWAY_BASE_URL = "https://tan-key-moth-8.mypinata.cloud/ipfs"
 
-const DEVMENTOR_CONTRACT_ADDRESS = "0x1919721c8a80952a341a98e64EE033298dD3D963"
+const DEVMENTOR_CONTRACT_ADDRESS = "0xa29dc4b51D9b74A009f9D47115499Ce9b2103125"
 const DEVMENTOR_CONTRACT_ABI = [
   {
     inputs: [
@@ -31,6 +31,24 @@ const DEVMENTOR_CONTRACT_ABI = [
   {
     inputs: [
       {
+        internalType: "address",
+        name: "_mentorAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_sessionId",
+        type: "uint256",
+      },
+    ],
+    name: "confirmSessionAsMentorAdmin",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "uint256",
         name: "_sessionId",
         type: "uint256",
@@ -42,6 +60,29 @@ const DEVMENTOR_CONTRACT_ABI = [
       },
     ],
     name: "confirmSessionAsStudent",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_studentAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_sessionId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_rating",
+        type: "uint256",
+      },
+    ],
+    name: "confirmSessionAsStudentAdmin",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -78,6 +119,45 @@ const DEVMENTOR_CONTRACT_ABI = [
       },
     ],
     stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_studentAddress",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_mentorAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_startTime",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_endTime",
+        type: "uint256",
+      },
+      {
+        internalType: "string",
+        name: "studentContactHash",
+        type: "string",
+      },
+    ],
+    name: "createSessionAdmin",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -828,6 +908,37 @@ const DEVMENTOR_CONTRACT_ABI = [
     type: "function",
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+    ],
+    name: "UpdatedMentorInfo",
+    type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_yearsOfExperience",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_hourlyRate",
+        type: "uint256",
+      },
+    ],
+    name: "updateMentorInfo",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "getAllMentors",
     outputs: [
@@ -1227,6 +1338,7 @@ const ETH_DECIMALS = 18
 
 const BASE_USER_PATH = "/api/user"
 const MEETING_EVENTS_PATH = "/meeting-events"
+const BASE_CONTRACT_PATH = "/api/contract"
 
 export {
   PINATA_GATEWAY_BASE_URL,
@@ -1240,6 +1352,7 @@ export {
   ONE_HOUR_IN_MS,
   SUNDAY,
   ETH_DECIMALS,
+  BASE_CONTRACT_PATH,
   BASE_USER_PATH,
   MEETING_EVENTS_PATH,
 }

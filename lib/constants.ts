@@ -1,6 +1,6 @@
 const PINATA_GATEWAY_BASE_URL = "https://tan-key-moth-8.mypinata.cloud/ipfs"
 
-const DEVMENTOR_CONTRACT_ADDRESS = "0xc1172Cd2e186A6d49bB6f6258d7E7025a4C06c32"
+const DEVMENTOR_CONTRACT_ADDRESS = "0x1919721c8a80952a341a98e64EE033298dD3D963"
 const DEVMENTOR_CONTRACT_ABI = [
   {
     inputs: [
@@ -110,6 +110,11 @@ const DEVMENTOR_CONTRACT_ABI = [
     type: "error",
   },
   {
+    inputs: [],
+    name: "Devmentor__AddressMismatch",
+    type: "error",
+  },
+  {
     inputs: [
       {
         internalType: "address",
@@ -206,6 +211,28 @@ const DEVMENTOR_CONTRACT_ABI = [
     type: "error",
   },
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+    ],
+    name: "OwnableInvalidOwner",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+    ],
+    name: "OwnableUnauthorizedAccount",
+    type: "error",
+  },
+  {
     anonymous: false,
     inputs: [
       {
@@ -244,6 +271,63 @@ const DEVMENTOR_CONTRACT_ABI = [
     type: "event",
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "previousOwner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "OwnershipTransferred",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "PaymentPending",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "PendingPaymentResolved",
+    type: "event",
+  },
+  {
     inputs: [
       {
         components: [
@@ -263,12 +347,12 @@ const DEVMENTOR_CONTRACT_ABI = [
             type: "uint8[]",
           },
           {
-            internalType: "enum Devmentor.Subject[]",
+            internalType: "enum DevmentorLib.Subject[]",
             name: "subjects",
             type: "uint8[]",
           },
         ],
-        internalType: "struct Devmentor.BaseUser",
+        internalType: "struct DevmentorLib.BaseUser",
         name: "_baseUser",
         type: "tuple",
       },
@@ -305,12 +389,12 @@ const DEVMENTOR_CONTRACT_ABI = [
                 type: "uint8[]",
               },
               {
-                internalType: "enum Devmentor.Subject[]",
+                internalType: "enum DevmentorLib.Subject[]",
                 name: "subjects",
                 type: "uint8[]",
               },
             ],
-            internalType: "struct Devmentor.BaseUser",
+            internalType: "struct DevmentorLib.BaseUser",
             name: "user",
             type: "tuple",
           },
@@ -340,8 +424,8 @@ const DEVMENTOR_CONTRACT_ABI = [
             type: "uint256",
           },
         ],
-        internalType: "struct Devmentor.Mentor",
-        name: "mentor",
+        internalType: "struct DevmentorLib.Mentor",
+        name: "",
         type: "tuple",
       },
     ],
@@ -368,12 +452,117 @@ const DEVMENTOR_CONTRACT_ABI = [
             type: "uint8[]",
           },
           {
-            internalType: "enum Devmentor.Subject[]",
+            internalType: "enum DevmentorLib.Subject[]",
             name: "subjects",
             type: "uint8[]",
           },
         ],
-        internalType: "struct Devmentor.BaseUser",
+        internalType: "struct DevmentorLib.BaseUser",
+        name: "_baseUser",
+        type: "tuple",
+      },
+      {
+        internalType: "uint256",
+        name: "_yearsOfExperience",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_hourlyRate",
+        type: "uint256",
+      },
+    ],
+    name: "registerMentorAdmin",
+    outputs: [
+      {
+        components: [
+          {
+            components: [
+              {
+                internalType: "address",
+                name: "account",
+                type: "address",
+              },
+              {
+                internalType: "string",
+                name: "userName",
+                type: "string",
+              },
+              {
+                internalType: "uint8[]",
+                name: "languages",
+                type: "uint8[]",
+              },
+              {
+                internalType: "enum DevmentorLib.Subject[]",
+                name: "subjects",
+                type: "uint8[]",
+              },
+            ],
+            internalType: "struct DevmentorLib.BaseUser",
+            name: "user",
+            type: "tuple",
+          },
+          {
+            internalType: "bool",
+            name: "validated",
+            type: "bool",
+          },
+          {
+            internalType: "uint256",
+            name: "yearsOfExperience",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "sessionCount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "hourlyRate",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "totalRating",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct DevmentorLib.Mentor",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "account",
+            type: "address",
+          },
+          {
+            internalType: "string",
+            name: "userName",
+            type: "string",
+          },
+          {
+            internalType: "uint8[]",
+            name: "languages",
+            type: "uint8[]",
+          },
+          {
+            internalType: "enum DevmentorLib.Subject[]",
+            name: "subjects",
+            type: "uint8[]",
+          },
+        ],
+        internalType: "struct DevmentorLib.BaseUser",
         name: "_baseUser",
         type: "tuple",
       },
@@ -383,7 +572,7 @@ const DEVMENTOR_CONTRACT_ABI = [
         type: "string",
       },
       {
-        internalType: "enum Devmentor.Experience",
+        internalType: "enum DevmentorLib.Experience",
         name: "_experience",
         type: "uint8",
       },
@@ -410,12 +599,12 @@ const DEVMENTOR_CONTRACT_ABI = [
                 type: "uint8[]",
               },
               {
-                internalType: "enum Devmentor.Subject[]",
+                internalType: "enum DevmentorLib.Subject[]",
                 name: "subjects",
                 type: "uint8[]",
               },
             ],
-            internalType: "struct Devmentor.BaseUser",
+            internalType: "struct DevmentorLib.BaseUser",
             name: "user",
             type: "tuple",
           },
@@ -425,16 +614,113 @@ const DEVMENTOR_CONTRACT_ABI = [
             type: "string",
           },
           {
-            internalType: "enum Devmentor.Experience",
+            internalType: "enum DevmentorLib.Experience",
             name: "experience",
             type: "uint8",
           },
         ],
-        internalType: "struct Devmentor.Student",
-        name: "student",
+        internalType: "struct DevmentorLib.Student",
+        name: "",
         type: "tuple",
       },
     ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "account",
+            type: "address",
+          },
+          {
+            internalType: "string",
+            name: "userName",
+            type: "string",
+          },
+          {
+            internalType: "uint8[]",
+            name: "languages",
+            type: "uint8[]",
+          },
+          {
+            internalType: "enum DevmentorLib.Subject[]",
+            name: "subjects",
+            type: "uint8[]",
+          },
+        ],
+        internalType: "struct DevmentorLib.BaseUser",
+        name: "_baseUser",
+        type: "tuple",
+      },
+      {
+        internalType: "string",
+        name: "_contactHash",
+        type: "string",
+      },
+      {
+        internalType: "enum DevmentorLib.Experience",
+        name: "_experience",
+        type: "uint8",
+      },
+    ],
+    name: "registerStudentAdmin",
+    outputs: [
+      {
+        components: [
+          {
+            components: [
+              {
+                internalType: "address",
+                name: "account",
+                type: "address",
+              },
+              {
+                internalType: "string",
+                name: "userName",
+                type: "string",
+              },
+              {
+                internalType: "uint8[]",
+                name: "languages",
+                type: "uint8[]",
+              },
+              {
+                internalType: "enum DevmentorLib.Subject[]",
+                name: "subjects",
+                type: "uint8[]",
+              },
+            ],
+            internalType: "struct DevmentorLib.BaseUser",
+            name: "user",
+            type: "tuple",
+          },
+          {
+            internalType: "string",
+            name: "contactHash",
+            type: "string",
+          },
+          {
+            internalType: "enum DevmentorLib.Experience",
+            name: "experience",
+            type: "uint8",
+          },
+        ],
+        internalType: "struct DevmentorLib.Student",
+        name: "",
+        type: "tuple",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "renounceOwnership",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -444,6 +730,38 @@ const DEVMENTOR_CONTRACT_ABI = [
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
+  },
+  {
+    inputs: [],
+    name: "resolvePendingPayment",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "uint256",
+        name: "sessionId",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "mentorAccount",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "studentAccount",
+        type: "address",
+      },
+    ],
+    name: "SessionCompleted",
+    type: "event",
   },
   {
     anonymous: false,
@@ -495,6 +813,19 @@ const DEVMENTOR_CONTRACT_ABI = [
     ],
     name: "StudentRegistered",
     type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "transferOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
     inputs: [],
@@ -571,12 +902,12 @@ const DEVMENTOR_CONTRACT_ABI = [
                 type: "uint8[]",
               },
               {
-                internalType: "enum Devmentor.Subject[]",
+                internalType: "enum DevmentorLib.Subject[]",
                 name: "subjects",
                 type: "uint8[]",
               },
             ],
-            internalType: "struct Devmentor.BaseUser",
+            internalType: "struct DevmentorLib.BaseUser",
             name: "user",
             type: "tuple",
           },
@@ -606,9 +937,28 @@ const DEVMENTOR_CONTRACT_ABI = [
             type: "uint256",
           },
         ],
-        internalType: "struct Devmentor.Mentor",
+        internalType: "struct DevmentorLib.Mentor",
         name: "",
         type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+    ],
+    name: "getPendingEarnings",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -625,7 +975,7 @@ const DEVMENTOR_CONTRACT_ABI = [
     name: "getRoleByAccount",
     outputs: [
       {
-        internalType: "enum Devmentor.Role",
+        internalType: "enum DevmentorLib.Role",
         name: "",
         type: "uint8",
       },
@@ -686,7 +1036,7 @@ const DEVMENTOR_CONTRACT_ABI = [
             type: "bool",
           },
         ],
-        internalType: "struct Devmentor.Session",
+        internalType: "struct DevmentorLib.Session",
         name: "",
         type: "tuple",
       },
@@ -756,12 +1106,12 @@ const DEVMENTOR_CONTRACT_ABI = [
                 type: "uint8[]",
               },
               {
-                internalType: "enum Devmentor.Subject[]",
+                internalType: "enum DevmentorLib.Subject[]",
                 name: "subjects",
                 type: "uint8[]",
               },
             ],
-            internalType: "struct Devmentor.BaseUser",
+            internalType: "struct DevmentorLib.BaseUser",
             name: "user",
             type: "tuple",
           },
@@ -771,14 +1121,27 @@ const DEVMENTOR_CONTRACT_ABI = [
             type: "string",
           },
           {
-            internalType: "enum Devmentor.Experience",
+            internalType: "enum DevmentorLib.Experience",
             name: "experience",
             type: "uint8",
           },
         ],
-        internalType: "struct Devmentor.Student",
+        internalType: "struct DevmentorLib.Student",
         name: "",
         type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "owner",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",

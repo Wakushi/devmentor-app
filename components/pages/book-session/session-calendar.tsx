@@ -6,51 +6,54 @@ import { MeetingEvent, Timeslot } from "@/lib/types/timeslot.type"
 import { getTimeslotMatcher } from "@/lib/utils"
 import TimeslotCardList from "./timeslot-card-list"
 import { CalendarDays } from "lucide-react"
-import MeetingEventList from "./meeting-event-list"
 
 export default function SessionCalendar({
-  meetingEvents,
   handleConfirmTimeslot,
   selectedMeetingEvent,
-  handleConfirmMeetingEvent,
   selectedDate,
   handleSelectDate,
 }: {
-  meetingEvents: MeetingEvent[]
   handleConfirmTimeslot: (slot: number) => void
   selectedMeetingEvent: MeetingEvent | null
-  handleConfirmMeetingEvent: (meetingEvent: MeetingEvent) => void
-  selectedDate: Date
-  handleSelectDate: (date: Date) => void
+  selectedDate: Date | undefined
+  handleSelectDate: (date: Date | undefined) => void
 }) {
   const [selectedSlot, setSelectedSlot] = useState<number | undefined>()
   const [selectedDateAvailableSlots, setSelectedDateAvailableSlots] = useState<
     number[]
-  >([])
+  >(selectedDate ? computeDividedSlots(selectedDate) : [])
 
   function handleDateSelect(date: Date | undefined) {
     if (date) {
       if (selectedMeetingEvent) {
-        const timeslots = getTimeslotsByDate(date)
-        const timeDividedSlots: number[] = []
-        const eventDurationInMs = selectedMeetingEvent.duration
-
-        timeslots.forEach(({ timeStart, timeEnd }) => {
-          let sessionStartTime = timeStart
-
-          while (sessionStartTime < timeEnd - eventDurationInMs) {
-            sessionStartTime += eventDurationInMs
-
-            timeDividedSlots.push(sessionStartTime)
-          }
-        })
-
-        handleSelectDate(date)
+        const timeDividedSlots = computeDividedSlots(date)
         setSelectedDateAvailableSlots(timeDividedSlots)
       }
     } else {
       setSelectedDateAvailableSlots([])
     }
+
+    handleSelectDate(date)
+  }
+
+  function computeDividedSlots(date: Date): number[] {
+    if (!selectedMeetingEvent) return []
+
+    const timeDividedSlots: number[] = []
+    const timeslots = getTimeslotsByDate(date)
+    const eventDurationInMs = selectedMeetingEvent.duration
+
+    timeslots.forEach(({ timeStart, timeEnd }) => {
+      let sessionStartTime = timeStart
+
+      while (sessionStartTime < timeEnd - eventDurationInMs) {
+        sessionStartTime += eventDurationInMs
+
+        timeDividedSlots.push(sessionStartTime)
+      }
+    })
+
+    return timeDividedSlots
   }
 
   function getTimeslotsByDate(date: Date): Timeslot[] {
@@ -65,9 +68,7 @@ export default function SessionCalendar({
     setSelectedSlot(slot)
   }
 
-  function handleSelectEvent(meetingEvent: MeetingEvent): void {
-    handleConfirmMeetingEvent(meetingEvent)
-  }
+  if (!selectedMeetingEvent) return null
 
   return (
     <Card className="glass border-stone-800 text-white max-w-fit fade-in-bottom">
@@ -83,29 +84,19 @@ export default function SessionCalendar({
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <div className="flex gap-8 items-center">
-          <MeetingEventList
-            meetingEvents={meetingEvents}
-            selectedMeetingEvent={selectedMeetingEvent}
-            handleSelectEvent={handleSelectEvent}
+          <Calendar
+            mode="single"
+            selected={selectedDate || undefined}
+            onSelect={handleDateSelect}
+            disabled={getTimeslotMatcher(selectedMeetingEvent?.timeslots)}
+            className="calendar rounded-md p-0 mb-4 mx-auto"
           />
-
-          {!!selectedMeetingEvent && (
-            <>
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={handleDateSelect}
-                disabled={getTimeslotMatcher(selectedMeetingEvent?.timeslots)}
-                className="calendar rounded-md p-0 mb-4 mx-auto"
-              />
-              <TimeslotCardList
-                selectedSlot={selectedSlot}
-                dividedSlots={selectedDateAvailableSlots}
-                handleSlotSelect={handleSlotSelect}
-                handleConfirmTimeslot={handleConfirmTimeslot}
-              />
-            </>
-          )}
+          <TimeslotCardList
+            selectedSlot={selectedSlot}
+            dividedSlots={selectedDateAvailableSlots}
+            handleSlotSelect={handleSlotSelect}
+            handleConfirmTimeslot={handleConfirmTimeslot}
+          />
         </div>
       </CardContent>
     </Card>

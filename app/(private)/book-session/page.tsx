@@ -4,7 +4,7 @@ import AnimatedBackground from "@/components/ui/animated-background"
 import MentorDetails from "@/components/pages/book-session/mentor-details"
 import SessionCalendar from "@/components/pages/book-session/session-calendar"
 import { useEffect, useState } from "react"
-import { MeetingEvent, SessionSlot, Timeslot } from "@/lib/types/timeslot.type"
+import { MeetingEvent, SessionSlot } from "@/lib/types/timeslot.type"
 import LoadingScreen from "@/components/ui/loading-screen"
 import SessionRecap from "@/components/pages/book-session/session-recap"
 import { IoIosArrowBack } from "react-icons/io"
@@ -35,6 +35,7 @@ import {
 import useMeetingEventsQuery from "@/hooks/queries/meeting-event-query"
 import { Address } from "viem"
 import { computeTimeAndDateTimestamps } from "@/lib/utils"
+import SessionEventSelector from "@/components/pages/book-session/session-event-selector"
 
 export default function BookSessionPage({
   searchParams,
@@ -55,18 +56,24 @@ export default function BookSessionPage({
 
   const [mentor, setMentor] = useState<Mentor>()
 
-  const [bookStep, setBookStep] = useState<BookStep>(BookStep.SCHEDULE)
+  const [bookStep, setBookStep] = useState<BookStep>(BookStep.SESSION)
+
   const [sessionGoals, setSessionGoals] = useState<string>("")
+
   const [editedStep, setEditedStep] = useState<BookStep | null>(null)
 
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date())
+
   const [createdSession, setCreatedSession] = useState<Session | null>(null)
+
   const [selectedMeetingEvent, setSelectedMeetingEvent] =
     useState<MeetingEvent | null>(null)
+
   const [confirmedSessionSlot, setConfirmedSessionSlot] =
     useState<SessionSlot>()
 
   const [loading, setLoading] = useState<boolean>(false)
+
   const [loadingMessage, setLoadingMessage] = useState<string>("")
 
   const steps = Array.from(Object.keys(BookStep) as BookStep[])
@@ -88,7 +95,7 @@ export default function BookSessionPage({
   }, [mentors])
 
   function handleConfirmTimeslot(selectedSlot: number): void {
-    if (!selectedSlot || !selectedMeetingEvent) return
+    if (!selectedSlot || !selectedMeetingEvent || !selectedDate) return
 
     const sessionDate = computeSessionSlot({
       time: selectedSlot,
@@ -107,8 +114,9 @@ export default function BookSessionPage({
     setBookStep(BookStep.OBJECTIVES)
   }
 
-  function handleConfirmMeetingEvent(meetingEvent: MeetingEvent) {
+  function handleSelectEvent(meetingEvent: MeetingEvent) {
     setSelectedMeetingEvent(meetingEvent)
+    handleSelectDate(undefined)
   }
 
   function currentStepIndex(): number {
@@ -121,6 +129,8 @@ export default function BookSessionPage({
 
   function isCurrentStepValid(): boolean {
     switch (bookStep) {
+      case BookStep.SESSION:
+        return !!selectedMeetingEvent
       case BookStep.SCHEDULE:
         return false
       case BookStep.OBJECTIVES:
@@ -134,6 +144,9 @@ export default function BookSessionPage({
 
   function handleNextStep(): void {
     switch (bookStep) {
+      case BookStep.SESSION:
+        setBookStep(BookStep.SCHEDULE)
+        break
       case BookStep.SCHEDULE:
         setBookStep(BookStep.OBJECTIVES)
         break
@@ -145,6 +158,9 @@ export default function BookSessionPage({
 
   function handlePrevStep(): void {
     switch (bookStep) {
+      case BookStep.SCHEDULE:
+        setBookStep(BookStep.SESSION)
+        break
       case BookStep.OBJECTIVES:
         setBookStep(BookStep.SCHEDULE)
         break
@@ -170,7 +186,7 @@ export default function BookSessionPage({
     setBookStep(step)
   }
 
-  function handleSelectDate(date: Date): void {
+  function handleSelectDate(date: Date | undefined): void {
     setSelectedDate(date)
   }
 
@@ -302,20 +318,7 @@ export default function BookSessionPage({
   return (
     <>
       <div className="flex glass rounded-md flex-col gap-4 p-8 mt-[8rem] h-fit max-w-[95%] mx-auto w-full">
-        <div className="mb-2 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Book a session</h1>
-            <p className="text-dim">
-              Pick out the perfect time for your mentoring session
-            </p>
-          </div>
-          <div className="flex items-center self-baseline">
-            <NavLinkButton href="/mentor-search">
-              <IoIosArrowBack />
-              Back to search
-            </NavLinkButton>
-          </div>
-        </div>
+        <BookSessionHead />
         <div className="flex flex-col md:flex-row gap-8">
           <MentorDetails mentor={mentor} />
 
@@ -329,12 +332,18 @@ export default function BookSessionPage({
               <Separator className="opacity-30" />
             </CardHeader>
             <CardContent className="flex flex-col items-center justify-center gap-6">
+              {bookStep === BookStep.SESSION && (
+                <SessionEventSelector
+                  meetingEvents={meetingEvents ?? []}
+                  selectedMeetingEvent={selectedMeetingEvent}
+                  handleSelectEvent={handleSelectEvent}
+                />
+              )}
+
               {bookStep === BookStep.SCHEDULE && (
                 <SessionCalendar
-                  meetingEvents={meetingEvents ?? []}
-                  handleConfirmTimeslot={handleConfirmTimeslot}
                   selectedMeetingEvent={selectedMeetingEvent}
-                  handleConfirmMeetingEvent={handleConfirmMeetingEvent}
+                  handleConfirmTimeslot={handleConfirmTimeslot}
                   selectedDate={selectedDate}
                   handleSelectDate={handleSelectDate}
                 />
@@ -371,5 +380,24 @@ export default function BookSessionPage({
       </div>
       <AnimatedBackground shader={false} />
     </>
+  )
+}
+
+function BookSessionHead() {
+  return (
+    <div className="mb-2 flex items-center justify-between">
+      <div>
+        <h1 className="text-3xl font-bold mb-2">Book a session</h1>
+        <p className="text-dim">
+          Pick out the perfect time for your mentoring session
+        </p>
+      </div>
+      <div className="flex items-center self-baseline">
+        <NavLinkButton href="/mentor-search">
+          <IoIosArrowBack />
+          Back to search
+        </NavLinkButton>
+      </div>
+    </div>
   )
 }

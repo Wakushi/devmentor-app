@@ -1,4 +1,5 @@
 export enum BookStep {
+  SESSION = "SESSION",
   SCHEDULE = "SCHEDULE",
   OBJECTIVES = "OBJECTIVES",
   RECAP = "RECAP",

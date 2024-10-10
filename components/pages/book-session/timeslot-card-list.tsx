@@ -11,9 +11,7 @@ export default function TimeslotCardList({
   handleSlotSelect: (slot: number) => void
   handleConfirmTimeslot: (slot: number) => void
 }) {
-  if (!dividedSlots.length) {
-    return null
-  }
+  if (!dividedSlots.length) return null
 
   return (
     <div className="relative flex flex-col self-stretch h-full min-w-[280px] fade-in-right">
@@ -28,7 +26,7 @@ export default function TimeslotCardList({
           />
         ))}
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[#343434] to-transparent pointer-events-none"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-[#343434] to-transparent pointer-events-none"></div>
     </div>
   )
 }

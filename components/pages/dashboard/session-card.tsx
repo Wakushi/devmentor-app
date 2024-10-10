@@ -16,13 +16,13 @@ import useEthPriceQuery from "@/hooks/queries/eth-price-query"
 import { weiToUsd } from "@/services/contract.service"
 
 export function SessionCard({ session }: { session: Session }) {
-  const { startTime, valueLocked, mentor } = session
+  const { startTime, endTime, valueLocked, mentor } = session
 
   return (
     <div className="flex items-center justify-between gap-8 glass rounded-md px-4 py-2">
       <div className="flex items-center gap-4">
         <SessionMentor name={mentor?.baseUser?.userName ?? "?"} />
-        <SessionTime startTime={startTime} />
+        <SessionTime startTime={startTime} endTime={endTime} />
       </div>
       <div className="flex items-center gap-8">
         <SessionPrice sessionPriceWei={valueLocked} />
@@ -47,7 +47,13 @@ function SessionMentor({ name }: { name: string }) {
   )
 }
 
-function SessionTime({ startTime }: { startTime: number }) {
+function SessionTime({
+  startTime,
+  endTime,
+}: {
+  startTime: number
+  endTime: number
+}) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2 text-small">
@@ -56,7 +62,8 @@ function SessionTime({ startTime }: { startTime: number }) {
       </div>
       <div className="flex items-center gap-2 text-small">
         <Clock className="w-5 h-5" />
-        <span className="text-dim">{formatTime(startTime)}</span>
+        <span className="text-dim">{formatTime(startTime)}</span>-
+        <span className="text-dim">{formatTime(endTime)}</span>
       </div>
     </div>
   )

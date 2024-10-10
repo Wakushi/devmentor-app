@@ -60,11 +60,11 @@ export default function BookSessionPage({
   const [editedStep, setEditedStep] = useState<BookStep | null>(null)
 
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
-  const [confirmedSessionSlot, setConfirmedSessionSlot] =
-    useState<SessionSlot>()
   const [createdSession, setCreatedSession] = useState<Session | null>(null)
   const [selectedMeetingEvent, setSelectedMeetingEvent] =
     useState<MeetingEvent | null>(null)
+  const [confirmedSessionSlot, setConfirmedSessionSlot] =
+    useState<SessionSlot>()
 
   const [loading, setLoading] = useState<boolean>(false)
   const [loadingMessage, setLoadingMessage] = useState<string>("")

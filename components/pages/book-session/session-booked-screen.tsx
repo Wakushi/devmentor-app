@@ -27,7 +27,7 @@ export default function SessionBookedScreen({
         subtitle="You can find all your session detail in the dashboard"
       >
         <div className="max-w-[300px] flex flex-col gap-2 w-full">
-          <NavLinkButton href="/dashboard/student" variant="filled">
+          <NavLinkButton href="/student/dashboard" variant="filled">
             Go to dashboard <FaLongArrowAltRight />
           </NavLinkButton>
           <NavLinkButton

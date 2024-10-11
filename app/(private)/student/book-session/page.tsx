@@ -393,7 +393,7 @@ function BookSessionHead() {
         </p>
       </div>
       <div className="flex items-center self-baseline">
-        <NavLinkButton href="/mentor-search">
+        <NavLinkButton href="/student/mentor-search">
           <IoIosArrowBack />
           Back to search
         </NavLinkButton>

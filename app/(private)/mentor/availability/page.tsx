@@ -1,6 +1,5 @@
 "use client"
 
-import { MeetingEvents } from "@/components/pages/dashboard/mentor/meeting-events"
 import AnimatedBackground from "@/components/ui/animated-background"
 import { useUser } from "@/stores/user.store"
 import LoadingScreen from "@/components/ui/loading-screen"
@@ -25,6 +24,7 @@ import { MdError } from "react-icons/md"
 import { useQueryClient } from "@tanstack/react-query"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
 import Loader from "@/components/ui/loader"
+import { MeetingEvents } from "@/components/pages/dashboard/mentor/meeting-events"
 
 export default function AvailabilityPage() {
   const queryClient = useQueryClient()

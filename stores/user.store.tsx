@@ -114,7 +114,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
       case "/auth/login":
         router.push(
           user.role !== Role.VISITOR
-            ? `/dashboard/${user.role?.toLowerCase()}`
+            ? `/${user.role?.toLowerCase()}/dashboard`
             : `/auth/signup/${role || "choice"}`
         )
         break

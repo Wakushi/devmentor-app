@@ -26,7 +26,7 @@ export default function DashboardPage() {
       </h1>
       <div className="flex items-center gap-4 mb-6">
         <div className="w-[200px]">
-          <NavLinkButton variant="filled" href="/dashboard/mentor/availability">
+          <NavLinkButton variant="filled" href="/mentor/availability">
             My availabilities <FaLongArrowAltRight />
           </NavLinkButton>
         </div>

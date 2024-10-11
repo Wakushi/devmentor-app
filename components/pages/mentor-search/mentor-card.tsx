@@ -24,7 +24,7 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
 
   return (
     <Card className="bg-primary-faded rounded-md border border-primary-faded text-white overflow-hidden transition-all duration-300 hover:border-white cursor-pointer hover:-translate-y-1 hover:shadow-xl">
-      <Link href={`/book-session?mentor=${account}`}>
+      <Link href={`/student/book-session?mentor=${account}`}>
         <CardContent className="flex items-center justify-between gap-4 p-4">
           <div className="flex items-center gap-2">
             <Avatar className="w-14 h-14">

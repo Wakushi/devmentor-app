@@ -42,17 +42,16 @@ export default function Header() {
       (user.role === Role.MENTOR || user.role === Role.STUDENT)
     ) {
       const navLinks = [
-        { href: "/", label: "Home" },
-        { href: `/dashboard/${user.role?.toLowerCase()}`, label: "Dashboard" },
+        { href: `/${user.role?.toLowerCase()}/dashboard`, label: "Dashboard" },
       ]
 
       if (user.role === Role.STUDENT) {
-        navLinks.push({ href: "/mentor-search", label: "Mentors" })
+        navLinks.push({ href: "/student/mentor-search", label: "Mentors" })
       }
 
       if (user.role === Role.MENTOR) {
         navLinks.push({
-          href: "/dashboard/mentor/availability",
+          href: "/mentor/availability",
           label: "Availability",
         })
       }

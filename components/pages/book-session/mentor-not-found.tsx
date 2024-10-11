@@ -9,7 +9,7 @@ export default function MentorNotFound() {
         <p className="text-dim">Sorry, but we couldn't find your mentor.</p>
       </div>
       <Button variant="default" asChild>
-        <a href="/mentor-search" className="flex items-center gap-2">
+        <a href="/student/mentor-search" className="flex items-center gap-2">
           <FaLongArrowAltLeft /> Back to mentor list
         </a>
       </Button>

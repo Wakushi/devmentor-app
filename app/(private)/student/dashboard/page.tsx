@@ -41,7 +41,10 @@ export default function DashboardPage() {
                 Welcome back, {user.baseUser.userName} !
               </h1>
               <div>
-                <NavLinkButton variant="filled-secondary" href="/mentor-search">
+                <NavLinkButton
+                  variant="filled-secondary"
+                  href="/student/mentor-search"
+                >
                   Find a Mentor <FaLongArrowAltRight />
                 </NavLinkButton>
               </div>
@@ -73,7 +76,7 @@ function EmptyDashboard() {
         <p className="text-dim">Let's book a session with a mentor !</p>
       </div>
       <div>
-        <NavLinkButton variant="filled" href="/mentor-search">
+        <NavLinkButton variant="filled" href="/student/mentor-search">
           Find a Mentor <FaLongArrowAltRight />
         </NavLinkButton>
       </div>

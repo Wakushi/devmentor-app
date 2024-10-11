@@ -325,7 +325,7 @@ export default function MentorSignUpPage() {
           subtitle="Let's discover your dashboard and update your availabilties"
         >
           <div className="max-w-[300px]">
-            <NavLinkButton href="/dashboard/mentor" variant="filled">
+            <NavLinkButton href="/mentor/dashboard" variant="filled">
               Go to dashboard <FaLongArrowAltRight />
             </NavLinkButton>
           </div>

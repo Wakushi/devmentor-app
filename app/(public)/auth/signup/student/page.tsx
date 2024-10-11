@@ -295,7 +295,7 @@ export default function StudentSignUpPage() {
           subtitle="Let's find a mentor to help you for your first session"
         >
           <div className="max-w-[300px]">
-            <NavLinkButton href="/dashboard/student" variant="filled">
+            <NavLinkButton href="/student/dashboard" variant="filled">
               Go to dashboard <FaLongArrowAltRight />
             </NavLinkButton>
           </div>

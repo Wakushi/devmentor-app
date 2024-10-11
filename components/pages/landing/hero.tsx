@@ -15,7 +15,7 @@ export default function Hero() {
     let url = "/auth/signup?role=mentor"
 
     if (user?.role === Role.MENTOR) {
-      url = "/dashboard/mentor"
+      url = "/mentor/dashboard"
     }
 
     return url
@@ -25,11 +25,11 @@ export default function Hero() {
     let url = "/auth/signup?role=student"
 
     if (user?.role === Role.MENTOR) {
-      url = "/dashboard/mentor"
+      url = "/mentor/dashboard"
     }
 
     if (user?.role === Role.STUDENT) {
-      url = "/mentor-search"
+      url = "/student/mentor-search"
     }
 
     return url

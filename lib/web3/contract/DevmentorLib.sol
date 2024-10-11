@@ -35,6 +35,7 @@ library DevmentorLib {
         uint256 startTime;
         uint256 endTime;
         uint256 valueLocked;
+        bool accepted;
         bool mentorConfirmed;
         bool studentConfirmed;
     }

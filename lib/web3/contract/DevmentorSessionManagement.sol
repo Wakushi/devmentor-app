@@ -22,7 +22,8 @@ contract DevmentorSessionManagement is
     error Devmentor__SessionAlreadyConfirmed();
     error Devmentor__NotAuthorizedToConfirm();
     error Devmentor__SessionNotCompleted();
-    error DEVMentor__WrongRating();
+    error Devmentor__WrongRating();
+    error Devmentor__NotAuthorizedForValidation();
 
     event SessionCreated(
         address indexed studentAccount,
@@ -37,6 +38,11 @@ contract DevmentorSessionManagement is
         address indexed mentorAccount,
         address indexed studentAccount
     );
+    event SessionValidated(
+        uint256 indexed sessionId,
+        address indexed mentorAccount,
+        bool indexed accepted
+    );
 
     constructor(
         address _nativeToUsdpriceFeed
@@ -47,7 +53,7 @@ contract DevmentorSessionManagement is
         uint256 _startTime,
         uint256 _endTime,
         string memory studentContactHash
-    ) external payable returns (uint256) {
+    ) external payable onlyRegisteredStudent returns (uint256) {
         return
             _createSession(
                 msg.sender,
@@ -73,6 +79,73 @@ contract DevmentorSessionManagement is
                 _endTime,
                 studentContactHash
             );
+    }
+
+    function confirmSessionAsStudent(
+        uint256 _sessionId,
+        uint256 _rating
+    ) external onlyRegisteredStudent {
+        _confirmSessionAsStudent(msg.sender, _sessionId, _rating);
+    }
+
+    function confirmSessionAsStudentAdmin(
+        address _studentAddress,
+        uint256 _sessionId,
+        uint256 _rating
+    ) external onlyOwner {
+        _confirmSessionAsStudent(_studentAddress, _sessionId, _rating);
+    }
+
+    function confirmSessionAsMentor(
+        uint256 _sessionId
+    ) external onlyRegisteredMentor {
+        _confirmSessionAsMentor(msg.sender, _sessionId);
+    }
+
+    function confirmSessionAsMentorAdmin(
+        address _mentorAddress,
+        uint256 _sessionId
+    ) external onlyOwner {
+        _confirmSessionAsMentor(_mentorAddress, _sessionId);
+    }
+
+    function acceptSession(uint256 _sessionId, bool _accepted) external onlyRegisteredMentor {
+        _acceptSession(msg.sender, _sessionId, _accepted);
+    }
+
+    function acceptSessionAdmin(address _mentorAddress, uint256 _sessionId, bool _accepted) external onlyOwner {
+        _acceptSession(_mentorAddress, _sessionId, _accepted);
+    }
+
+    function cancelSession(uint256 _sessionId) external {
+        // TO SPECIFY AND IMPLEMENT
+    }
+
+    function _confirmSessionAsMentor(
+        address _mentorAddress,
+        uint256 _sessionId
+    ) internal {
+        DevmentorLib.Session storage session = s_sessions[_sessionId];
+
+        if (session.mentor == address(0)) {
+            revert Devmentor__SessionNotFound(_sessionId);
+        }
+
+        if (_mentorAddress != session.mentor) {
+            revert Devmentor__NotAuthorizedToConfirm();
+        }
+
+        if (session.mentorConfirmed) {
+            revert Devmentor__SessionAlreadyConfirmed();
+        }
+
+        session.mentorConfirmed = true;
+
+        emit SessionConfirmed(_sessionId, _mentorAddress);
+
+        if (session.mentorConfirmed && session.studentConfirmed) {
+            _completeSession(_sessionId);
+        }
     }
 
     function _createSession(
@@ -111,7 +184,8 @@ contract DevmentorSessionManagement is
             endTime: _endTime,
             valueLocked: msg.value,
             mentorConfirmed: false,
-            studentConfirmed: false
+            studentConfirmed: false,
+            accepted: false
         });
 
         s_sessionIdsByAccount[_studentAddress].push(sessionId);
@@ -120,21 +194,6 @@ contract DevmentorSessionManagement is
         emit SessionCreated(_studentAddress, sessionId);
 
         return sessionId;
-    }
-
-    function confirmSessionAsStudent(
-        uint256 _sessionId,
-        uint256 _rating
-    ) external onlyRegisteredStudent {
-        _confirmSessionAsStudent(msg.sender, _sessionId, _rating);
-    }
-
-    function confirmSessionAsStudentAdmin(
-        address _studentAddress,
-        uint256 _sessionId,
-        uint256 _rating
-    ) external onlyOwner {
-        _confirmSessionAsStudent(_studentAddress, _sessionId, _rating);
     }
 
     function _confirmSessionAsStudent(
@@ -157,7 +216,7 @@ contract DevmentorSessionManagement is
         }
 
         if (_rating < 0 || _rating > 5) {
-            revert DEVMentor__WrongRating();
+            revert Devmentor__WrongRating();
         }
 
         DevmentorLib.Mentor storage mentor = s_mentorByAccount[session.mentor];
@@ -171,50 +230,6 @@ contract DevmentorSessionManagement is
         if (session.mentorConfirmed && session.studentConfirmed) {
             _completeSession(_sessionId);
         }
-    }
-
-    function confirmSessionAsMentor(
-        uint256 _sessionId
-    ) external onlyRegisteredMentor {
-        _confirmSessionAsMentor(msg.sender, _sessionId);
-    }
-
-    function confirmSessionAsMentorAdmin(
-        address _mentorAddress,
-        uint256 _sessionId
-    ) external onlyOwner {
-        _confirmSessionAsMentor(_mentorAddress, _sessionId);
-    }
-
-    function _confirmSessionAsMentor(
-        address _mentorAddress,
-        uint256 _sessionId
-    ) internal {
-        DevmentorLib.Session storage session = s_sessions[_sessionId];
-
-        if (session.mentor == address(0)) {
-            revert Devmentor__SessionNotFound(_sessionId);
-        }
-
-        if (_mentorAddress != session.mentor) {
-            revert Devmentor__NotAuthorizedToConfirm();
-        }
-
-        if (session.mentorConfirmed) {
-            revert Devmentor__SessionAlreadyConfirmed();
-        }
-
-        session.mentorConfirmed = true;
-
-        emit SessionConfirmed(_sessionId, _mentorAddress);
-
-        if (session.mentorConfirmed && session.studentConfirmed) {
-            _completeSession(_sessionId);
-        }
-    }
-
-    function cancelSession(uint256 _sessionId) external {
-        // TO SPECIFY AND IMPLEMENT
     }
 
     function _completeSession(uint256 _sessionId) internal {
@@ -242,6 +257,22 @@ contract DevmentorSessionManagement is
         }
 
         emit SessionCompleted(_sessionId, session.mentor, session.student);
+    }
+
+    function _acceptSession(address _mentorAddress, uint256 _sessionId, bool _accepted) internal {
+        DevmentorLib.Session storage session = s_sessions[_sessionId];
+
+        if (session.mentor == address(0)) {
+            revert Devmentor__SessionNotFound(_sessionId);
+        }
+
+        if (_mentorAddress != session.mentor) {
+            revert Devmentor__NotAuthorizedForValidation();
+        }
+
+        session.accepted = _accepted;
+
+        emit SessionValidated(_sessionId, _mentorAddress, _accepted);
     }
 
     function getSessionIdsByAccount(

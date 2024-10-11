@@ -1,5 +1,5 @@
 import { Address } from "viem"
-import { Mentor } from "./user.type"
+import { Mentor, Student } from "./user.type"
 
 export type Session = {
   mentorAddress: Address
@@ -10,6 +10,7 @@ export type Session = {
   objectives: string
   cancelled?: boolean
   mentor?: Mentor
+  student?: Student
   studentContactHash: string
   mentorConfirmed: boolean
   studentConfirmed: boolean

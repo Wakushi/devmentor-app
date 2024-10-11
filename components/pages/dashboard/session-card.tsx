@@ -14,25 +14,42 @@ import { BsThreeDots } from "react-icons/bs"
 import HourlyRate from "@/components/hourly-rate"
 import useEthPriceQuery from "@/hooks/queries/eth-price-query"
 import { weiToUsd } from "@/services/contract.service"
+import { Role } from "@/lib/types/role.type"
 
-export function SessionCard({ session }: { session: Session }) {
-  const { startTime, endTime, valueLocked, mentor } = session
+export function SessionCard({
+  session,
+  viewerRole,
+}: {
+  session: Session
+  viewerRole: Role
+}) {
+  const { startTime, endTime, valueLocked, mentor, student } = session
+
+  function isMentorView(): boolean {
+    return viewerRole === Role.MENTOR
+  }
 
   return (
     <div className="flex items-center justify-between gap-8 glass rounded-md px-4 py-2">
       <div className="flex items-center gap-4">
-        <SessionMentor name={mentor?.baseUser?.userName ?? "?"} />
+        <SessionPeer
+          name={
+            isMentorView()
+              ? student?.baseUser?.userName
+              : mentor?.baseUser?.userName
+          }
+        />
         <SessionTime startTime={startTime} endTime={endTime} />
       </div>
       <div className="flex items-center gap-8">
-        <SessionPrice sessionPriceWei={valueLocked} />
+        {!isMentorView() && <SessionPrice sessionPriceWei={valueLocked} />}
         <SessionOptions />
       </div>
     </div>
   )
 }
 
-function SessionMentor({ name }: { name: string }) {
+function SessionPeer({ name = "Anon" }: { name?: string }) {
   return (
     <div className="flex flex-col justify-center items-center gap-1">
       <Avatar className="w-10 h-10">

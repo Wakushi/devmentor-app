@@ -15,7 +15,7 @@ import {
   DEVMENTOR_CONTRACT_ADDRESS,
   ETH_DECIMALS,
 } from "@/lib/constants"
-import { BaseUser, Mentor } from "@/lib/types/user.type"
+import { BaseUser, Mentor, Student } from "@/lib/types/user.type"
 import { Role } from "@/lib/types/role.type"
 import { Session } from "@/lib/types/session.type"
 import { IProvider } from "@web3auth/base"
@@ -257,13 +257,25 @@ export async function getRole(account: Address) {
   })
 }
 
-export async function getStudent(studentAddress: Address) {
-  return publicClient.readContract({
+export async function getStudent(studentAddress: Address): Promise<Student> {
+  const data: any = await publicClient.readContract({
     address: DEVMENTOR_CONTRACT_ADDRESS,
     abi: DEVMENTOR_CONTRACT_ABI,
     functionName: "getStudent",
     args: [studentAddress],
   })
+
+  const { user, contactHash, experience } = data
+
+  const student: Student = {
+    account: studentAddress,
+    baseUser: user,
+    contactHash,
+    experience,
+    role: Role.STUDENT,
+  }
+
+  return student
 }
 
 export async function getSession(sessionId: number): Promise<Session> {

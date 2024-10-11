@@ -51,7 +51,7 @@ export default function DashboardPage() {
             </div>
             <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit">
               <h2 className="text-xl font-semibold mb-4">Upcoming Sessions</h2>
-              <SessionCardList sessions={sessions} />
+              <SessionCardList sessions={sessions} viewerRole={user.role} />
             </section>
           </div>
         ),

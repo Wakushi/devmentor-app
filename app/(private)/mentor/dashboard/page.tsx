@@ -39,7 +39,7 @@ export default function DashboardPage() {
       <div className="flex items-center gap-8">
         {matchQueryStatus(sessionsQuery, {
           Loading: (
-            <div>
+            <div className="w-[300px] h-[100px] flex justify-center items-center">
               <Loader />
             </div>
           ),

@@ -15,6 +15,8 @@
     --secondary-shade: #474596;
 
     --background: #121212;
+    --background-shade: #1d1d1d;
+
     --text: #e0e0e0;
     --text-dim: #9e9e9e;
 
@@ -57,6 +59,8 @@
     --secondary-shade: #2c7a7b;
 
     --background: #121212;
+    --background-shade: var(--background-shade);
+
     --text: #e0e0e0;
     --text-dim: #9e9e9e;
 

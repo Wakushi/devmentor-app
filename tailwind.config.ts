@@ -28,6 +28,7 @@ const config = {
         error: "var(--error)",
         success: "var(--success)",
         background: "var(--background)",
+        "background-shade": "var(--background-shade)",
         dim: "var(--text-dim)",
         l1: "var(--dm-l1)",
         d1: "var(--dm-d1)",

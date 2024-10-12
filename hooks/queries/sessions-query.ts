@@ -38,7 +38,7 @@ export default function useSessionsQuery(
         sessions.push(session)
       }
 
-      return sessions
+      return sessions.sort((a, b) => a.startTime - b.startTime)
     },
   })
 

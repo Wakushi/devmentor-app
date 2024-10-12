@@ -34,7 +34,7 @@ export default function SessionRequestsPage() {
       </div>
       {matchQueryStatus(sessionsQuery, {
         Loading: (
-          <div>
+          <div className="w-[300px] h-[100px] flex justify-center items-center">
             <Loader />
           </div>
         ),

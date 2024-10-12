@@ -21,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import clsx from "clsx"
 
 interface SessionDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -79,10 +80,13 @@ export default function SessionRequestsTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row, i) => (
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className={clsx({
+                    "bg-background-shade": i % 2 === 1,
+                  })}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>

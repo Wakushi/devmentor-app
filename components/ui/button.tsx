@@ -22,7 +22,7 @@ const buttonVariants = cva(
           "border border-white bg-transparent text-white shadow-sm hover:opacity-80",
         "outline-brand":
           "border border-primary text-primary bg-transparent shadow-sm hover:bg-slate-100 hover:text-accent-foreground",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
+        ghost: "border-transparent hover:border-inherit",
         link: "text-primary underline-offset-4 hover:underline",
         white:
           "bg-white border-white hover:bg-slate-200 hover:text-primary active:bg-slate-50 active:text-primary shadow gap-2",

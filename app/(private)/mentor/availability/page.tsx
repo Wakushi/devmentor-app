@@ -111,7 +111,7 @@ export default function AvailabilityPage() {
   if (!user) return
 
   return (
-    <div className="p-4 pt-[8rem] pb-8 min-h-screen m-auto w-[90%]">
+    <div className="p-4 pt-[8rem] pb-8 min-h-screen m-auto w-[95%]">
       <div className="flex gap-8 w-full">
         <div className="flex flex-col gap-4 w-full">
           <div className="flex flex-col">

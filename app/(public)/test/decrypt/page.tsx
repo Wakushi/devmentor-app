@@ -79,7 +79,7 @@ export default function DecryptPage() {
   }
 
   return (
-    <div className="p-4 pt-[8rem] min-h-screen m-auto w-[90%]">
+    <div className="p-4 pt-[8rem] min-h-screen m-auto w-[95%]">
       <div className="flex flex-col gap-2 max-w-[300px]">
         <Label>Message</Label>
         <Input

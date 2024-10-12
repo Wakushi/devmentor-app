@@ -16,12 +16,18 @@ export async function encryptForAddress(
   return encrypted
 }
 
-export async function decryptWithSignature(
-  encryptedData: string,
-  address: string,
+export async function decryptWithSignature({
+  encryptedData,
+  address,
+  signature,
+  message,
+}: {
+  encryptedData: string
+  address: string
   signature: string
-): Promise<string> {
-  const messageHash = ethers.hashMessage("Authorize decryption")
+  message: string
+}): Promise<string> {
+  const messageHash = ethers.hashMessage(message)
   const recoveredAddress = ethers.recoverAddress(messageHash, signature)
 
   if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {

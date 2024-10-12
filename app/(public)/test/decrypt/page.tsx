@@ -55,17 +55,20 @@ export default function DecryptPage() {
         throw new Error("Please connect your wallet")
       }
 
+      const message = "Authorize decryption"
+
       addLog(`Requesting signature to authorize decryption`)
       const signature = await signMessageAsync({
-        message: "Authorize decryption",
+        message,
       })
 
       addLog(`Signature received, attempting to decrypt`)
-      const decrypted = await decryptWithSignature(
-        encryptedInfo,
+      const decrypted = await decryptWithSignature({
+        encryptedData: encryptedInfo,
         address,
-        signature
-      )
+        signature,
+        message,
+      })
 
       addLog(`Decrypted result: "${decrypted}"`)
 

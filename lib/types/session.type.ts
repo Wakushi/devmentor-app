@@ -2,6 +2,7 @@ import { Address } from "viem"
 import { Mentor, Student } from "./user.type"
 
 export type Session = {
+  id?: number
   startTime: number
   endTime: number
   valueLocked: number

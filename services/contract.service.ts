@@ -26,6 +26,7 @@ export enum ContractEvent {
   MENTOR_REGISTERED = "MentorRegistered",
   SESSION_CREATED = "SessionCreated",
   FUNDS_SENT_TO_MENTOR = "FundsSentToMentor",
+  SESSION_VALIDATED = "SessionValidated",
 }
 
 interface WatchContractEventArgs {
@@ -199,6 +200,22 @@ export async function confirmSession(account: Address, sessionId: bigint) {
   })
 }
 
+export async function acceptSession({
+  account,
+  sessionId,
+  accepted,
+}: {
+  account: Address
+  sessionId: number
+  accepted: boolean
+}) {
+  return executeContractWrite({
+    account,
+    functionName: "acceptSession",
+    args: [sessionId, accepted],
+  })
+}
+
 export async function deleteAccount(account: Address) {
   return executeContractWrite({
     account,
@@ -308,6 +325,7 @@ export async function getSession(sessionId: number): Promise<Session> {
   } = data
 
   return {
+    id: sessionId,
     mentorAddress: mentor,
     studentAddress: student,
     startTime: Number(startTime),

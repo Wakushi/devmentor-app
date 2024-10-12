@@ -25,13 +25,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { AlertDialog } from "@/components/ui/alert-dialog"
+import { useQueryClient } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 import { Student } from "@/lib/types/user.type"
 import { PiStudent } from "react-icons/pi"
 import { GoGoal } from "react-icons/go"
 import useEthPriceQuery from "@/hooks/queries/eth-price-query"
-import { weiToUsd } from "@/services/contract.service"
+import {
+  acceptSession,
+  ContractEvent,
+  watchForEvent,
+  weiToUsd,
+} from "@/services/contract.service"
 import { CiDollar } from "react-icons/ci"
 import {
   FaDiscord,
@@ -40,17 +45,21 @@ import {
   FaLinkedin,
   FaTelegram,
   FaTwitter,
+  FaLongArrowAltRight,
 } from "react-icons/fa"
 import { RiContactsBook3Fill } from "react-icons/ri"
 import { useSignMessage } from "wagmi"
 import { decryptWithSignature } from "@/lib/crypto/crypto"
-import { Address } from "viem"
 import { useUser } from "@/stores/user.store"
 import Copy from "@/components/ui/copy"
 import { ContactType } from "@/lib/types/profile-form.type"
 import { MdAlternateEmail } from "react-icons/md"
 import CopyWrapper from "@/components/ui/copy-wrapper"
 import { getFileByHash } from "@/services/ipfs.service"
+import { toast } from "@/hooks/use-toast"
+import Loader from "@/components/ui/loader"
+import { QueryKeys } from "@/lib/types/query-keys.type"
+import Link from "next/link"
 
 export const columns: ColumnDef<Session>[] = [
   {
@@ -231,27 +240,75 @@ export const columns: ColumnDef<Session>[] = [
   {
     id: "actions",
     cell: ({ row }) => {
-      const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+      const { user } = useUser()
+      const queryClient = useQueryClient()
 
-      async function updateStatus() {}
+      async function handleAcceptSession(): Promise<void> {
+        const sessionId = row.original.id
+
+        if (!user || sessionId === undefined) return
+
+        try {
+          toast({
+            title: "Pending confirmation...",
+            action: <Loader fill="white" color="primary" size="4" />,
+          })
+
+          await acceptSession({
+            account: user.account,
+            accepted: true,
+            sessionId,
+          })
+
+          toast({
+            title: "Accepting session...",
+            action: <Loader fill="white" color="primary" size="4" />,
+          })
+
+          watchForEvent({
+            event: ContractEvent.SESSION_VALIDATED,
+            args: { mentorAccount: user.account },
+            handler: () => {
+              queryClient.invalidateQueries({
+                queryKey: [QueryKeys.SESSIONS, user?.account],
+              })
+
+              toast({
+                title: "Success",
+                description: "Session accepted !",
+                action: (
+                  <Link
+                    href="/mentor/dashboard"
+                    className="bg-transparent flex items-center gap-1 border border-white text-white rounded text-xs w-fit font-semibold px-2 py-1"
+                  >
+                    See on dashboard <FaLongArrowAltRight />
+                  </Link>
+                ),
+              })
+            },
+          })
+        } catch (error: any) {
+          console.log("error: ", error)
+          toast({
+            title: "Error",
+            variant: "destructive",
+            description: "Something wrong happened !",
+          })
+        }
+      }
 
       return (
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
+          <DropdownMenuTrigger>
+            <MoreHorizontal />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DropdownMenuItem
-                className="cursor-pointer p-2"
-                onClick={() => updateStatus()}
-              >
-                Action
-              </DropdownMenuItem>
-            </AlertDialog>
+          <DropdownMenuContent className="glass border-dim text-white">
+            <DropdownMenuItem
+              className="flex drop-shadow-lg justify-center cursor-pointer"
+              onClick={handleAcceptSession}
+            >
+              Accept session
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )

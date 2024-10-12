@@ -58,10 +58,7 @@ export default function DashboardPage() {
               <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit">
                 <h2 className="text-xl font-semibold">Upcoming Sessions</h2>
                 {filteredSessions.length ? (
-                  <SessionCardList
-                    sessions={filteredSessions}
-                    viewerRole={user.role}
-                  />
+                  <SessionCardList sessions={filteredSessions} user={user} />
                 ) : (
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-col">

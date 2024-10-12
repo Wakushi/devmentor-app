@@ -1,8 +1,9 @@
 "use client"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Session } from "@/lib/types/session.type"
 import { formatDate, formatTime, getInitials } from "@/lib/utils"
-import { CalendarDays, Clock } from "lucide-react"
+import { CalendarDays, Clock, MoreHorizontal } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,23 +11,33 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { BsThreeDots } from "react-icons/bs"
 import HourlyRate from "@/components/hourly-rate"
 import useEthPriceQuery from "@/hooks/queries/eth-price-query"
-import { weiToUsd } from "@/services/contract.service"
+import {
+  acceptSession,
+  ContractEvent,
+  watchForEvent,
+  weiToUsd,
+} from "@/services/contract.service"
 import { Role } from "@/lib/types/role.type"
+import { Mentor, Student } from "@/lib/types/user.type"
+import { toast } from "@/hooks/use-toast"
+import Loader from "@/components/ui/loader"
+import { QueryKeys } from "@/lib/types/query-keys.type"
+import { FaCircleCheck } from "react-icons/fa6"
+import { useQueryClient } from "@tanstack/react-query"
 
 export function SessionCard({
+  user,
   session,
-  viewerRole,
 }: {
+  user: Mentor | Student
   session: Session
-  viewerRole: Role
 }) {
   const { startTime, endTime, valueLocked, mentor, student } = session
 
   function isMentorView(): boolean {
-    return viewerRole === Role.MENTOR
+    return user.role === Role.MENTOR
   }
 
   return (
@@ -43,7 +54,7 @@ export function SessionCard({
       </div>
       <div className="flex items-center gap-8">
         {!isMentorView() && <SessionPrice sessionPriceWei={valueLocked} />}
-        <SessionOptions />
+        <SessionOptions session={session} user={user} />
       </div>
     </div>
   )
@@ -98,19 +109,71 @@ function SessionPrice({ sessionPriceWei }: { sessionPriceWei: number }) {
   )
 }
 
-function SessionOptions() {
+function SessionOptions({
+  user,
+  session,
+}: {
+  session: Session
+  user: Mentor | Student
+}) {
+  const queryClient = useQueryClient()
+
+  async function handleRevokeSession(): Promise<void> {
+    if (!user || session.id === undefined) return
+
+    try {
+      toast({
+        title: "Pending confirmation...",
+        action: <Loader fill="white" color="primary" size="4" />,
+      })
+
+      await acceptSession({
+        account: user.account,
+        accepted: false,
+        sessionId: session.id,
+      })
+
+      toast({
+        title: "Revoking session...",
+        action: <Loader fill="white" color="primary" size="4" />,
+      })
+
+      watchForEvent({
+        event: ContractEvent.SESSION_VALIDATED,
+        args: { mentorAccount: user.account },
+        handler: () => {
+          queryClient.invalidateQueries({
+            queryKey: [QueryKeys.SESSIONS, user?.account],
+          })
+
+          toast({
+            title: "Success",
+            description: "Session approval revoked successfully",
+            action: <FaCircleCheck className="text-white" />,
+          })
+        },
+      })
+    } catch (error: any) {
+      console.log("error: ", error)
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: "Something wrong happened !",
+      })
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <BsThreeDots />
+        <MoreHorizontal />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="glass border-dim text-white">
-        <DropdownMenuItem className="flex drop-shadow-lg justify-center cursor-pointer">
-          Report an issue
-        </DropdownMenuItem>
-        <DropdownMenuSeparator className="bg-dim" />
-        <DropdownMenuItem className="flex drop-shadow-lg justify-center cursor-pointer focus:bg-destructive">
-          Cancel
+        <DropdownMenuItem
+          className="flex drop-shadow-lg justify-center cursor-pointer"
+          onClick={handleRevokeSession}
+        >
+          Revoke session
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

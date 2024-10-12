@@ -159,7 +159,6 @@ export default function AvailabilityPicker({
       .forEach(({ slots, index }) => {
         slots.forEach(({ timeStart, timeEnd }) => {
           availabilities.push({
-            mentorAddress,
             day: index,
             timeStart,
             timeEnd,

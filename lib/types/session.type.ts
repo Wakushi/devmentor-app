@@ -6,12 +6,12 @@ export type Session = {
   endTime: number
   valueLocked: number
   studentAddress: Address
-  objectives: string
   accepted: boolean
   cancelled?: boolean
   mentor?: Mentor
   student?: Student
   studentContactHash: string
+  sessionGoalHash: string
   mentorAddress: Address
   mentorConfirmed: boolean
   studentConfirmed: boolean

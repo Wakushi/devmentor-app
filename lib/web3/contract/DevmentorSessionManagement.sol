@@ -52,7 +52,8 @@ contract DevmentorSessionManagement is
         address _mentorAddress,
         uint256 _startTime,
         uint256 _endTime,
-        string memory studentContactHash
+        string memory _studentContactHash,
+        string memory _sessionGoalHash
     ) external payable onlyRegisteredStudent returns (uint256) {
         return
             _createSession(
@@ -60,7 +61,8 @@ contract DevmentorSessionManagement is
                 _mentorAddress,
                 _startTime,
                 _endTime,
-                studentContactHash
+                _studentContactHash,
+                _sessionGoalHash
             );
     }
 
@@ -69,7 +71,8 @@ contract DevmentorSessionManagement is
         address _mentorAddress,
         uint256 _startTime,
         uint256 _endTime,
-        string memory studentContactHash
+        string memory _studentContactHash,
+        string memory _sessionGoalHash
     ) external onlyOwner returns (uint256) {
         return
             _createSession(
@@ -77,7 +80,8 @@ contract DevmentorSessionManagement is
                 _mentorAddress,
                 _startTime,
                 _endTime,
-                studentContactHash
+                _studentContactHash,
+                _sessionGoalHash
             );
     }
 
@@ -153,7 +157,8 @@ contract DevmentorSessionManagement is
         address _mentorAddress,
         uint256 _startTime,
         uint256 _endTime,
-        string memory studentContactHash
+        string memory _studentContactHash,
+        string memory _sessionGoalHash
     ) internal returns (uint256) {
         if (s_mentorByAccount[_mentorAddress].user.account == address(0)) {
             revert Devmentor__MentorNotFound(_mentorAddress);
@@ -177,7 +182,8 @@ contract DevmentorSessionManagement is
         uint256 sessionId = s_sessionCounter++;
 
         s_sessions[sessionId] = DevmentorLib.Session({
-            studentContactHash: studentContactHash,
+            studentContactHash: _studentContactHash,
+            sessionGoalHash: _sessionGoalHash,
             mentor: _mentorAddress,
             student: _studentAddress,
             startTime: _startTime,

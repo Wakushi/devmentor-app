@@ -30,6 +30,7 @@ library DevmentorLib {
 
     struct Session {
         string studentContactHash;
+        string sessionGoalHash;
         address mentor;
         address student;
         uint256 startTime;

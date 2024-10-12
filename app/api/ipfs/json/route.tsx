@@ -3,20 +3,14 @@ import { pinJSONToIPFS, unpinFile } from "../../(services)/ipfs.service"
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const body = await req.json()
-    const { json, filename } = body
+    const { json } = await req.json()
+    const timestamp = Date.now().toString()
 
-    const ipfsHash = await pinJSONToIPFS(json, filename)
+    const ipfsHash = await pinJSONToIPFS(json, timestamp)
 
-    return new NextResponse(JSON.stringify({ ipfsHash }))
+    return NextResponse.json({ success: true, data: ipfsHash }, { status: 200 })
   } catch (error: any) {
-    return new NextResponse(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-    })
+    return NextResponse.json({ error: JSON.stringify(error) }, { status: 500 })
   }
 }
 
@@ -26,14 +20,8 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
     const { hash } = body
     await unpinFile(hash)
 
-    return new NextResponse(JSON.stringify({ message: "Ok" }))
+    return NextResponse.json({ success: true }, { status: 200 })
   } catch (error: any) {
-    return new NextResponse(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-      },
-    })
+    return NextResponse.json({ error: JSON.stringify(error) }, { status: 500 })
   }
 }

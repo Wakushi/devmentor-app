@@ -38,6 +38,7 @@ import { computeTimeAndDateTimestamps } from "@/lib/utils"
 import SessionEventSelector from "@/components/pages/book-session/session-event-selector"
 import { decryptWithSignature, encryptForAddress } from "@/lib/crypto/crypto"
 import { useSignMessage } from "wagmi"
+import { pinJSON } from "@/services/ipfs.service"
 
 export default function BookSessionPage({
   searchParams,
@@ -258,6 +259,7 @@ export default function BookSessionPage({
       })
 
       const encryptedContact = await encryptForAddress(contact, mentor.account)
+      const sessionGoalHash = await pinJSON({ sessionGoals })
 
       await createSession({
         account: user.account,
@@ -265,6 +267,7 @@ export default function BookSessionPage({
         startTime: confirmedSessionSlot.timeStart,
         endTime: confirmedSessionSlot.timeEnd,
         studentContactHash: encryptedContact,
+        sessionGoalHash,
         value: ethAmount,
       })
 

@@ -29,6 +29,7 @@
     "@react-spring/three": "^9.7.3",
     "@react-three/drei": "^9.93.0",
     "@react-three/fiber": "^8.15.13",
+    "@tanstack/react-table": "^8.20.5",
     "@web3auth/base": "^8.12.4",
     "@web3auth/ethereum-provider": "^8.12.4",
     "@web3auth/modal": "^8.12.4",

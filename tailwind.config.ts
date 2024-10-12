@@ -32,6 +32,7 @@ const config = {
         l1: "var(--dm-l1)",
         d1: "var(--dm-d1)",
         "primary-faded": "var(--primary-faded)",
+        border: "var(--border)",
         foreground: "hsl(var(--foreground))",
         card: {
           DEFAULT: "hsl(var(--card))",
@@ -49,7 +50,6 @@ const config = {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
-        border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         chart: {

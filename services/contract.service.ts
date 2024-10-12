@@ -295,6 +295,7 @@ export async function getSession(sessionId: number): Promise<Session> {
     valueLocked,
     mentorConfirmed,
     studentConfirmed,
+    accepted,
   } = data
 
   return {
@@ -303,6 +304,7 @@ export async function getSession(sessionId: number): Promise<Session> {
     startTime: Number(startTime),
     endTime: Number(endTime),
     valueLocked: Number(valueLocked),
+    accepted,
     objectives: "",
     studentContactHash,
     mentorConfirmed,

@@ -17,7 +17,7 @@ export default function DashboardPage() {
     loadingUser: boolean
   }
 
-  const sessionsQuery = useSessionsQuery(user)
+  const sessionsQuery = useSessionsQuery(user, "students")
 
   if (loadingUser) {
     return <LoadingScreen />
@@ -26,7 +26,7 @@ export default function DashboardPage() {
   if (!user) return
 
   return (
-    <div className="flex flex-col gap-4 p-4 pt-[8rem] min-h-screen m-auto w-[90%]">
+    <div className="flex flex-col gap-4 p-4 pt-[8rem] min-h-screen m-auto w-[95%]">
       <h1 className="text-2xl font-bold">
         Welcome back, {user.baseUser.userName} !
       </h1>
@@ -49,12 +49,40 @@ export default function DashboardPage() {
               <p>No sessions planned yet.</p>
             </div>
           ),
-          Success: ({ data: sessions }) => (
-            <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit">
-              <h2 className="text-xl font-semibold mb-4">Upcoming Sessions</h2>
-              <SessionCardList sessions={sessions} viewerRole={user.role} />
-            </section>
-          ),
+          Success: ({ data: sessions }) => {
+            const filteredSessions = sessions.filter(
+              (session) => session.accepted
+            )
+
+            return (
+              <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit">
+                <h2 className="text-xl font-semibold">Upcoming Sessions</h2>
+                {filteredSessions.length ? (
+                  <SessionCardList
+                    sessions={filteredSessions}
+                    viewerRole={user.role}
+                  />
+                ) : (
+                  <div className="flex flex-col gap-4">
+                    <div className="flex flex-col">
+                      <p className="text-small text-dim">
+                        No upcoming sessions.
+                      </p>
+                      <p className="text-small text-dim">
+                        You have some pending session requests
+                      </p>
+                    </div>
+                    <NavLinkButton
+                      variant="outline"
+                      href="/mentor/session-requests"
+                    >
+                      Check pending requests {"->"}
+                    </NavLinkButton>
+                  </div>
+                )}
+              </section>
+            )
+          },
         })}
       </div>
       <AnimatedBackground shader={false} />

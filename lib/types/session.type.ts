@@ -4,8 +4,8 @@ import { Mentor, Student } from "./user.type"
 export type Session = {
   startTime: number
   endTime: number
-  studentAddress: Address
   valueLocked: number
+  studentAddress: Address
   objectives: string
   accepted: boolean
   cancelled?: boolean

@@ -10,15 +10,19 @@ import { matchQueryStatus } from "@/lib/matchQueryStatus"
 import Loader from "@/components/ui/loader"
 import Image from "next/image"
 import { Student } from "@/lib/types/user.type"
+import useMentorsQuery from "@/hooks/queries/mentors-query"
 
 export default function DashboardPage() {
   const { user, loadingUser } = useUser() as {
     user: Student | null
     loadingUser: boolean
   }
-  const sessionsQuery = useSessionsQuery(user)
 
-  if (loadingUser) {
+  const mentorsQuery = useMentorsQuery()
+  const { data: mentors, isLoading: loadingMentors } = mentorsQuery
+  const sessionsQuery = useSessionsQuery(user, "mentors", mentors)
+
+  if (loadingUser || loadingMentors) {
     return <LoadingScreen />
   }
 

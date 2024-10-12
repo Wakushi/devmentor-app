@@ -1,6 +1,6 @@
 "use client"
 
-import { Column, ColumnDef } from "@tanstack/react-table"
+import { Column, ColumnDef, Row } from "@tanstack/react-table"
 import { Session } from "@/lib/types/session.type"
 import { formatDate, formatTime } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -26,7 +26,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { AlertDialog } from "@/components/ui/alert-dialog"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Student } from "@/lib/types/user.type"
 import { PiStudent } from "react-icons/pi"
 import { GoGoal } from "react-icons/go"
@@ -50,6 +50,7 @@ import Copy from "@/components/ui/copy"
 import { ContactType } from "@/lib/types/profile-form.type"
 import { MdAlternateEmail } from "react-icons/md"
 import CopyWrapper from "@/components/ui/copy-wrapper"
+import { getFileByHash } from "@/services/ipfs.service"
 
 export const columns: ColumnDef<Session>[] = [
   {
@@ -88,7 +89,6 @@ export const columns: ColumnDef<Session>[] = [
       const topic = "Blockchain 101"
       return (
         <div className="flex items-center gap-2 text-small text-dim">
-          <GoGoal className="w-5 h-5" />
           <span>{topic}</span>
         </div>
       )
@@ -161,7 +161,7 @@ export const columns: ColumnDef<Session>[] = [
       return (
         <Dialog>
           <DialogTrigger>
-            <RiContactsBook3Fill className="w-6 h-6 text-dim hover:-translate-y-1 transition-all duration-200 opacity-70 hover:opacity-100" />
+            <RiContactsBook3Fill className="w-6 h-6 text-primary hover:-translate-y-1 transition-all duration-200 opacity-70 hover:opacity-100" />
           </DialogTrigger>
           <DialogContent>
             {!!contact ? (
@@ -201,6 +201,11 @@ export const columns: ColumnDef<Session>[] = [
         </Dialog>
       )
     },
+  },
+  {
+    accessorKey: "sessionGoalHash",
+    header: "Objectives",
+    cell: ({ row }) => <ObjectivesCell row={row} />,
   },
   {
     accessorKey: "valueLocked",
@@ -269,5 +274,49 @@ function SortableColumnHead({
       {title}
       <ArrowUpDown className="ml-2 h-4 w-4" />
     </Button>
+  )
+}
+
+const ObjectivesCell = ({ row }: { row: Row<Session> }) => {
+  const [objectives, setObjectives] = useState<string>("")
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
+
+  const sessionGoalHash: string = row.getValue("sessionGoalHash")
+
+  useEffect(() => {
+    if (dialogOpen && !objectives && !isLoading) {
+      setIsLoading(true)
+      getFileByHash(sessionGoalHash)
+        .then(({ sessionGoals }) => {
+          setObjectives(sessionGoals)
+        })
+        .catch((error) => {
+          console.error("Failed to fetch objectives:", error)
+          setObjectives("Failed to load objectives.")
+        })
+        .finally(() => {
+          setIsLoading(false)
+        })
+    }
+  }, [dialogOpen, objectives, sessionGoalHash])
+
+  return (
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DialogTrigger>
+        <GoGoal
+          onClick={() => setDialogOpen(true)}
+          className="w-6 h-6 text-dm-accent hover:-translate-y-1 transition-all duration-200 opacity-70 hover:opacity-100 cursor-pointer"
+        />
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Student objectives</DialogTitle>
+          <DialogDescription>
+            {isLoading ? "Loading..." : objectives}
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
   )
 }

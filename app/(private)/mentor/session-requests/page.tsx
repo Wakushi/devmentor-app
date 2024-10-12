@@ -25,6 +25,13 @@ export default function SessionRequestsPage() {
 
   return (
     <div className="flex flex-col gap-4 pt-[8rem] min-h-screen m-auto w-[95%]">
+      <div className="flex flex-col">
+        <h2 className="text-2xl">Session requests</h2>
+        <p className="text-small font-normal font-sans text-dim">
+          List of students waiting for your approval to schedule a mentoring
+          session
+        </p>
+      </div>
       {matchQueryStatus(sessionsQuery, {
         Loading: (
           <div>

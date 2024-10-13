@@ -6,7 +6,7 @@ import LoadingScreen from "@/components/ui/loading-screen"
 import AvailabilityPicker from "@/components/timeslot-selection/availability-picker"
 import { Mentor } from "@/lib/types/user.type"
 import { MeetingEvent, Timeslot } from "@/lib/types/timeslot.type"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Select,
   SelectContent,
@@ -38,6 +38,12 @@ export default function AvailabilityPage() {
   const { data: meetingEvents } = meetingEventsQuery
 
   const [selectedEvent, setSelectedEvent] = useState<MeetingEvent | null>(null)
+
+  useEffect(() => {
+    if (selectedEvent || !meetingEvents || !meetingEvents.length) return
+
+    setSelectedEvent(meetingEvents[0])
+  }, [meetingEvents])
 
   function handleSelectEvent(meetingEvent: MeetingEvent | null): void {
     setSelectedEvent(meetingEvent)

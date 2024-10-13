@@ -50,10 +50,16 @@ export default function Header() {
       }
 
       if (user.role === Role.MENTOR) {
-        navLinks.push({
-          href: "/mentor/availability",
-          label: "Availability",
-        })
+        navLinks.push(
+          {
+            href: "/mentor/session-requests",
+            label: "Session requests",
+          },
+          {
+            href: "/mentor/availability",
+            label: "Availability",
+          }
+        )
       }
 
       return (

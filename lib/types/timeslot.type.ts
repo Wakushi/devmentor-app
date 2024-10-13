@@ -24,7 +24,6 @@ export type MeetingEvent = {
 
 export type Timeslot = {
   id?: string
-  mentorAddress: Address
   day: number
   timeStart: number
   timeEnd: number

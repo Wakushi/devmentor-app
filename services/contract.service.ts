@@ -26,6 +26,7 @@ export enum ContractEvent {
   MENTOR_REGISTERED = "MentorRegistered",
   SESSION_CREATED = "SessionCreated",
   FUNDS_SENT_TO_MENTOR = "FundsSentToMentor",
+  SESSION_VALIDATED = "SessionValidated",
 }
 
 interface WatchContractEventArgs {
@@ -157,6 +158,7 @@ export async function createSession({
   startTime,
   endTime,
   studentContactHash,
+  sessionGoalHash,
   value,
 }: {
   account: Address
@@ -164,9 +166,16 @@ export async function createSession({
   startTime: number
   endTime: number
   studentContactHash: string
+  sessionGoalHash: string
   value: bigint
 }) {
-  const args = [mentorAddress, startTime, endTime, studentContactHash]
+  const args = [
+    mentorAddress,
+    startTime,
+    endTime,
+    studentContactHash,
+    sessionGoalHash,
+  ]
 
   const freeSession = Number(value) === 0
 
@@ -188,6 +197,22 @@ export async function confirmSession(account: Address, sessionId: bigint) {
     account,
     functionName: "confirmSession",
     args: [sessionId],
+  })
+}
+
+export async function acceptSession({
+  account,
+  sessionId,
+  accepted,
+}: {
+  account: Address
+  sessionId: number
+  accepted: boolean
+}) {
+  return executeContractWrite({
+    account,
+    functionName: "acceptSession",
+    args: [sessionId, accepted],
   })
 }
 
@@ -292,18 +317,22 @@ export async function getSession(sessionId: number): Promise<Session> {
     startTime,
     endTime,
     studentContactHash,
+    sessionGoalHash,
     valueLocked,
     mentorConfirmed,
     studentConfirmed,
+    accepted,
   } = data
 
   return {
+    id: sessionId,
     mentorAddress: mentor,
     studentAddress: student,
     startTime: Number(startTime),
     endTime: Number(endTime),
     valueLocked: Number(valueLocked),
-    objectives: "",
+    accepted,
+    sessionGoalHash,
     studentContactHash,
     mentorConfirmed,
     studentConfirmed,

@@ -30,11 +30,13 @@ library DevmentorLib {
 
     struct Session {
         string studentContactHash;
+        string sessionGoalHash;
         address mentor;
         address student;
         uint256 startTime;
         uint256 endTime;
         uint256 valueLocked;
+        bool accepted;
         bool mentorConfirmed;
         bool studentConfirmed;
     }

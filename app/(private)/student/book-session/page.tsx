@@ -22,7 +22,7 @@ import SessionBookedScreen from "@/components/pages/book-session/session-booked-
 import MentorNotFound from "@/components/pages/book-session/mentor-not-found"
 import BookSessionNavigation from "@/components/pages/book-session/book-session-navigation"
 import { BookStep } from "@/lib/types/book-session-form.type"
-import { Mentor } from "@/lib/types/user.type"
+import { Mentor, Student } from "@/lib/types/user.type"
 import useMentorsQuery from "@/hooks/queries/mentors-query"
 import useEthPriceQuery from "@/hooks/queries/eth-price-query"
 import {
@@ -36,13 +36,19 @@ import useMeetingEventsQuery from "@/hooks/queries/meeting-event-query"
 import { Address } from "viem"
 import { computeTimeAndDateTimestamps } from "@/lib/utils"
 import SessionEventSelector from "@/components/pages/book-session/session-event-selector"
+import { decryptWithSignature, encryptForAddress } from "@/lib/crypto/crypto"
+import { useSignMessage } from "wagmi"
+import { pinJSON } from "@/services/ipfs.service"
 
 export default function BookSessionPage({
   searchParams,
 }: {
   searchParams?: { [key: string]: string | string[] | undefined }
 }) {
-  const { user } = useUser()
+  const { user } = useUser() as {
+    user: Student
+  }
+  const { signMessageAsync } = useSignMessage()
 
   const mentorsQuery = useMentorsQuery()
   const ethPriceQuery = useEthPriceQuery()
@@ -226,21 +232,42 @@ export default function BookSessionPage({
       ethAmount = usdToWei(usdAmountDue, ethPriceUsd)
     }
 
+    setLoadingMessage("We're preparing your session")
+    setLoading(true)
+
     toast({
-      title: "Awaiting session validation...",
+      title: "Pending signature to confirm session creation...",
       action: <Loader fill="white" color="primary" size="4" />,
     })
 
-    setLoadingMessage("Creating session")
-    setLoading(true)
-
     try {
+      const message = `Please sign to share your contact information with your mentor (${mentor.baseUser.userName}).`
+      const signature = await signMessageAsync({
+        message,
+      })
+
+      const contact = await decryptWithSignature({
+        encryptedData: user.contactHash,
+        address: user.account,
+        signature,
+        message,
+      })
+
+      toast({
+        title: "Verifying signature...",
+        action: <Loader fill="white" color="primary" size="4" />,
+      })
+
+      const encryptedContact = await encryptForAddress(contact, mentor.account)
+      const sessionGoalHash = await pinJSON({ sessionGoals })
+
       await createSession({
         account: user.account,
         mentorAddress: mentor.account,
         startTime: confirmedSessionSlot.timeStart,
         endTime: confirmedSessionSlot.timeEnd,
-        studentContactHash: "",
+        studentContactHash: encryptedContact,
+        sessionGoalHash,
         value: ethAmount,
       })
 

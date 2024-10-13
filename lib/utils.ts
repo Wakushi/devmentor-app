@@ -137,12 +137,6 @@ export function hashCode(str: string): number {
   return hash
 }
 
-export function getTimeslotId(slot: Timeslot): number {
-  const { mentorAddress, day, timeStart, timeEnd } = slot
-  const concatenatedString = `${mentorAddress}${day}${timeStart}${timeEnd}`
-  return hashCode(concatenatedString)
-}
-
 export function getSubjectsFromIds(subjectsIds: number[]): LearningField[] {
   return subjectsIds.map((subjectId) => allSubjects[subjectId])
 }

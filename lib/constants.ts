@@ -1,7 +1,48 @@
 const PINATA_GATEWAY_BASE_URL = "https://tan-key-moth-8.mypinata.cloud/ipfs"
 
-const DEVMENTOR_CONTRACT_ADDRESS = "0xa29dc4b51D9b74A009f9D47115499Ce9b2103125"
+const DEVMENTOR_CONTRACT_ADDRESS = "0x67225FBe246DfBED468AB785e09A478665C46356"
 const DEVMENTOR_CONTRACT_ABI = [
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_sessionId",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "_accepted",
+        type: "bool",
+      },
+    ],
+    name: "acceptSession",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_mentorAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_sessionId",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "_accepted",
+        type: "bool",
+      },
+    ],
+    name: "acceptSessionAdmin",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
   {
     inputs: [
       {
@@ -106,7 +147,12 @@ const DEVMENTOR_CONTRACT_ABI = [
       },
       {
         internalType: "string",
-        name: "studentContactHash",
+        name: "_studentContactHash",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_sessionGoalHash",
         type: "string",
       },
     ],
@@ -145,7 +191,12 @@ const DEVMENTOR_CONTRACT_ABI = [
       },
       {
         internalType: "string",
-        name: "studentContactHash",
+        name: "_studentContactHash",
+        type: "string",
+      },
+      {
+        internalType: "string",
+        name: "_sessionGoalHash",
         type: "string",
       },
     ],
@@ -183,11 +234,6 @@ const DEVMENTOR_CONTRACT_ABI = [
     ],
     stateMutability: "nonpayable",
     type: "constructor",
-  },
-  {
-    inputs: [],
-    name: "DEVMentor__WrongRating",
-    type: "error",
   },
   {
     inputs: [],
@@ -235,6 +281,11 @@ const DEVMENTOR_CONTRACT_ABI = [
       },
     ],
     name: "Devmentor__MentorNotFound",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "Devmentor__NotAuthorizedForValidation",
     type: "error",
   },
   {
@@ -288,6 +339,11 @@ const DEVMENTOR_CONTRACT_ABI = [
       },
     ],
     name: "Devmentor__SessionNotFound",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "Devmentor__WrongRating",
     type: "error",
   },
   {
@@ -886,6 +942,31 @@ const DEVMENTOR_CONTRACT_ABI = [
     inputs: [
       {
         indexed: true,
+        internalType: "uint256",
+        name: "sessionId",
+        type: "uint256",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "mentorAccount",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "bool",
+        name: "accepted",
+        type: "bool",
+      },
+    ],
+    name: "SessionValidated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
         internalType: "address",
         name: "account",
         type: "address",
@@ -1112,6 +1193,11 @@ const DEVMENTOR_CONTRACT_ABI = [
             type: "string",
           },
           {
+            internalType: "string",
+            name: "sessionGoalHash",
+            type: "string",
+          },
+          {
             internalType: "address",
             name: "mentor",
             type: "address",
@@ -1135,6 +1221,11 @@ const DEVMENTOR_CONTRACT_ABI = [
             internalType: "uint256",
             name: "valueLocked",
             type: "uint256",
+          },
+          {
+            internalType: "bool",
+            name: "accepted",
+            type: "bool",
           },
           {
             internalType: "bool",
@@ -1287,6 +1378,11 @@ const DEVMENTOR_CONTRACT_ABI = [
         type: "string",
       },
       {
+        internalType: "string",
+        name: "sessionGoalHash",
+        type: "string",
+      },
+      {
         internalType: "address",
         name: "mentor",
         type: "address",
@@ -1310,6 +1406,11 @@ const DEVMENTOR_CONTRACT_ABI = [
         internalType: "uint256",
         name: "valueLocked",
         type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "accepted",
+        type: "bool",
       },
       {
         internalType: "bool",

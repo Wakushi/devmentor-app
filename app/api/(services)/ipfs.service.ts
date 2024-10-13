@@ -15,7 +15,7 @@ export const pinJSONToIPFS = async (json: any, filename: string) => {
       body: formData,
     }
   )
-  const { ipfsHash } = await response.json()
+  const { IpfsHash: ipfsHash } = await response.json()
   return ipfsHash
 }
 

@@ -2,16 +2,18 @@ import { Address } from "viem"
 import { Mentor, Student } from "./user.type"
 
 export type Session = {
-  mentorAddress: Address
-  studentAddress: Address
+  id?: number
   startTime: number
   endTime: number
   valueLocked: number
-  objectives: string
+  studentAddress: Address
+  accepted: boolean
   cancelled?: boolean
   mentor?: Mentor
   student?: Student
   studentContactHash: string
+  sessionGoalHash: string
+  mentorAddress: Address
   mentorConfirmed: boolean
   studentConfirmed: boolean
 }

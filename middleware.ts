@@ -9,20 +9,19 @@ export async function middleware(request: NextRequest) {
   const user = await getRequestUser(request)
 
   const protectedRoutes = {
-    "/student/dashboard": [Role.STUDENT],
-    "/student/mentor-search": [Role.STUDENT],
-    "/mentor/dashboard": [Role.MENTOR],
+    student: Role.STUDENT,
+    mentor: Role.MENTOR,
   }
 
-  const requiredRoles =
-    protectedRoutes[pathname as keyof typeof protectedRoutes]
+  const mainPath = pathname.split("/")[1]
+  const requiredRole = protectedRoutes[mainPath as keyof typeof protectedRoutes]
 
-  if (requiredRoles) {
+  if (requiredRole) {
     if (!user) {
       return NextResponse.redirect(new URL("/auth/login", request.url))
     }
 
-    if (!user.role || !requiredRoles.includes(user.role)) {
+    if (!user.role || requiredRole !== user.role) {
       return NextResponse.redirect(new URL("/", request.url))
     }
   }
@@ -31,5 +30,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/student/mentor-search"],
+  matcher: ["/student/:path*", "/mentor/:path*"],
 }

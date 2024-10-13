@@ -10,15 +10,19 @@ import { matchQueryStatus } from "@/lib/matchQueryStatus"
 import Loader from "@/components/ui/loader"
 import Image from "next/image"
 import { Student } from "@/lib/types/user.type"
+import useMentorsQuery from "@/hooks/queries/mentors-query"
 
 export default function DashboardPage() {
   const { user, loadingUser } = useUser() as {
     user: Student | null
     loadingUser: boolean
   }
-  const sessionsQuery = useSessionsQuery(user)
 
-  if (loadingUser) {
+  const mentorsQuery = useMentorsQuery()
+  const { data: mentors, isLoading: loadingMentors } = mentorsQuery
+  const sessionsQuery = useSessionsQuery(user, "mentors", mentors)
+
+  if (loadingUser || loadingMentors) {
     return <LoadingScreen />
   }
 
@@ -51,7 +55,7 @@ export default function DashboardPage() {
             </div>
             <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit">
               <h2 className="text-xl font-semibold mb-4">Upcoming Sessions</h2>
-              <SessionCardList sessions={sessions} viewerRole={user.role} />
+              <SessionCardList sessions={sessions} user={user} />
             </section>
           </div>
         ),

@@ -62,6 +62,8 @@ export default function AvailabilityPicker({
   }, [selectedEvent])
 
   function timeValueToTimestamp(timeValue: TimeValue): number {
+    if (!timeValue) return 0
+
     const { hour, minute } = timeValue
     const date = new Date()
 
@@ -157,7 +159,6 @@ export default function AvailabilityPicker({
       .forEach(({ slots, index }) => {
         slots.forEach(({ timeStart, timeEnd }) => {
           availabilities.push({
-            mentorAddress,
             day: index,
             timeStart,
             timeEnd,

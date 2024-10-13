@@ -169,12 +169,14 @@ function SessionOptions({
         <MoreHorizontal />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="glass border-dim text-white">
-        <DropdownMenuItem
-          className="flex drop-shadow-lg justify-center cursor-pointer"
-          onClick={handleRevokeSession}
-        >
-          Revoke session
-        </DropdownMenuItem>
+        {user.role === Role.MENTOR && (
+          <DropdownMenuItem
+            className="flex drop-shadow-lg justify-center cursor-pointer"
+            onClick={handleRevokeSession}
+          >
+            Revoke session
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

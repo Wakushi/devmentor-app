@@ -13,7 +13,7 @@ export default function MeetingEventList({
   handleSelectEvent: (meetingEvents: MeetingEvent) => void
 }) {
   return (
-    <div className="flex flex-col self-start gap-2">
+    <div className="flex flex-wrap self-start gap-2">
       {!!meetingEvents &&
         meetingEvents.map((meetingEvent) => (
           <div
@@ -28,7 +28,7 @@ export default function MeetingEventList({
               }
             )}
           >
-            <div className="flex justify-between items-center">
+            <div className="flex gap-4 justify-between items-center">
               <h3 className="text-body text-md">{meetingEvent.name}</h3>
               <span className="text-small text-dim flex items-center gap-1">
                 <Clock className="w-5 h-5" />{" "}

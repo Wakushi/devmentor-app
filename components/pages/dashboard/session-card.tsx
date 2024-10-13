@@ -152,6 +152,10 @@ function SessionOptions({
 }) {
   const queryClient = useQueryClient()
 
+  function isPastSession(): boolean {
+    return session.endTime > Date.now()
+  }
+
   async function handleRevokeSession(): Promise<void> {
     if (!user || session.id === undefined) return
 
@@ -197,18 +201,33 @@ function SessionOptions({
     }
   }
 
+  async function handleConfirmSession(): Promise<void> {}
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
         <IoIosMore />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="glass border-dim text-white">
-        <DropdownMenuItem
-          className="flex drop-shadow-lg justify-center cursor-pointer"
-          onClick={handleRevokeSession}
-        >
-          Revoke session
-        </DropdownMenuItem>
+        {isPastSession() ? (
+          <>
+            <DropdownMenuItem
+              className="flex drop-shadow-lg justify-center cursor-pointer"
+              onClick={handleConfirmSession}
+            >
+              Confirm session
+            </DropdownMenuItem>
+          </>
+        ) : (
+          <>
+            <DropdownMenuItem
+              className="flex drop-shadow-lg justify-center cursor-pointer"
+              onClick={handleRevokeSession}
+            >
+              Revoke session
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

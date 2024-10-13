@@ -24,6 +24,7 @@ contract DevmentorSessionManagement is
     error Devmentor__SessionNotCompleted();
     error Devmentor__WrongRating();
     error Devmentor__NotAuthorizedForValidation();
+    error Devmentor__SessionNotPast();
 
     event SessionCreated(
         address indexed studentAccount,
@@ -47,6 +48,11 @@ contract DevmentorSessionManagement is
     constructor(
         address _nativeToUsdpriceFeed
     ) DevmentorPaymentHandling(_nativeToUsdpriceFeed) {}
+
+    modifier ensureSessionTimeDone(uint256 _sessionId){
+        _ensureSessionTimeDone(_sessionId);
+        _;
+    }
 
     function createSession(
         address _mentorAddress,
@@ -92,7 +98,7 @@ contract DevmentorSessionManagement is
     function confirmSessionAsStudent(
         uint256 _sessionId,
         uint256 _rating
-    ) external onlyRegisteredStudent {
+    ) external onlyRegisteredStudent ensureSessionTimeDone(_sessionId) {
         _confirmSessionAsStudent(msg.sender, _sessionId, _rating);
     }
 
@@ -100,20 +106,20 @@ contract DevmentorSessionManagement is
         address _studentAddress,
         uint256 _sessionId,
         uint256 _rating
-    ) external onlyOwner {
+    ) external onlyOwner ensureSessionTimeDone(_sessionId) {
         _confirmSessionAsStudent(_studentAddress, _sessionId, _rating);
     }
 
     function confirmSessionAsMentor(
         uint256 _sessionId
-    ) external onlyRegisteredMentor {
+    ) external onlyRegisteredMentor ensureSessionTimeDone(_sessionId) {
         _confirmSessionAsMentor(msg.sender, _sessionId);
     }
 
     function confirmSessionAsMentorAdmin(
         address _mentorAddress,
         uint256 _sessionId
-    ) external onlyOwner {
+    ) external onlyOwner ensureSessionTimeDone(_sessionId) {
         _confirmSessionAsMentor(_mentorAddress, _sessionId);
     }
 
@@ -125,8 +131,10 @@ contract DevmentorSessionManagement is
         _acceptSession(_mentorAddress, _sessionId, _accepted);
     }
 
-    function cancelSession(uint256 _sessionId) external {
-        // TO SPECIFY AND IMPLEMENT
+    // TEST METHOD
+    function updateSessionEndtime(uint256 _sessionId, uint256 _endTime) external onlyOwner {
+        DevmentorLib.Session storage session = s_sessions[_sessionId];
+        session.endTime = _endTime;
     }
 
     function _confirmSessionAsMentor(
@@ -285,6 +293,14 @@ contract DevmentorSessionManagement is
         session.accepted = _accepted;
 
         emit SessionValidated(_sessionId, _mentorAddress, _accepted);
+    }
+
+    function _ensureSessionTimeDone(uint256 _sessionId) internal view {
+        DevmentorLib.Session memory session = s_sessions[_sessionId];
+
+        if(session.endTime > block.timestamp * 1000){
+            revert Devmentor__SessionNotPast();
+        }
     }
 
     function getSessionIdsByAccount(

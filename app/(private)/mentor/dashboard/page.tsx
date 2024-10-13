@@ -7,7 +7,8 @@ import LoadingScreen from "@/components/ui/loading-screen"
 import NavLinkButton from "@/components/ui/nav-link"
 import useSessionsQuery from "@/hooks/queries/sessions-query"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
-import { Mentor } from "@/lib/types/user.type"
+import { Session } from "@/lib/types/session.type"
+import { Mentor, Student } from "@/lib/types/user.type"
 import { useUser } from "@/stores/user.store"
 import { FaLongArrowAltRight } from "react-icons/fa"
 
@@ -50,39 +51,91 @@ export default function DashboardPage() {
             </div>
           ),
           Success: ({ data: sessions }) => {
-            const filteredSessions = sessions.filter(
+            const acceptedSessions = sessions.filter(
               (session) => session.accepted
             )
 
+            const pendingConfirmationSessions = acceptedSessions.filter(
+              (session) => {
+                return (
+                  session.endTime < Date.now() &&
+                  (!session.mentorConfirmed || !session.studentConfirmed)
+                )
+              }
+            )
+
             return (
-              <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit">
-                <h2 className="text-xl font-semibold">Upcoming Sessions</h2>
-                {filteredSessions.length ? (
-                  <SessionCardList sessions={filteredSessions} user={user} />
-                ) : (
-                  <div className="flex flex-col gap-4">
-                    <div className="flex flex-col">
-                      <p className="text-small text-dim">
-                        No upcoming sessions.
-                      </p>
-                      <p className="text-small text-dim">
-                        You have some pending session requests
-                      </p>
-                    </div>
-                    <NavLinkButton
-                      variant="outline"
-                      href="/mentor/session-requests"
-                    >
-                      Check pending requests {"->"}
-                    </NavLinkButton>
-                  </div>
+              <div className="flex items-center gap-8">
+                <IncomingSessions
+                  acceptedSessions={acceptedSessions}
+                  user={user}
+                />
+                {!!pendingConfirmationSessions.length && (
+                  <SessionsPendingConfirmation
+                    pendingConfirmationSessions={pendingConfirmationSessions}
+                    user={user}
+                  />
                 )}
-              </section>
+              </div>
             )
           },
         })}
       </div>
       <AnimatedBackground shader={false} />
     </div>
+  )
+}
+
+function IncomingSessions({
+  acceptedSessions,
+  user,
+}: {
+  acceptedSessions: Session[]
+  user: Mentor | Student
+}) {
+  return (
+    <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit">
+      <div className="flex flex-col">
+        <h2 className="text-xl font-semibold">Upcoming Sessions</h2>
+        <p className="text-dim text-small">
+          Mentoring sessions on your horizon
+        </p>
+      </div>
+      {acceptedSessions.length ? (
+        <SessionCardList sessions={acceptedSessions} user={user} />
+      ) : (
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
+            <p className="text-small text-dim">No upcoming sessions.</p>
+            <p className="text-small text-dim">
+              You have some pending session requests
+            </p>
+          </div>
+          <NavLinkButton variant="outline" href="/mentor/session-requests">
+            Check pending requests {"->"}
+          </NavLinkButton>
+        </div>
+      )}
+    </section>
+  )
+}
+
+function SessionsPendingConfirmation({
+  pendingConfirmationSessions,
+  user,
+}: {
+  pendingConfirmationSessions: Session[]
+  user: Mentor | Student
+}) {
+  return (
+    <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit">
+      <div className="flex flex-col">
+        <h2 className="text-xl font-semibold">Past sessions</h2>
+        <p className="text-dim text-small">
+          Past sessions to review and confirm
+        </p>
+      </div>
+      <SessionCardList sessions={pendingConfirmationSessions} user={user} />
+    </section>
   )
 }

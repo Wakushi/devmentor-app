@@ -3,12 +3,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Session } from "@/lib/types/session.type"
 import { formatDate, formatTime, getInitials } from "@/lib/utils"
-import { CalendarDays, Clock, MoreHorizontal } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import HourlyRate from "@/components/hourly-rate"
@@ -26,6 +24,13 @@ import Loader from "@/components/ui/loader"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { FaCircleCheck } from "react-icons/fa6"
 import { useQueryClient } from "@tanstack/react-query"
+import { GoGoal } from "react-icons/go"
+import StudentContactDialog from "@/components/student-contact-dialog"
+import { RiContactsBook3Fill } from "react-icons/ri"
+import StudentGoalsDialog from "@/components/student-goals-dialog"
+import { FaBook, FaCalendar } from "react-icons/fa"
+import { FaClock } from "react-icons/fa6"
+import { IoIosMore } from "react-icons/io"
 
 export function SessionCard({
   user,
@@ -34,7 +39,7 @@ export function SessionCard({
   user: Mentor | Student
   session: Session
 }) {
-  const { startTime, endTime, valueLocked, mentor, student } = session
+  const { startTime, endTime, valueLocked, mentor, student, topic } = session
 
   function isMentorView(): boolean {
     return user.role === Role.MENTOR
@@ -51,9 +56,28 @@ export function SessionCard({
           }
         />
         <SessionTime startTime={startTime} endTime={endTime} />
+        <div className="flex flex-col gap-2">
+          <SessionTopic topic={topic} />
+          <SessionPrice sessionPriceWei={valueLocked} />
+        </div>
+        <div className="flex flex-col gap-2">
+          <StudentGoalsDialog sessionGoalHash={session.sessionGoalHash}>
+            <div className="flex items-center gap-2 text-dm-accent">
+              <GoGoal />
+              <span className="text-small hover:underline">Objectives</span>
+            </div>
+          </StudentGoalsDialog>
+          <StudentContactDialog contactHash={session.studentContactHash}>
+            <div className="flex items-center gap-2 text-primary">
+              <RiContactsBook3Fill />
+              <span className="text-small hover:underline">
+                Student contact
+              </span>
+            </div>
+          </StudentContactDialog>
+        </div>
       </div>
       <div className="flex items-center gap-8">
-        {!isMentorView() && <SessionPrice sessionPriceWei={valueLocked} />}
         <SessionOptions session={session} user={user} />
       </div>
     </div>
@@ -75,6 +99,15 @@ function SessionPeer({ name = "Anon" }: { name?: string }) {
   )
 }
 
+function SessionTopic({ topic }: { topic: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <FaBook />
+      <span className="text-small text-dim">{topic}</span>
+    </div>
+  )
+}
+
 function SessionTime({
   startTime,
   endTime,
@@ -85,11 +118,11 @@ function SessionTime({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2 text-small">
-        <CalendarDays className="w-5 h-5" />
+        <FaCalendar />
         <span className="text-dim">{formatDate(startTime)}</span>
       </div>
       <div className="flex items-center gap-2 text-small">
-        <Clock className="w-5 h-5" />
+        <FaClock />
         <span className="text-dim">{formatTime(startTime)}</span>-
         <span className="text-dim">{formatTime(endTime)}</span>
       </div>
@@ -102,11 +135,7 @@ function SessionPrice({ sessionPriceWei }: { sessionPriceWei: number }) {
   const { data: ethPrice } = ethPriceQuery
   const sessionPriceUsd = weiToUsd(sessionPriceWei, ethPrice ?? 0)
 
-  return (
-    <div className="flex items-center text-sm text-gray-300">
-      <HourlyRate hourlyRate={sessionPriceUsd} />
-    </div>
-  )
+  return <HourlyRate hourlyRate={sessionPriceUsd} />
 }
 
 function SessionOptions({
@@ -166,16 +195,18 @@ function SessionOptions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <MoreHorizontal />
+        <IoIosMore />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="glass border-dim text-white">
         {user.role === Role.MENTOR && (
-          <DropdownMenuItem
-            className="flex drop-shadow-lg justify-center cursor-pointer"
-            onClick={handleRevokeSession}
-          >
-            Revoke session
-          </DropdownMenuItem>
+          <>
+            <DropdownMenuItem
+              className="flex drop-shadow-lg justify-center cursor-pointer"
+              onClick={handleRevokeSession}
+            >
+              Revoke session
+            </DropdownMenuItem>
+          </>
         )}
       </DropdownMenuContent>
     </DropdownMenu>

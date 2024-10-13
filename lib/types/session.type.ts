@@ -8,7 +8,6 @@ export type Session = {
   valueLocked: number
   studentAddress: Address
   accepted: boolean
-  cancelled?: boolean
   mentor?: Mentor
   student?: Student
   topic: string

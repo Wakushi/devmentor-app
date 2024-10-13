@@ -4,13 +4,7 @@ import { Column, ColumnDef, Row } from "@tanstack/react-table"
 import { Session } from "@/lib/types/session.type"
 import { formatDate, formatTime } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-  ArrowUpDown,
-  CalendarDays,
-  Clock,
-  MoreHorizontal,
-  User2Icon,
-} from "lucide-react"
+import { ArrowUpDown, CalendarDays, Clock, MoreHorizontal } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,28 +32,22 @@ import {
   weiToUsd,
 } from "@/services/contract.service"
 import { CiDollar } from "react-icons/ci"
-import {
-  FaDiscord,
-  FaEye,
-  FaGithub,
-  FaLinkedin,
-  FaTelegram,
-  FaTwitter,
-  FaLongArrowAltRight,
-} from "react-icons/fa"
+import { FaEye, FaLongArrowAltRight } from "react-icons/fa"
 import { RiContactsBook3Fill } from "react-icons/ri"
 import { useSignMessage } from "wagmi"
 import { decryptWithSignature } from "@/lib/crypto/crypto"
 import { useUser } from "@/stores/user.store"
 import Copy from "@/components/ui/copy"
 import { ContactType } from "@/lib/types/profile-form.type"
-import { MdAlternateEmail } from "react-icons/md"
 import CopyWrapper from "@/components/ui/copy-wrapper"
 import { getFileByHash } from "@/services/ipfs.service"
 import { toast } from "@/hooks/use-toast"
 import Loader from "@/components/ui/loader"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import Link from "next/link"
+import ContactIcon from "@/components/contact-icon"
+import StudentContactDialog from "@/components/student-contact-dialog"
+import StudentGoalsDialog from "@/components/student-goals-dialog"
 
 export const columns: ColumnDef<Session>[] = [
   {
@@ -118,103 +106,30 @@ export const columns: ColumnDef<Session>[] = [
     },
   },
   {
-    id: "contact",
+    accessorKey: "studentContactHash",
     header: "Contact",
     cell: ({ row }) => {
-      const { user } = useUser()
-      const { signMessageAsync } = useSignMessage()
-
-      const [contact, setContact] =
-        useState<{ type: ContactType; value: string }[]>()
-
-      function ContactIcon({ type }: { type: ContactType }) {
-        switch (type) {
-          case ContactType.DISCORD:
-            return <FaDiscord />
-          case ContactType.EMAIL:
-            return <MdAlternateEmail />
-          case ContactType.TWITTER:
-            return <FaTwitter />
-          case ContactType.LINKEDIN:
-            return <FaLinkedin />
-          case ContactType.GITHUB:
-            return <FaGithub />
-          case ContactType.TELEGRAM:
-            return <FaTelegram />
-          default:
-            return <User2Icon />
-        }
-      }
-
-      async function decryptContactInfo(): Promise<void> {
-        if (!user) return
-
-        const contactHash: string = row.original.studentContactHash
-        const message = "Sign to decrypt your student contact information."
-
-        const signature = await signMessageAsync({
-          message,
-        })
-
-        const rawContact = await decryptWithSignature({
-          encryptedData: contactHash,
-          address: user?.account,
-          signature,
-          message,
-        })
-
-        const contact = JSON.parse(rawContact)
-        setContact(contact)
-      }
+      const contactHash: string = row.getValue("studentContactHash")
 
       return (
-        <Dialog>
-          <DialogTrigger>
-            <RiContactsBook3Fill className="w-6 h-6 text-primary hover:-translate-y-1 transition-all duration-200 opacity-70 hover:opacity-100" />
-          </DialogTrigger>
-          <DialogContent>
-            {!!contact ? (
-              <>
-                <DialogHeader>
-                  <DialogTitle>Decrypt student contact</DialogTitle>
-                  <DialogDescription>
-                    Here are your student contact information
-                  </DialogDescription>
-                </DialogHeader>
-                {contact.map(({ value, type }) => (
-                  <CopyWrapper key={value + type} contentToCopy={value}>
-                    <div className="flex text-base items-center max-h-none border-none justify-between w-full h-auto max-w-none p-4 rounded-md shadow-lg hover:shadow-xl hover:bg-white hover:bg-opacity-[0.03] glass hover:opacity-80 cursor-pointer">
-                      <div className="flex gap-1 items-center">
-                        <ContactIcon type={type} />
-                        <span>{value}</span>
-                      </div>
-                      <Copy contentToCopy={value} />
-                    </div>
-                  </CopyWrapper>
-                ))}
-              </>
-            ) : (
-              <>
-                <DialogHeader>
-                  <DialogTitle>Decrypt student contact</DialogTitle>
-                  <DialogDescription>
-                    Please sign to decrypt your student contact informations
-                  </DialogDescription>
-                </DialogHeader>
-                <Button onClick={decryptContactInfo}>
-                  <FaEye /> See contact
-                </Button>
-              </>
-            )}
-          </DialogContent>
-        </Dialog>
+        <StudentContactDialog contactHash={contactHash}>
+          <RiContactsBook3Fill className="w-6 h-6 text-primary hover:-translate-y-1 transition-all duration-200 opacity-70 hover:opacity-100" />
+        </StudentContactDialog>
       )
     },
   },
   {
     accessorKey: "sessionGoalHash",
     header: "Objectives",
-    cell: ({ row }) => <ObjectivesCell row={row} />,
+    cell: ({ row }) => {
+      const sessionGoalHash: string = row.getValue("sessionGoalHash")
+
+      return (
+        <StudentGoalsDialog sessionGoalHash={sessionGoalHash}>
+          <GoGoal className="w-6 h-6 text-dm-accent hover:-translate-y-1 transition-all duration-200 opacity-70 hover:opacity-100 cursor-pointer" />
+        </StudentGoalsDialog>
+      )
+    },
   },
   {
     accessorKey: "valueLocked",
@@ -331,49 +246,5 @@ function SortableColumnHead({
       {title}
       <ArrowUpDown className="ml-2 h-4 w-4" />
     </Button>
-  )
-}
-
-const ObjectivesCell = ({ row }: { row: Row<Session> }) => {
-  const [objectives, setObjectives] = useState<string>("")
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  const sessionGoalHash: string = row.getValue("sessionGoalHash")
-
-  useEffect(() => {
-    if (dialogOpen && !objectives && !isLoading) {
-      setIsLoading(true)
-      getFileByHash(sessionGoalHash)
-        .then(({ sessionGoals }) => {
-          setObjectives(sessionGoals)
-        })
-        .catch((error) => {
-          console.error("Failed to fetch objectives:", error)
-          setObjectives("Failed to load objectives.")
-        })
-        .finally(() => {
-          setIsLoading(false)
-        })
-    }
-  }, [dialogOpen, objectives, sessionGoalHash])
-
-  return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogTrigger>
-        <GoGoal
-          onClick={() => setDialogOpen(true)}
-          className="w-6 h-6 text-dm-accent hover:-translate-y-1 transition-all duration-200 opacity-70 hover:opacity-100 cursor-pointer"
-        />
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Student objectives</DialogTitle>
-          <DialogDescription>
-            {isLoading ? "Loading..." : objectives}
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
-    </Dialog>
   )
 }

@@ -44,7 +44,7 @@ export default function DashboardPage() {
               <h1 className="text-2xl font-bold">
                 Welcome back, {user.baseUser.userName} !
               </h1>
-              <div>
+              <div className="relative z-[2]">
                 <NavLinkButton
                   variant="filled-secondary"
                   href="/student/mentor-search"

@@ -32,8 +32,6 @@ import {
   usdToWei,
   watchForEvent,
 } from "@/services/contract.service"
-import useMeetingEventsQuery from "@/hooks/queries/meeting-event-query"
-import { Address } from "viem"
 import { computeTimeAndDateTimestamps } from "@/lib/utils"
 import SessionEventSelector from "@/components/pages/book-session/session-event-selector"
 import { decryptWithSignature, encryptForAddress } from "@/lib/crypto/crypto"
@@ -52,11 +50,7 @@ export default function BookSessionPage({
 
   const mentorsQuery = useMentorsQuery()
   const ethPriceQuery = useEthPriceQuery()
-  const meetingEventsQuery = useMeetingEventsQuery(
-    searchParams?.mentor as Address
-  )
 
-  const { data: meetingEvents } = meetingEventsQuery
   const { data: ethPriceUsd } = ethPriceQuery
   const { data: mentors } = mentorsQuery
 
@@ -361,7 +355,7 @@ export default function BookSessionPage({
             <CardContent className="flex flex-col items-center justify-center gap-6">
               {bookStep === BookStep.SESSION && (
                 <SessionEventSelector
-                  meetingEvents={meetingEvents ?? []}
+                  mentorAddress={mentor.account}
                   selectedMeetingEvent={selectedMeetingEvent}
                   handleSelectEvent={handleSelectEvent}
                 />

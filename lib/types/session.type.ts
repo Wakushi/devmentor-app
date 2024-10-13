@@ -11,6 +11,7 @@ export type Session = {
   cancelled?: boolean
   mentor?: Mentor
   student?: Student
+  topic: string
   studentContactHash: string
   sessionGoalHash: string
   mentorAddress: Address

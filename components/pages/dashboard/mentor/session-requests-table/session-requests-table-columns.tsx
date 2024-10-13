@@ -92,10 +92,10 @@ export const columns: ColumnDef<Session>[] = [
     },
   },
   {
-    id: "meetingEvent",
+    accessorKey: "topic",
     header: "Topic",
     cell: ({ row }) => {
-      const topic = "Blockchain 101"
+      const topic: string = row.getValue("topic")
       return (
         <div className="flex items-center gap-2 text-small text-dim">
           <span>{topic}</span>

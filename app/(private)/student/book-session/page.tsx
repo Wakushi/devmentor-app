@@ -262,6 +262,7 @@ export default function BookSessionPage({
         endTime: confirmedSessionSlot.timeEnd,
         studentContactHash: encryptedContact,
         sessionGoalHash,
+        topic: selectedMeetingEvent.name,
         value: ethAmount,
       })
 

@@ -53,7 +53,8 @@ contract DevmentorSessionManagement is
         uint256 _startTime,
         uint256 _endTime,
         string memory _studentContactHash,
-        string memory _sessionGoalHash
+        string memory _sessionGoalHash,
+        string memory _topic
     ) external payable onlyRegisteredStudent returns (uint256) {
         return
             _createSession(
@@ -62,7 +63,8 @@ contract DevmentorSessionManagement is
                 _startTime,
                 _endTime,
                 _studentContactHash,
-                _sessionGoalHash
+                _sessionGoalHash,
+                _topic
             );
     }
 
@@ -72,7 +74,8 @@ contract DevmentorSessionManagement is
         uint256 _startTime,
         uint256 _endTime,
         string memory _studentContactHash,
-        string memory _sessionGoalHash
+        string memory _sessionGoalHash,
+        string memory _topic
     ) external onlyOwner returns (uint256) {
         return
             _createSession(
@@ -81,7 +84,8 @@ contract DevmentorSessionManagement is
                 _startTime,
                 _endTime,
                 _studentContactHash,
-                _sessionGoalHash
+                _sessionGoalHash,
+                _topic
             );
     }
 
@@ -158,7 +162,8 @@ contract DevmentorSessionManagement is
         uint256 _startTime,
         uint256 _endTime,
         string memory _studentContactHash,
-        string memory _sessionGoalHash
+        string memory _sessionGoalHash,
+        string memory _topic
     ) internal returns (uint256) {
         if (s_mentorByAccount[_mentorAddress].user.account == address(0)) {
             revert Devmentor__MentorNotFound(_mentorAddress);
@@ -191,7 +196,8 @@ contract DevmentorSessionManagement is
             valueLocked: msg.value,
             mentorConfirmed: false,
             studentConfirmed: false,
-            accepted: false
+            accepted: false,
+            topic: _topic
         });
 
         s_sessionIdsByAccount[_studentAddress].push(sessionId);

@@ -29,6 +29,7 @@ library DevmentorLib {
     }
 
     struct Session {
+        string topic;
         string studentContactHash;
         string sessionGoalHash;
         address mentor;

@@ -159,6 +159,7 @@ export async function createSession({
   endTime,
   studentContactHash,
   sessionGoalHash,
+  topic,
   value,
 }: {
   account: Address
@@ -167,6 +168,7 @@ export async function createSession({
   endTime: number
   studentContactHash: string
   sessionGoalHash: string
+  topic: string
   value: bigint
 }) {
   const args = [
@@ -175,6 +177,7 @@ export async function createSession({
     endTime,
     studentContactHash,
     sessionGoalHash,
+    topic,
   ]
 
   const freeSession = Number(value) === 0
@@ -322,6 +325,7 @@ export async function getSession(sessionId: number): Promise<Session> {
     mentorConfirmed,
     studentConfirmed,
     accepted,
+    topic,
   } = data
 
   return {
@@ -336,6 +340,7 @@ export async function getSession(sessionId: number): Promise<Session> {
     studentContactHash,
     mentorConfirmed,
     studentConfirmed,
+    topic,
   }
 }
 

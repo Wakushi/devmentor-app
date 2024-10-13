@@ -1,4 +1,5 @@
 import clsx from "clsx"
+import AnimatedBackground from "./animated-background"
 
 export default function LoadingScreen({
   message = "",
@@ -20,6 +21,7 @@ export default function LoadingScreen({
         <span className="text-4xl font-heading font-semibold">{message}</span>
       )}
       <div className="loader"></div>
+      <AnimatedBackground shader={false} />
     </div>
   )
 }

@@ -47,7 +47,7 @@ export function SessionCard({
 
   return (
     <div className="flex items-center justify-between gap-8 glass rounded-md px-4 py-2">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6">
         <SessionPeer
           name={
             isMentorView()
@@ -61,25 +61,30 @@ export function SessionCard({
           <SessionPrice sessionPriceWei={valueLocked} />
         </div>
         <div className="flex flex-col gap-2">
-          <StudentGoalsDialog sessionGoalHash={session.sessionGoalHash}>
-            <div className="flex items-center gap-2 text-dm-accent">
-              <GoGoal />
-              <span className="text-small hover:underline">Objectives</span>
-            </div>
-          </StudentGoalsDialog>
-          <StudentContactDialog contactHash={session.studentContactHash}>
-            <div className="flex items-center gap-2 text-primary">
-              <RiContactsBook3Fill />
-              <span className="text-small hover:underline">
-                Student contact
-              </span>
-            </div>
-          </StudentContactDialog>
+          {user.role === Role.MENTOR && (
+            <>
+              <StudentGoalsDialog sessionGoalHash={session.sessionGoalHash}>
+                <div className="flex items-center gap-2 text-dm-accent">
+                  <GoGoal />
+                  <span className="text-small hover:underline">Objectives</span>
+                </div>
+              </StudentGoalsDialog>
+
+              <StudentContactDialog contactHash={session.studentContactHash}>
+                <div className="flex items-center gap-2 text-primary">
+                  <RiContactsBook3Fill />
+                  <span className="text-small hover:underline">
+                    Student contact
+                  </span>
+                </div>
+              </StudentContactDialog>
+            </>
+          )}
         </div>
       </div>
-      <div className="flex items-center gap-8">
+      {user.role === Role.MENTOR && (
         <SessionOptions session={session} user={user} />
-      </div>
+      )}
     </div>
   )
 }
@@ -198,16 +203,12 @@ function SessionOptions({
         <IoIosMore />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="glass border-dim text-white">
-        {user.role === Role.MENTOR && (
-          <>
-            <DropdownMenuItem
-              className="flex drop-shadow-lg justify-center cursor-pointer"
-              onClick={handleRevokeSession}
-            >
-              Revoke session
-            </DropdownMenuItem>
-          </>
-        )}
+        <DropdownMenuItem
+          className="flex drop-shadow-lg justify-center cursor-pointer"
+          onClick={handleRevokeSession}
+        >
+          Revoke session
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

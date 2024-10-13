@@ -31,7 +31,7 @@ export default function DashboardPage() {
         Welcome back, {user.baseUser.userName} !
       </h1>
 
-      <div className="w-[200px] mb-2">
+      <div className="w-[200px] mb-2 relative z-[2]">
         <NavLinkButton variant="filled" href="/mentor/availability">
           My availabilities <FaLongArrowAltRight />
         </NavLinkButton>

@@ -1,13 +1,18 @@
 "use client"
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { MeetingEvent } from "@/lib/types/timeslot.type"
-import { BookOpen } from "lucide-react"
+import { MeetingEvent, Timeslot } from "@/lib/types/timeslot.type"
+import { BookOpen, Clock } from "lucide-react"
 import MeetingEventList from "./meeting-event-list"
 import useMeetingEventsQuery from "@/hooks/queries/meeting-event-query"
 import { Address } from "viem"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from "@/components/ui/button"
+import NavLinkButton from "@/components/ui/nav-link"
+import { FaLongArrowAltLeft } from "react-icons/fa"
+import clsx from "clsx"
+import { Checkbox } from "@/components/ui/checkbox"
 
 export default function SessionEventSelector({
   mentorAddress,
@@ -19,6 +24,34 @@ export default function SessionEventSelector({
   handleSelectEvent: (meetingEvent: MeetingEvent) => void
 }) {
   const meetingEventsQuery = useMeetingEventsQuery(mentorAddress)
+
+  function createCustomMeetingEvent(): MeetingEvent {
+    const createTime = (hours: number, minutes: number): number => {
+      const date = new Date(2024, 0, 1, hours, minutes)
+      return date.getTime()
+    }
+
+    const createAllTimeslots = (): Timeslot[] => {
+      const timeslots: Timeslot[] = []
+      for (let day = 0; day < 7; day++) {
+        timeslots.push({
+          day,
+          timeStart: createTime(0, 0),
+          timeEnd: createTime(23, 59),
+        })
+      }
+      return timeslots
+    }
+
+    const customMeetingEvent: MeetingEvent = {
+      mentorAddress,
+      name: "Custom meeting event",
+      duration: 60 * 60 * 1000,
+      timeslots: createAllTimeslots(),
+    }
+
+    return customMeetingEvent
+  }
 
   return (
     <Card className="glass border-stone-800 text-white w-full fade-in-bottom">
@@ -40,7 +73,39 @@ export default function SessionEventSelector({
             </div>
           ),
           Errored: <p>Something wrong happened</p>,
-          Empty: <p>Something wrong happened</p>,
+          Empty: (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col text-base text-dim">
+                <p>This mentor hasn't set up any specific meeting times.</p>
+                <p>You can still propose a custom time for your session.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="h-[36px] text-small">
+                  <NavLinkButton
+                    variant="filled-secondary"
+                    text="small"
+                    href="/student/mentor-search"
+                  >
+                    <FaLongArrowAltLeft />
+                    Back to list
+                  </NavLinkButton>
+                </div>
+                <Button
+                  className={clsx({
+                    "bg-slate-400 border-slate-500 hover:border-primary":
+                      !!!selectedMeetingEvent,
+                  })}
+                  onClick={() => {
+                    const customMeetingEvent = createCustomMeetingEvent()
+                    handleSelectEvent(customMeetingEvent)
+                  }}
+                >
+                  <Clock className="w-4 h-4" />
+                  Choose Custom Time
+                </Button>
+              </div>
+            </div>
+          ),
           Success: ({ data: meetingEvents }) => (
             <>
               <MeetingEventList

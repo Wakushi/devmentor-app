@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { StarIcon, ClockIcon } from "lucide-react"
+import { StarIcon, Clock } from "lucide-react"
 import { Mentor } from "@/lib/types/user.type"
 import {
   allSubjects,
@@ -69,7 +69,7 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
           </div>
 
           <div className="flex flex-1 items-center text-sm text-gray-300">
-            <ClockIcon className="w-4 h-4 mr-2" />
+            <Clock className="w-4 h-4 mr-2" />
             <span>{yearsOfExperience} years of experience</span>
           </div>
 

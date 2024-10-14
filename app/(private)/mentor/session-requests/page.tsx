@@ -4,10 +4,13 @@ import { columns } from "@/components/pages/dashboard/mentor/session-requests-ta
 import AnimatedBackground from "@/components/ui/animated-background"
 import Loader from "@/components/ui/loader"
 import LoadingScreen from "@/components/ui/loading-screen"
+import NavLinkButton from "@/components/ui/nav-link"
 import useSessionsQuery from "@/hooks/queries/sessions-query"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
 import { Mentor } from "@/lib/types/user.type"
 import { useUser } from "@/stores/user.store"
+import Image from "next/image"
+import { FaLongArrowAltRight } from "react-icons/fa"
 
 export default function SessionRequestsPage() {
   const { user, loadingUser } = useUser() as {
@@ -40,8 +43,25 @@ export default function SessionRequestsPage() {
         ),
         Errored: <p>Something wrong happened</p>,
         Empty: (
-          <div>
-            <p>No sessions planned yet.</p>
+          <div className="flex flex-col justify-center items-center">
+            <Image
+              width={300}
+              height={300}
+              src="/assets/search.gif"
+              alt="Search icon"
+              unoptimized
+            />
+            <div className="flex flex-col text-center mb-8">
+              <h3>No pending approvals</h3>
+              <p className="text-dim">
+                There are currently no sessions waiting for approval.
+              </p>
+            </div>
+            <div>
+              <NavLinkButton variant="filled" href="/mentor/availability">
+                Update my availabilities <FaLongArrowAltRight />
+              </NavLinkButton>
+            </div>
           </div>
         ),
         Success: ({ data: sessions }) => {

@@ -53,7 +53,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
   }, [web3AuthInstance.connected, isConnected])
 
   async function fetchUser(): Promise<Visitor | Student | Mentor | null> {
-    if (!isConnected) return null
+    if (!isConnected && !web3AuthInstance.connected) return null
 
     try {
       let user: Visitor | Student | Mentor | null = null

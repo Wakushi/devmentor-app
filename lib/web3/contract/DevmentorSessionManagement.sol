@@ -255,7 +255,7 @@ contract DevmentorSessionManagement is
     function _completeSession(uint256 _sessionId) internal {
         DevmentorLib.Session storage session = s_sessions[_sessionId];
 
-        if (block.timestamp < session.endTime) {
+        if (block.timestamp * 1000 < session.endTime) {
             revert Devmentor__SessionNotCompleted();
         }
 
@@ -264,7 +264,10 @@ contract DevmentorSessionManagement is
 
         session.valueLocked = 0;
 
-        s_mentorByAccount[session.mentor].sessionCount++;
+        if(amountToSend == 0){
+            emit SessionCompleted(_sessionId, session.mentor, session.student);
+            return;
+        }
 
         (bool success, ) = mentorAddress.call{value: amountToSend}("");
 

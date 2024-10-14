@@ -3,11 +3,15 @@ import { executeContractWriteGasless } from "../(services)/contract.service"
 import { getRequestUser } from "@/lib/crypto/jwt"
 import { Role } from "@/lib/types/role.type"
 
-const authorizedGaslessMethods = [
-  "registerMentorAdmin",
-  "registerStudentAdmin",
-  "createSessionAdmin",
-]
+enum GaslessMethods {
+  REGISTER_MENTOR_ADMIN = "registerMentorAdmin",
+  REGISTER_STUDENT_ADMIN = "registerStudentAdmin",
+  CREATE_SESSION_ADMIN = "createSessionAdmin",
+  CONFIRM_SESSION_AS_STUDENT_ADMIN = "confirmSessionAsStudentAdmin",
+  CONFIRM_SESSION_AS_MENTOR_ADMIN = "confirmSessionAsMentorAdmin",
+}
+
+const authorizedGaslessMethods = Object.values(GaslessMethods)
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
@@ -27,14 +31,20 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     switch (functionName) {
-      case "registerMentorAdmin":
-      case "registerStudentAdmin":
+      case GaslessMethods.REGISTER_MENTOR_ADMIN:
+      case GaslessMethods.REGISTER_STUDENT_ADMIN:
         if (user.role !== Role.VISITOR) {
           return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
         break
-      case "createSessionAdmin":
+      case GaslessMethods.CREATE_SESSION_ADMIN:
+      case GaslessMethods.CONFIRM_SESSION_AS_STUDENT_ADMIN:
         if (user.role !== Role.STUDENT) {
+          return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+        }
+        break
+      case GaslessMethods.CONFIRM_SESSION_AS_MENTOR_ADMIN:
+        if (user.role !== Role.MENTOR) {
           return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         }
         break

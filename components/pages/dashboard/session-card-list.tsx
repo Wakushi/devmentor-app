@@ -1,6 +1,6 @@
 "use client"
 import { Session } from "@/lib/types/session.type"
-import { SessionCard } from "./session-card"
+import { SessionCard } from "./(session-card)/session-card"
 import { Mentor, Student } from "@/lib/types/user.type"
 
 export default function SessionCardList({

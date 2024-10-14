@@ -27,6 +27,7 @@ export enum ContractEvent {
   SESSION_CREATED = "SessionCreated",
   FUNDS_SENT_TO_MENTOR = "FundsSentToMentor",
   SESSION_VALIDATED = "SessionValidated",
+  SESSION_CONFIRMED = "SessionConfirmed",
 }
 
 interface WatchContractEventArgs {
@@ -107,11 +108,17 @@ async function sendGaslessTransaction({
   functionName: string
   args: any[]
 }): Promise<void> {
-  await fetch(BASE_CONTRACT_PATH, {
+  const response = await fetch(BASE_CONTRACT_PATH, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ functionName, args }),
   })
+
+  const { error } = await response.json()
+
+  if (error) {
+    throw new Error(error)
+  }
 }
 
 export async function registerMentor({
@@ -195,11 +202,31 @@ export async function createSession({
   })
 }
 
-export async function confirmSession(account: Address, sessionId: bigint) {
+export async function confirmSession({
+  user,
+  sessionId,
+  rating,
+}: {
+  user: Mentor | Student
+  sessionId: number
+  rating?: number
+}) {
+  const functionName =
+    user.role === Role.STUDENT
+      ? "confirmSessionAsStudentAdmin"
+      : "confirmSessionAsMentorAdmin"
+
+  const args: any[] = [user.account, sessionId]
+
+  if (user.role === Role.STUDENT && rating) {
+    args.push(rating)
+  }
+
   return executeContractWrite({
-    account,
-    functionName: "confirmSession",
-    args: [sessionId],
+    account: user.account,
+    functionName,
+    args,
+    gasless: true,
   })
 }
 

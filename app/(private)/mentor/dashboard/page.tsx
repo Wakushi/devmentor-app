@@ -1,6 +1,7 @@
 "use client"
 
 import SessionCardList from "@/components/pages/dashboard/session-card-list"
+import SessionsPendingConfirmation from "@/components/pages/dashboard/sessions-pending-confirmation"
 import AnimatedBackground from "@/components/ui/animated-background"
 import Loader from "@/components/ui/loader"
 import LoadingScreen from "@/components/ui/loading-screen"
@@ -51,25 +52,30 @@ export default function DashboardPage() {
             </div>
           ),
           Success: ({ data: sessions }) => {
-            const acceptedSessions = sessions.filter(
+            const incomingSessions = sessions.filter(
+              (session) => session.endTime > Date.now()
+            )
+
+            const acceptedSessions = incomingSessions.filter(
               (session) => session.accepted
             )
 
-            const pendingConfirmationSessions = acceptedSessions.filter(
-              (session) => {
-                return (
-                  session.endTime < Date.now() &&
-                  (!session.mentorConfirmed || !session.studentConfirmed)
-                )
-              }
-            )
+            const pendingConfirmationSessions = sessions.filter((session) => {
+              return (
+                session.accepted &&
+                session.endTime < Date.now() &&
+                (!session.mentorConfirmed || !session.studentConfirmed)
+              )
+            })
 
             return (
-              <div className="flex items-center gap-8">
-                <IncomingSessions
-                  acceptedSessions={acceptedSessions}
-                  user={user}
-                />
+              <div className="flex gap-8">
+                {!!incomingSessions.length && (
+                  <IncomingSessions
+                    acceptedSessions={acceptedSessions}
+                    user={user}
+                  />
+                )}
                 {!!pendingConfirmationSessions.length && (
                   <SessionsPendingConfirmation
                     pendingConfirmationSessions={pendingConfirmationSessions}
@@ -95,10 +101,10 @@ function IncomingSessions({
 }) {
   return (
     <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit">
-      <div className="flex flex-col">
+      <div className="flex flex-col mb-2">
         <h2 className="text-xl font-semibold">Upcoming Sessions</h2>
         <p className="text-dim text-small">
-          Mentoring sessions on your horizon
+          Accepted mentoring sessions on your horizon
         </p>
       </div>
       {acceptedSessions.length ? (
@@ -116,26 +122,6 @@ function IncomingSessions({
           </NavLinkButton>
         </div>
       )}
-    </section>
-  )
-}
-
-function SessionsPendingConfirmation({
-  pendingConfirmationSessions,
-  user,
-}: {
-  pendingConfirmationSessions: Session[]
-  user: Mentor | Student
-}) {
-  return (
-    <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit">
-      <div className="flex flex-col">
-        <h2 className="text-xl font-semibold">Past sessions</h2>
-        <p className="text-dim text-small">
-          Past sessions to review and confirm
-        </p>
-      </div>
-      <SessionCardList sessions={pendingConfirmationSessions} user={user} />
     </section>
   )
 }

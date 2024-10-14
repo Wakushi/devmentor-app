@@ -21,6 +21,7 @@ const config = {
       colors: {
         primary: "var(--primary)",
         "primary-shade": "var(--primary-shade)",
+        "primary-light": "var(--primary-light)",
         secondary: "var(--secondary)",
         "secondary-shade": "var(--secondary-shade)",
         accent: "var(--accent)",

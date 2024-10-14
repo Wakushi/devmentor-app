@@ -50,6 +50,7 @@ export default function SessionRequestsPage() {
               src="/assets/search.gif"
               alt="Search icon"
               unoptimized
+              priority
             />
             <div className="flex flex-col text-center mb-8">
               <h3>No pending approvals</h3>

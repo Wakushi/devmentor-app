@@ -47,7 +47,12 @@ export default function UserContextProvider(props: UserContextProviderProps) {
   })
 
   useEffect(() => {
-    if (!isConnected && !web3AuthInstance.connected) return
+    if (!isConnected && !web3AuthInstance.connected) {
+      queryClient.resetQueries({
+        queryKey: [QueryKeys.USER],
+      })
+      return
+    }
 
     queryClient.refetchQueries({ queryKey: [QueryKeys.USER] })
   }, [web3AuthInstance.connected, isConnected])

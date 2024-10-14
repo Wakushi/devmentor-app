@@ -18,7 +18,7 @@ import {
   getLanguagesFromIds,
   getSubjectsFromIds,
 } from "@/lib/utils"
-import { Star } from "lucide-react"
+import { FaStar } from "react-icons/fa";
 
 interface FiltersProps {
   filters: {
@@ -159,7 +159,7 @@ function StarRating({
   return (
     <div className="flex items-center">
       {[1, 2, 3, 4, 5].map((star) => (
-        <Star
+        <FaStar
           key={star}
           className={`w-6 h-6 cursor-pointer transition-colors duration-150 ${
             star <= (hoverRating || rating)

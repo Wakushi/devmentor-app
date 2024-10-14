@@ -1,14 +1,14 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { StarIcon, Clock } from "lucide-react"
+import {  Clock } from "lucide-react"
 import { Mentor } from "@/lib/types/user.type"
 import {
   allSubjects,
   getLanguageOption,
   LearningField,
 } from "@/lib/types/profile-form.type"
-import { FaLongArrowAltRight } from "react-icons/fa"
+import { FaLongArrowAltRight, FaStar } from "react-icons/fa"
 import Flag from "@/components/ui/flag"
 import { getAverageRating, getInitials } from "@/lib/utils"
 import Link from "next/link"
@@ -37,7 +37,7 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
             <div>
               <p className="text-lg font-semibold">{userName}</p>
               <div className="flex items-center mt-1">
-                <StarIcon className="w-4 h-4 text-primary fill-primary mr-1" />
+                <FaStar className="w-4 h-4 text-primary fill-primary mr-1" />
                 <span className="text-sm font-medium">
                   {getAverageRating(mentor)}
                 </span>

@@ -117,7 +117,7 @@ export default function Header() {
     <Link href="/" className="flex gap-1 items-center">
       <GiMountaintop className="text-3xl" />
       <div className="font-heading font-light text-2xl flex items-center drop-shadow-md">
-        DEVMENTOR
+        D<span className="text-primary-light">EVM</span>ENTOR
       </div>
     </Link>
   )

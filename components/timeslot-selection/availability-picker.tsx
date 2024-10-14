@@ -12,15 +12,10 @@ import { TimeValue } from "react-aria"
 import DayOfWeekCard from "./day-of-week-card"
 import { Button } from "../ui/button"
 import { Mentor } from "@/lib/types/user.type"
-import { DAYS_OF_WEEK, FIVE_PM, NINE_THIRTY_AM } from "@/lib/constants"
+import { DAYS_OF_WEEK } from "@/lib/constants"
 import { Address } from "viem"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { RiEditLine } from "react-icons/ri"
-
-const DEFAULT_SLOT: DaySlot = {
-  timeStart: NINE_THIRTY_AM,
-  timeEnd: FIVE_PM,
-}
 
 export default function AvailabilityPicker({
   mentor,
@@ -52,7 +47,7 @@ export default function AvailabilityPicker({
 
       return baseDays.map((day) => ({
         ...day,
-        slots: [DEFAULT_SLOT],
+        slots: [getDefaultSlot()],
         active: false,
       }))
     }
@@ -115,7 +110,7 @@ export default function AvailabilityPicker({
     setDaysOfWeek((prevDaysOfWeek) =>
       prevDaysOfWeek.map((day) =>
         day.index === dayIndex
-          ? { ...day, slots: [...day.slots, DEFAULT_SLOT] }
+          ? { ...day, slots: [...day.slots, getDefaultSlot()] }
           : day
       )
     )
@@ -183,8 +178,26 @@ export default function AvailabilityPicker({
 
     return baseDays.map((day) => ({
       ...day,
-      slots: day.active ? day.slots : [DEFAULT_SLOT],
+      slots: day.active ? day.slots : [getDefaultSlot()],
     }))
+  }
+
+  function getDefaultSlot(): DaySlot {
+    const date = new Date()
+    date.setMinutes(0)
+
+    date.setHours(9)
+    const timeStart = date.getTime()
+
+    date.setHours(17)
+    const timeEnd = date.getTime()
+
+    const defaultSlot: DaySlot = {
+      timeStart,
+      timeEnd,
+    }
+
+    return defaultSlot
   }
 
   return (

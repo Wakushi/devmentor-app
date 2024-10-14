@@ -11,6 +11,8 @@ contract DevmentorSessionManagement is
 {
     using DevmentorLib for *;
 
+    uint256 private constant PRECISION = 1e18;
+
     mapping(uint256 => DevmentorLib.Session) public s_sessions;
     mapping(address => uint256[]) private s_sessionIdsByAccount;
     uint256 public s_sessionCounter;
@@ -25,6 +27,7 @@ contract DevmentorSessionManagement is
     error Devmentor__WrongRating();
     error Devmentor__NotAuthorizedForValidation();
     error Devmentor__SessionNotPast();
+    error Devmentor__InvalidTimeInput();
 
     event SessionCreated(
         address indexed studentAccount,
@@ -49,7 +52,7 @@ contract DevmentorSessionManagement is
         address _nativeToUsdpriceFeed
     ) DevmentorPaymentHandling(_nativeToUsdpriceFeed) {}
 
-    modifier ensureSessionTimeDone(uint256 _sessionId){
+    modifier ensureSessionTimeDone(uint256 _sessionId) {
         _ensureSessionTimeDone(_sessionId);
         _;
     }
@@ -123,16 +126,26 @@ contract DevmentorSessionManagement is
         _confirmSessionAsMentor(_mentorAddress, _sessionId);
     }
 
-    function acceptSession(uint256 _sessionId, bool _accepted) external onlyRegisteredMentor {
+    function acceptSession(
+        uint256 _sessionId,
+        bool _accepted
+    ) external onlyRegisteredMentor {
         _acceptSession(msg.sender, _sessionId, _accepted);
     }
 
-    function acceptSessionAdmin(address _mentorAddress, uint256 _sessionId, bool _accepted) external onlyOwner {
+    function acceptSessionAdmin(
+        address _mentorAddress,
+        uint256 _sessionId,
+        bool _accepted
+    ) external onlyOwner {
         _acceptSession(_mentorAddress, _sessionId, _accepted);
     }
 
     // TEST METHOD
-    function updateSessionEndtime(uint256 _sessionId, uint256 _endTime) external onlyOwner {
+    function updateSessionEndtime(
+        uint256 _sessionId,
+        uint256 _endTime
+    ) external onlyOwner {
         DevmentorLib.Session storage session = s_sessions[_sessionId];
         session.endTime = _endTime;
     }
@@ -182,10 +195,17 @@ contract DevmentorSessionManagement is
         }
 
         uint256 hourlyRateUsd = s_mentorByAccount[_mentorAddress].hourlyRate;
+
+        uint256 amountDueUsd = _calculateAmountDue(
+            _startTime,
+            _endTime,
+            hourlyRateUsd
+        );
+
         uint256 hourlyRateWei = 0;
 
         if (hourlyRateUsd > 0) {
-            hourlyRateWei = getHourlyRateInWei(hourlyRateUsd);
+            hourlyRateWei = getHourlyRateInWei(amountDueUsd);
         }
 
         if (hourlyRateWei > 0 && msg.value < hourlyRateWei) {
@@ -205,7 +225,8 @@ contract DevmentorSessionManagement is
             mentorConfirmed: false,
             studentConfirmed: false,
             accepted: false,
-            topic: _topic
+            topic: _topic,
+            rating: 0
         });
 
         s_sessionIdsByAccount[_studentAddress].push(sessionId);
@@ -240,7 +261,11 @@ contract DevmentorSessionManagement is
         }
 
         DevmentorLib.Mentor storage mentor = s_mentorByAccount[session.mentor];
+
+        session.rating = _rating;
+
         mentor.totalRating += _rating;
+
         ++mentor.sessionCount;
 
         session.studentConfirmed = true;
@@ -264,7 +289,7 @@ contract DevmentorSessionManagement is
 
         session.valueLocked = 0;
 
-        if(amountToSend == 0){
+        if (amountToSend == 0) {
             emit SessionCompleted(_sessionId, session.mentor, session.student);
             return;
         }
@@ -282,7 +307,11 @@ contract DevmentorSessionManagement is
         emit SessionCompleted(_sessionId, session.mentor, session.student);
     }
 
-    function _acceptSession(address _mentorAddress, uint256 _sessionId, bool _accepted) internal {
+    function _acceptSession(
+        address _mentorAddress,
+        uint256 _sessionId,
+        bool _accepted
+    ) internal {
         DevmentorLib.Session storage session = s_sessions[_sessionId];
 
         if (session.mentor == address(0)) {
@@ -301,7 +330,7 @@ contract DevmentorSessionManagement is
     function _ensureSessionTimeDone(uint256 _sessionId) internal view {
         DevmentorLib.Session memory session = s_sessions[_sessionId];
 
-        if(session.endTime > block.timestamp * 1000){
+        if (session.endTime > block.timestamp * 1000) {
             revert Devmentor__SessionNotPast();
         }
     }
@@ -310,5 +339,23 @@ contract DevmentorSessionManagement is
         address _account
     ) external view returns (uint256[] memory) {
         return s_sessionIdsByAccount[_account];
+    }
+
+    function _calculateAmountDue(
+        uint256 _startTime,
+        uint256 _endTime,
+        uint256 _hourlyRate
+    ) internal pure returns (uint256) {
+        if (_startTime == 0 || _endTime == 0 || _endTime < _startTime) {
+            revert Devmentor__InvalidTimeInput();
+        }
+
+        uint256 durationInMs = _endTime - _startTime;
+        uint256 durationInHours = (durationInMs * PRECISION) / 1000 / 60 / 60;
+
+        return
+            (durationInHours * (_hourlyRate * PRECISION)) /
+            PRECISION /
+            PRECISION;
     }
 }

@@ -353,6 +353,7 @@ export async function getSession(sessionId: number): Promise<Session> {
     studentConfirmed,
     accepted,
     topic,
+    rating,
   } = data
 
   return {
@@ -368,6 +369,7 @@ export async function getSession(sessionId: number): Promise<Session> {
     mentorConfirmed,
     studentConfirmed,
     topic,
+    rating,
   }
 }
 

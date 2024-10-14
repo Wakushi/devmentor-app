@@ -222,7 +222,12 @@ export default function BookSessionPage({
     let ethAmount = BigInt(0)
 
     if (mentor.hourlyRate && ethPriceUsd) {
-      const usdAmountDue = mentor.hourlyRate
+      const usdAmountDue = calculateAmountDue({
+        startTime: confirmedSessionSlot.timeStart,
+        endTime: confirmedSessionSlot.timeEnd,
+        hourlyRate: mentor.hourlyRate,
+      })
+
       ethAmount = usdToWei(usdAmountDue, ethPriceUsd)
     }
 
@@ -318,6 +323,25 @@ export default function BookSessionPage({
       timeStart,
       timeEnd: timeStart + duration,
     }
+  }
+
+  function calculateAmountDue({
+    startTime,
+    endTime,
+    hourlyRate,
+  }: {
+    startTime: number
+    endTime: number
+    hourlyRate: number
+  }): number {
+    if (!startTime || !endTime || endTime < startTime) {
+      throw new Error("Invalid time")
+    }
+
+    const durationInMs = endTime - startTime
+    const durationInHours = durationInMs / 1000 / 60 / 60
+
+    return durationInHours * hourlyRate
   }
 
   if (loading) {

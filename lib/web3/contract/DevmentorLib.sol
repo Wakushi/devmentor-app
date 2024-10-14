@@ -2,9 +2,28 @@
 pragma solidity ^0.8.24;
 
 library DevmentorLib {
-    enum Subject { BLOCKCHAIN, SMART_CONTRACTS, DEFI, NFT, WEB3_DEVELOPMENT, CRYPTOCURRENCY, TOKENOMICS, SECURITY, DAO }
-    enum Experience { NOVICE, BEGINNER, INTERMEDIATE, ADEPT }
-    enum Role { VISITOR, MENTOR, STUDENT }
+    enum Subject {
+        BLOCKCHAIN,
+        SMART_CONTRACTS,
+        DEFI,
+        NFT,
+        WEB3_DEVELOPMENT,
+        CRYPTOCURRENCY,
+        TOKENOMICS,
+        SECURITY,
+        DAO
+    }
+    enum Experience {
+        NOVICE,
+        BEGINNER,
+        INTERMEDIATE,
+        ADEPT
+    }
+    enum Role {
+        VISITOR,
+        MENTOR,
+        STUDENT
+    }
 
     struct BaseUser {
         address account;
@@ -40,5 +59,6 @@ library DevmentorLib {
         bool accepted;
         bool mentorConfirmed;
         bool studentConfirmed;
+        uint256 rating;
     }
 }

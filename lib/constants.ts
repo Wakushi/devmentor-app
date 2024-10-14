@@ -1,6 +1,6 @@
 const PINATA_GATEWAY_BASE_URL = "https://tan-key-moth-8.mypinata.cloud/ipfs"
 
-const DEVMENTOR_CONTRACT_ADDRESS = "0x2265b81B164D053FF0beA976B35B0Fdc22F1a8AA"
+const DEVMENTOR_CONTRACT_ADDRESS = "0x2482E8241C0211d07d76B9F894fc194FA7db9cac"
 const DEVMENTOR_CONTRACT_ABI = [
   {
     inputs: [
@@ -267,6 +267,11 @@ const DEVMENTOR_CONTRACT_ABI = [
   {
     inputs: [],
     name: "Devmentor__InvalidSessionTime",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "Devmentor__InvalidTimeInput",
     type: "error",
   },
   {
@@ -1262,6 +1267,11 @@ const DEVMENTOR_CONTRACT_ABI = [
             name: "studentConfirmed",
             type: "bool",
           },
+          {
+            internalType: "uint256",
+            name: "rating",
+            type: "uint256",
+          },
         ],
         internalType: "struct DevmentorLib.Session",
         name: "",
@@ -1451,6 +1461,11 @@ const DEVMENTOR_CONTRACT_ABI = [
         internalType: "bool",
         name: "studentConfirmed",
         type: "bool",
+      },
+      {
+        internalType: "uint256",
+        name: "rating",
+        type: "uint256",
       },
     ],
     stateMutability: "view",

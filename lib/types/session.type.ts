@@ -16,4 +16,5 @@ export type Session = {
   mentorAddress: Address
   mentorConfirmed: boolean
   studentConfirmed: boolean
+  rating: number
 }

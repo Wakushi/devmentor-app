@@ -229,10 +229,10 @@ function RatingDialog({
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
       <DialogContent>
         <DialogHeader className="mb-4">
-          <DialogTitle>Give your mentor a rating</DialogTitle>
+          <DialogTitle>Evaluate Your Mentorship Session</DialogTitle>
           <DialogDescription>
-            Rating your session will help us improve in our goal to match you
-            with the best mentor !
+            Your feedback helps us pair you with the ideal mentor for future
+            sessions.
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col items-center gap-4">

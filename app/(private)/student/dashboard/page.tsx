@@ -93,7 +93,7 @@ export default function DashboardPage() {
                   </section>
                 )}
                 {!!acceptedSessions.length && (
-                  <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit">
+                  <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit h-fit">
                     <div className="flex flex-col mb-2">
                       <h2 className="text-xl font-semibold">
                         Upcoming Sessions

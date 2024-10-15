@@ -32,7 +32,7 @@ export function SessionCard({
   }
 
   return (
-    <div className="flex items-center justify-between gap-8 glass rounded-md px-4 py-2">
+    <div className="relative flex items-center justify-between gap-8 glass rounded-md px-4 py-2">
       <div className="flex items-center gap-6">
         <SessionPeer
           name={
@@ -75,6 +75,9 @@ export function SessionCard({
         )}
       </div>
       <SessionOptions session={session} user={user} />
+      <span className="absolute right-2 bottom-1 text-xs text-dim opacity-50">
+        {session.id}
+      </span>
     </div>
   )
 }

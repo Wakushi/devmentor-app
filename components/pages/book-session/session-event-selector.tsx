@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button"
 import NavLinkButton from "@/components/ui/nav-link"
 import { FaLongArrowAltLeft } from "react-icons/fa"
 import clsx from "clsx"
-import { Checkbox } from "@/components/ui/checkbox"
 
 export default function SessionEventSelector({
   mentorAddress,

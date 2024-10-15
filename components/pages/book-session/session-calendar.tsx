@@ -3,22 +3,32 @@ import { useState } from "react"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { MeetingEvent, Timeslot } from "@/lib/types/timeslot.type"
-import { getTimeslotMatcher } from "@/lib/utils"
+import { formatTime, getTimeslotMatcher } from "@/lib/utils"
 import TimeslotCardList from "./timeslot-card-list"
 import { CalendarDays } from "lucide-react"
+import useSessionsQuery from "@/hooks/queries/sessions-query"
+import { Mentor } from "@/lib/types/user.type"
+import Loader from "@/components/ui/loader"
+import { Session } from "@/lib/types/session.type"
 
 export default function SessionCalendar({
+  mentor,
   handleConfirmTimeslot,
   selectedMeetingEvent,
   selectedDate,
   handleSelectDate,
 }: {
+  mentor: Mentor
   handleConfirmTimeslot: (slot: number) => void
   selectedMeetingEvent: MeetingEvent | null
   selectedDate: Date | undefined
   handleSelectDate: (date: Date | undefined) => void
 }) {
+  const { data: sessions, isLoading: loadingSessions } =
+    useSessionsQuery(mentor)
+
   const [selectedSlot, setSelectedSlot] = useState<number | undefined>()
+
   const [selectedDateAvailableSlots, setSelectedDateAvailableSlots] = useState<
     number[]
   >(selectedDate ? computeDividedSlots(selectedDate) : [])
@@ -43,13 +53,58 @@ export default function SessionCalendar({
     const timeslots = getTimeslotsByDate(date)
     const eventDurationInMs = selectedMeetingEvent.duration
 
+    let bookedSessions: Session[] = []
+
+    const selectedDay = new Date(date)
+    selectedDay.setHours(0, 0, 0, 0)
+
+    if (sessions) {
+      bookedSessions = sessions.filter((session) => {
+        const sessionDay = new Date(session.startTime)
+        sessionDay.setHours(0, 0, 0, 0)
+
+        const sameDay = selectedDay.getTime() === sessionDay.getTime()
+        return sameDay && session.accepted && session.endTime > Date.now()
+      })
+    }
+
     timeslots.forEach(({ timeStart, timeEnd }) => {
       let sessionStartTime = timeStart
 
       while (sessionStartTime < timeEnd - eventDurationInMs) {
         sessionStartTime += eventDurationInMs
 
-        timeDividedSlots.push(sessionStartTime)
+        const sessionStart = new Date(sessionStartTime)
+        const sessionStartHour = sessionStart.getHours()
+        const sessionStartMinutes = sessionStart.getMinutes()
+
+        if (
+          !bookedSessions.some((session) => {
+            const bookedStartTime = new Date(session.startTime)
+            const bookedStartHour = bookedStartTime.getHours()
+            const bookedStartMinutes = bookedStartTime.getMinutes()
+
+            const bookedEndTime = new Date(session.endTime)
+            const bookedEndHour = bookedEndTime.getHours()
+
+            const startsAfter = (): boolean => {
+              if (sessionStartHour === bookedStartHour) {
+                return (
+                  bookedStartMinutes <= sessionStartMinutes ||
+                  bookedStartMinutes < eventDurationInMs / 60 / 1000
+                )
+              }
+
+              return sessionStartHour >= bookedStartHour
+            }
+
+            const endsBefore = sessionStartHour < bookedEndHour
+
+            return startsAfter() && endsBefore
+          })
+        ) {
+          timeDividedSlots.push(sessionStartTime)
+        }
       }
     })
 
@@ -69,6 +124,10 @@ export default function SessionCalendar({
   }
 
   if (!selectedMeetingEvent) return null
+
+  if (loadingSessions) {
+    return <Loader />
+  }
 
   return (
     <Card className="glass border-stone-800 text-white w-full fade-in-bottom">

@@ -48,11 +48,8 @@ export default function BookSessionPage({
   }
   const { signMessageAsync } = useSignMessage()
 
-  const mentorsQuery = useMentorsQuery()
-  const ethPriceQuery = useEthPriceQuery()
-
-  const { data: ethPriceUsd } = ethPriceQuery
-  const { data: mentors } = mentorsQuery
+  const { data: mentors } = useMentorsQuery()
+  const { data: ethPriceUsd } = useEthPriceQuery()
 
   const [mentor, setMentor] = useState<Mentor>()
 
@@ -388,6 +385,7 @@ export default function BookSessionPage({
 
               {bookStep === BookStep.SCHEDULE && (
                 <SessionCalendar
+                  mentor={mentor}
                   selectedMeetingEvent={selectedMeetingEvent}
                   handleConfirmTimeslot={handleConfirmTimeslot}
                   selectedDate={selectedDate}

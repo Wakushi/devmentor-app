@@ -239,10 +239,6 @@ export default function MentorSignUpPage() {
         event: ContractEvent.MENTOR_REGISTERED,
         args: { account: user.account },
         handler: async () => {
-          queryClient.invalidateQueries({
-            queryKey: [QueryKeys.USER],
-          })
-
           toast({
             title: "Success",
             description: "Account created successfully !",
@@ -253,6 +249,10 @@ export default function MentorSignUpPage() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userPayload, role: Role.MENTOR }),
+          })
+
+          queryClient.invalidateQueries({
+            queryKey: [QueryKeys.USER],
           })
 
           setLoading(false)

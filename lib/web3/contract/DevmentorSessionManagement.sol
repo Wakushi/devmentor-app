@@ -28,6 +28,7 @@ contract DevmentorSessionManagement is
     error Devmentor__NotAuthorizedForValidation();
     error Devmentor__SessionNotPast();
     error Devmentor__InvalidTimeInput();
+    error Devmentor__SessionNotValidated();
 
     event SessionCreated(
         address indexed studentAccount,
@@ -54,6 +55,11 @@ contract DevmentorSessionManagement is
 
     modifier ensureSessionTimeDone(uint256 _sessionId) {
         _ensureSessionTimeDone(_sessionId);
+        _;
+    }
+
+    modifier ensureSessionValidated(uint256 _sessionId) {
+        _ensureSessionValidated(_sessionId);
         _;
     }
 
@@ -101,7 +107,7 @@ contract DevmentorSessionManagement is
     function confirmSessionAsStudent(
         uint256 _sessionId,
         uint256 _rating
-    ) external onlyRegisteredStudent ensureSessionTimeDone(_sessionId) {
+    ) external onlyRegisteredStudent ensureSessionTimeDone(_sessionId) ensureSessionValidated(_sessionId) {
         _confirmSessionAsStudent(msg.sender, _sessionId, _rating);
     }
 
@@ -109,20 +115,20 @@ contract DevmentorSessionManagement is
         address _studentAddress,
         uint256 _sessionId,
         uint256 _rating
-    ) external onlyOwner ensureSessionTimeDone(_sessionId) {
+    ) external onlyOwner ensureSessionTimeDone(_sessionId) ensureSessionValidated(_sessionId) {
         _confirmSessionAsStudent(_studentAddress, _sessionId, _rating);
     }
 
     function confirmSessionAsMentor(
         uint256 _sessionId
-    ) external onlyRegisteredMentor ensureSessionTimeDone(_sessionId) {
+    ) external onlyRegisteredMentor ensureSessionTimeDone(_sessionId) ensureSessionValidated(_sessionId) {
         _confirmSessionAsMentor(msg.sender, _sessionId);
     }
 
     function confirmSessionAsMentorAdmin(
         address _mentorAddress,
         uint256 _sessionId
-    ) external onlyOwner ensureSessionTimeDone(_sessionId) {
+    ) external onlyOwner ensureSessionTimeDone(_sessionId) ensureSessionValidated(_sessionId) {
         _confirmSessionAsMentor(_mentorAddress, _sessionId);
     }
 
@@ -265,7 +271,7 @@ contract DevmentorSessionManagement is
         session.rating = _rating;
 
         mentor.totalRating += _rating;
-
+        
         ++mentor.sessionCount;
 
         session.studentConfirmed = true;
@@ -332,6 +338,14 @@ contract DevmentorSessionManagement is
 
         if (session.endTime > block.timestamp * 1000) {
             revert Devmentor__SessionNotPast();
+        }
+    }
+
+    function _ensureSessionValidated(uint256 _sessionId) internal view {
+        DevmentorLib.Session memory session = s_sessions[_sessionId];
+
+        if (!session.accepted) {
+            revert Devmentor__SessionNotValidated();
         }
     }
 

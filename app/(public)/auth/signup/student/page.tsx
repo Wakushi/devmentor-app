@@ -191,10 +191,6 @@ export default function StudentSignUpPage() {
         event: ContractEvent.STUDENT_REGISTERED,
         args: { account: user.account },
         handler: async () => {
-          queryClient.invalidateQueries({
-            queryKey: [QueryKeys.USER],
-          })
-
           toast({
             title: "Success",
             description: "Account created successfully !",
@@ -205,6 +201,10 @@ export default function StudentSignUpPage() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userPayload, role: Role.STUDENT }),
+          })
+
+          queryClient.invalidateQueries({
+            queryKey: [QueryKeys.USER],
           })
 
           setLoading(false)

@@ -58,22 +58,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         break
     }
 
-    const token = await createUserJwtToken({
-      address: user.account,
-      role,
-    })
-
-    const response = NextResponse.json({ user })
-
-    response.cookies.set({
-      name: process.env.NEXT_PUBLIC_TOKEN_COOKIE as string,
-      value: token,
-      httpOnly: true,
-      maxAge: 60 * 60 * 24 * 7, // 1 week
-      path: "/",
-    })
-
-    return response
+    return NextResponse.json({ user })
   } catch (error) {
     console.error("API error:", error)
     if (error instanceof Error) {
@@ -86,7 +71,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const { userPayload, role } = await req.json()
+    const { role } = await req.json()
 
     const user = await getRequestUser(req)
 
@@ -103,7 +88,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       role,
     })
 
-    const response = NextResponse.json({ userPayload })
+    const response = NextResponse.json({ success: true })
 
     response.cookies.set({
       name: process.env.NEXT_PUBLIC_TOKEN_COOKIE as string,

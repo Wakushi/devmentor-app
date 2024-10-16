@@ -10,6 +10,7 @@ import { matchQueryStatus } from "@/lib/matchQueryStatus"
 import { Session } from "@/lib/types/session.type"
 import { Mentor, Student } from "@/lib/types/user.type"
 import { useUser } from "@/stores/user.store"
+import Image from "next/image"
 import { FaLongArrowAltRight } from "react-icons/fa"
 
 export default function DashboardPage() {
@@ -25,7 +26,7 @@ export default function DashboardPage() {
   }
 
   if (!user) {
-    return <p>Something wrong happened</p>
+    return <LoadingScreen />
   }
 
   return (
@@ -33,11 +34,7 @@ export default function DashboardPage() {
       {matchQueryStatus(sessionsQuery, {
         Loading: <LoadingScreen />,
         Errored: <p>Something wrong happened</p>,
-        Empty: (
-          <div>
-            <p>No sessions planned yet.</p>
-          </div>
-        ),
+        Empty: <EmptyDashboard />,
         Success: ({ data: sessions }) => {
           const incomingSessions = sessions.filter(
             (session) => session.endTime > Date.now()
@@ -122,5 +119,29 @@ function IncomingSessions({
         </div>
       )}
     </section>
+  )
+}
+
+function EmptyDashboard() {
+  return (
+    <div className="min-h-screen flex flex-col justify-center items-center">
+      <Image
+        width={300}
+        height={300}
+        src="/assets/search.gif"
+        alt="Search icon"
+        unoptimized
+        priority
+      />
+      <div className="flex flex-col text-center mb-8">
+        <h3>No upcoming sessions</h3>
+        <p className="text-dim">Let's fine tune our availabilities !</p>
+      </div>
+      <div>
+        <NavLinkButton variant="filled" href="/mentor/availability">
+          Update my availabilities <FaLongArrowAltRight />
+        </NavLinkButton>
+      </div>
+    </div>
   )
 }

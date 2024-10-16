@@ -1,14 +1,20 @@
 "use client"
-import { createContext, ReactNode, useContext, useEffect } from "react"
-import { useAccount, useDisconnect } from "wagmi"
+
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react"
+import { useAccount, useDisconnect, useSignMessage } from "wagmi"
 import { useRouter } from "next/navigation"
 import { Mentor, Student, Visitor } from "@/lib/types/user.type"
-import { Address } from "viem"
 import { Role } from "@/lib/types/role.type"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { QueryKeys } from "@/lib/types/query-keys.type"
-import { BASE_USER_PATH } from "@/lib/constants"
 import { web3AuthInstance } from "@/lib/web3/Web3AuthConnectorInstance"
+import { toast } from "@/hooks/use-toast"
 
 interface UserContextProviderProps {
   children: ReactNode
@@ -19,10 +25,8 @@ interface UserContextProps {
   loadingUser: boolean
   isConnected: boolean
   logOut: () => void
-}
-
-enum Connectors {
-  WEB3AUTH = "Web3Auth",
+  pendingAuth: boolean
+  setPendingAuth: (pendingAuth: boolean) => void
 }
 
 const UserContext = createContext<UserContextProps>({
@@ -30,11 +34,17 @@ const UserContext = createContext<UserContextProps>({
   loadingUser: false,
   isConnected: false,
   logOut: () => {},
+  pendingAuth: false,
+  setPendingAuth: (pendingAuth: boolean) => {},
 })
 
 export default function UserContextProvider(props: UserContextProviderProps) {
-  const { address, connector, isConnected } = useAccount()
-  const { disconnectAsync } = useDisconnect()
+  const { address, isConnected } = useAccount()
+  const { disconnect, disconnectAsync } = useDisconnect()
+  const { signMessageAsync } = useSignMessage()
+
+  const [pendingAuth, setPendingAuth] = useState<boolean>(false)
+
   const router = useRouter()
   const queryClient = useQueryClient()
 
@@ -63,21 +73,15 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     try {
       let user: Visitor | Student | Mentor | null = null
 
-      switch (connector?.name) {
-        case Connectors.WEB3AUTH:
-          if (!web3AuthInstance.connected || !address) return null
+      user = await loginWithToken()
 
-          user = await getUserByAddress(address)
-          break
-
-        default:
-          if (!address) return null
-
-          user = await getUserByAddress(address)
-          break
+      if (!user) {
+        user = await login()
       }
 
-      routeUser(user)
+      if (user) {
+        routeUser(user)
+      }
 
       return user
     } catch (error) {
@@ -86,26 +90,79 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     }
   }
 
-  async function getUserByAddress(
-    address: Address
-  ): Promise<Visitor | Student | Mentor> {
-    try {
-      const response = await fetch(`${BASE_USER_PATH}?address=${address}`)
-      const { user } = await response.json()
+  async function login(): Promise<Visitor | Mentor | Student | null> {
+    setPendingAuth(true)
 
-      switch (user.role) {
-        case Role.VISITOR:
-          return user as Visitor
-        case Role.STUDENT:
-          return user as Student
-        case Role.MENTOR:
-          return user as Mentor
-        default:
-          return user as Visitor
+    try {
+      const nonce = Math.random().toString(36).substring(2, 15)
+
+      toast({
+        title: "Pending signature",
+        description: "Waiting for authentification signature...",
+      })
+
+      const signature = await signMessageAsync({ message: nonce })
+
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address, signature, nonce }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Login failed")
       }
+
+      const { data: user } = await response.json()
+
+      return user
     } catch (error: any) {
-      console.log("Error getting user: ", error)
-      return { account: address, role: Role.VISITOR }
+      toast({
+        title: "Login failed",
+        description: "Failed to authenticate, please try again.",
+      })
+
+      disconnect()
+      return null
+    } finally {
+      setPendingAuth(false)
+    }
+  }
+
+  async function loginWithToken(): Promise<Visitor | Mentor | Student | null> {
+    const response = await fetch("/api/auth/login-with-token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    })
+
+    const { data: user } = await response.json()
+
+    return user
+  }
+
+  async function logOut(): Promise<void> {
+    router.push("/")
+
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to log out")
+      }
+
+      disconnectAsync().then(() => {
+        queryClient.resetQueries({
+          queryKey: [QueryKeys.USER],
+        })
+      })
+    } catch (error) {
+      console.error(error)
     }
   }
 
@@ -126,40 +183,13 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     }
   }
 
-  async function logOut(): Promise<void> {
-    router.push("/")
-
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_API_URL}/auth/logout`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      )
-
-      if (!response.ok) {
-        throw new Error("Failed to log out")
-      }
-
-      disconnectAsync().then(() => {
-        queryClient.resetQueries({
-          queryKey: [QueryKeys.USER],
-        })
-      })
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
   const context: UserContextProps = {
     user,
     isConnected,
     loadingUser,
     logOut,
+    pendingAuth,
+    setPendingAuth,
   }
 
   return (

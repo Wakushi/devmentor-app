@@ -5,25 +5,34 @@ import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { connect } from "@wagmi/core"
 import { config } from "@/providers"
-import { useState } from "react"
 import { FaGoogle } from "react-icons/fa"
 import Loader from "@/components/ui/loader"
 import { usePathname } from "next/navigation"
+import { toast } from "@/hooks/use-toast"
+import { useUser } from "@/stores/user.store"
 
 export default function Connectors() {
   const { connectors } = useConnect()
+  const { pendingAuth, setPendingAuth } = useUser()
   const pathName = usePathname()
-  const [loading, setLoading] = useState<boolean>(false)
 
   async function handleConnect(connector: Connector) {
-    setLoading(true)
+    setPendingAuth(true)
 
-    connect(config, { connector }).catch(() => {
-      setLoading(false)
-    })
+    try {
+      await connect(config, { connector })
+    } catch (error) {
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: "Something wrong happened !",
+      })
+
+      setPendingAuth(false)
+    }
   }
 
-  if (loading) {
+  if (pendingAuth) {
     return (
       <div className="flex items-center justify-center min-h-[90px] my-2">
         <Loader />

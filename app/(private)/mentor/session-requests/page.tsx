@@ -60,7 +60,7 @@ export default function SessionRequestsPage() {
 
 function EmptyRequestsPage() {
   return (
-    <div className="flex flex-col gap-4 pt-[8rem] min-h-screen m-auto w-[95%]">
+    <div className="min-h-screen flex flex-col justify-center items-center">
       <div className="flex flex-col justify-center items-center">
         <Image
           width={300}

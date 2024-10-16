@@ -6,9 +6,36 @@ import {
   getSubCollection,
   updateSubDocument,
 } from "./base.service"
+import { Mentor, Student, Visitor } from "@/lib/types/user.type"
+import { Role } from "@/lib/types/role.type"
 
 const USER_COLLECTION = "users"
 const MEETING_EVENTS_COLLECTION = "meeting-events"
+
+export async function getUserByAddress(
+  address: Address
+): Promise<Visitor | Student | Mentor> {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_API_URL}/user?address=${address}`
+    )
+    const { user } = await response.json()
+
+    switch (user.role) {
+      case Role.VISITOR:
+        return user as Visitor
+      case Role.STUDENT:
+        return user as Student
+      case Role.MENTOR:
+        return user as Mentor
+      default:
+        return user as Visitor
+    }
+  } catch (error: any) {
+    console.log("Error getting user: ", error)
+    return { account: address, role: Role.VISITOR }
+  }
+}
 
 //////////////////////
 //  MEETING EVENTS  //

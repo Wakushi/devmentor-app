@@ -1,6 +1,6 @@
 const PINATA_GATEWAY_BASE_URL = "https://tan-key-moth-8.mypinata.cloud/ipfs"
 
-const DEVMENTOR_CONTRACT_ADDRESS = "0x2482E8241C0211d07d76B9F894fc194FA7db9cac"
+const DEVMENTOR_CONTRACT_ADDRESS = "0x12D0077c071d05B26c0bA343a7A04e9d3003C541"
 const DEVMENTOR_CONTRACT_ABI = [
   {
     inputs: [
@@ -346,6 +346,11 @@ const DEVMENTOR_CONTRACT_ABI = [
   {
     inputs: [],
     name: "Devmentor__SessionNotPast",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "Devmentor__SessionNotValidated",
     type: "error",
   },
   {

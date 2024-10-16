@@ -3,13 +3,13 @@ import { useState } from "react"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { MeetingEvent, Timeslot } from "@/lib/types/timeslot.type"
-import { formatTime, getTimeslotMatcher } from "@/lib/utils"
+import { getTimeslotMatcher } from "@/lib/utils"
 import TimeslotCardList from "./timeslot-card-list"
 import { CalendarDays } from "lucide-react"
 import useSessionsQuery from "@/hooks/queries/sessions-query"
 import { Mentor } from "@/lib/types/user.type"
-import Loader from "@/components/ui/loader"
 import { Session } from "@/lib/types/session.type"
+import CalendarSkeleton from "@/components/ui/calendar-skeleton"
 
 export default function SessionCalendar({
   mentor,
@@ -125,10 +125,6 @@ export default function SessionCalendar({
 
   if (!selectedMeetingEvent) return null
 
-  if (loadingSessions) {
-    return <Loader />
-  }
-
   return (
     <Card className="glass border-stone-800 text-white w-full fade-in-bottom">
       <CardHeader>
@@ -142,21 +138,27 @@ export default function SessionCalendar({
         </p>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        <div className="flex gap-8 items-center">
-          <Calendar
-            mode="single"
-            selected={selectedDate || undefined}
-            onSelect={handleDateSelect}
-            disabled={getTimeslotMatcher(selectedMeetingEvent?.timeslots)}
-            className="calendar rounded-md p-0 mb-4 mx-auto"
-          />
-          <TimeslotCardList
-            selectedSlot={selectedSlot}
-            dividedSlots={selectedDateAvailableSlots}
-            handleSlotSelect={handleSlotSelect}
-            handleConfirmTimeslot={handleConfirmTimeslot}
-          />
-        </div>
+        {loadingSessions ? (
+          <div className="flex justify-center items-center">
+            <CalendarSkeleton />
+          </div>
+        ) : (
+          <div className="flex gap-8 items-center">
+            <Calendar
+              mode="single"
+              selected={selectedDate || undefined}
+              onSelect={handleDateSelect}
+              disabled={getTimeslotMatcher(selectedMeetingEvent?.timeslots)}
+              className="calendar rounded-md p-0 mb-4 mx-auto"
+            />
+            <TimeslotCardList
+              selectedSlot={selectedSlot}
+              dividedSlots={selectedDateAvailableSlots}
+              handleSlotSelect={handleSlotSelect}
+              handleConfirmTimeslot={handleConfirmTimeslot}
+            />
+          </div>
+        )}
       </CardContent>
     </Card>
   )

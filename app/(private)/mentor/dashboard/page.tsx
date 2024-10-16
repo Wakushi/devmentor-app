@@ -3,7 +3,6 @@
 import SessionCardList from "@/components/pages/dashboard/session-card-list"
 import SessionsPendingConfirmation from "@/components/pages/dashboard/sessions-pending-confirmation"
 import AnimatedBackground from "@/components/ui/animated-background"
-import Loader from "@/components/ui/loader"
 import LoadingScreen from "@/components/ui/loading-screen"
 import NavLinkButton from "@/components/ui/nav-link"
 import useSessionsQuery from "@/hooks/queries/sessions-query"
@@ -25,50 +24,50 @@ export default function DashboardPage() {
     return <LoadingScreen />
   }
 
-  if (!user) return
+  if (!user) {
+    return <p>Something wrong happened</p>
+  }
 
   return (
-    <div className="flex flex-col gap-4 p-4 pt-[8rem] min-h-screen m-auto w-[95%]">
-      <h1 className="text-2xl font-bold">
-        Welcome back, {user.baseUser.userName} !
-      </h1>
+    <>
+      {matchQueryStatus(sessionsQuery, {
+        Loading: <LoadingScreen />,
+        Errored: <p>Something wrong happened</p>,
+        Empty: (
+          <div>
+            <p>No sessions planned yet.</p>
+          </div>
+        ),
+        Success: ({ data: sessions }) => {
+          const incomingSessions = sessions.filter(
+            (session) => session.endTime > Date.now()
+          )
 
-      <div className="w-[200px] mb-2 relative z-[2]">
-        <NavLinkButton variant="filled" href="/mentor/availability">
-          My availabilities <FaLongArrowAltRight />
-        </NavLinkButton>
-      </div>
-      <div className="flex items-center gap-8">
-        {matchQueryStatus(sessionsQuery, {
-          Loading: (
-            <div className="w-[300px] h-[100px] flex justify-center items-center">
-              <Loader />
-            </div>
-          ),
-          Errored: <p>Something wrong happened</p>,
-          Empty: (
-            <div>
-              <p>No sessions planned yet.</p>
-            </div>
-          ),
-          Success: ({ data: sessions }) => {
-            const incomingSessions = sessions.filter(
-              (session) => session.endTime > Date.now()
-            )
+          const acceptedSessions = incomingSessions.filter(
+            (session) => session.accepted
+          )
 
-            const acceptedSessions = incomingSessions.filter(
-              (session) => session.accepted
-            )
-
-            const pendingConfirmationSessions = sessions.filter((session) => {
-              return (
-                session.accepted &&
-                session.endTime < Date.now() &&
-                (!session.mentorConfirmed || !session.studentConfirmed)
-              )
-            })
-
+          const pendingConfirmationSessions = sessions.filter((session) => {
             return (
+              session.accepted &&
+              session.endTime < Date.now() &&
+              (!session.mentorConfirmed || !session.studentConfirmed)
+            )
+          })
+
+          return (
+            <div className="flex flex-col gap-4 p-4 pt-[8rem] min-h-screen m-auto w-[95%]">
+              <div className="flex items-center gap-8">
+                <h1 className="text-2xl font-bold">
+                  Welcome back, {user.baseUser.userName} !
+                </h1>
+
+                <div className="w-[200px] mb-2 relative z-[2]">
+                  <NavLinkButton variant="filled" href="/mentor/availability">
+                    My availabilities <FaLongArrowAltRight />
+                  </NavLinkButton>
+                </div>
+              </div>
               <div className="flex gap-8">
                 {!!incomingSessions.length && (
                   <IncomingSessions
@@ -83,12 +82,12 @@ export default function DashboardPage() {
                   />
                 )}
               </div>
-            )
-          },
-        })}
-      </div>
+            </div>
+          )
+        },
+      })}
       <AnimatedBackground shader={false} />
-    </div>
+    </>
   )
 }
 

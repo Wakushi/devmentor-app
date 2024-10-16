@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import {  Clock } from "lucide-react"
+import { Clock } from "lucide-react"
 import { Mentor } from "@/lib/types/user.type"
 import {
   allSubjects,
@@ -23,7 +23,7 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
   const learningFields = subjects.map((subject) => allSubjects[subject])
 
   return (
-    <Card className="bg-primary-faded relative z-[2] rounded-md border border-primary-faded text-white overflow-hidden transition-all duration-300 hover:border-primary-shade cursor-pointer hover:-translate-y-1 hover:shadow-xl">
+    <Card className="bg-primary-faded relative z-[2] rounded-md border border-primary-faded text-white overflow-hidden transition-all duration-300 cursor-pointer hover:-translate-y-1 hover:shadow-xl">
       <Link href={`/student/book-session?mentor=${account}`}>
         <CardContent className="flex items-center justify-between gap-4 p-4">
           <div className="flex items-center gap-2">

@@ -33,7 +33,7 @@ export function SessionCard({
 
   return (
     <div className="relative flex items-center justify-between gap-8 glass rounded-md px-4 py-2">
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-6 w-full">
         <SessionPeer
           name={
             isMentorView()
@@ -46,7 +46,7 @@ export function SessionCard({
           <SessionTopic topic={topic} />
           <SessionPrice sessionPriceWei={valueLocked} />
         </div>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 ml-auto">
           {user.role === Role.MENTOR && (
             <>
               <StudentGoalsDialog sessionGoalHash={session.sessionGoalHash}>
@@ -75,8 +75,8 @@ export function SessionCard({
         )}
       </div>
       <SessionOptions session={session} user={user} />
-      <span className="absolute right-2 bottom-1 text-xs text-dim opacity-50">
-        {session.id}
+      <span className="absolute left-2 top-1 text-xs text-dim opacity-50">
+        #{session.id}
       </span>
     </div>
   )

@@ -7,11 +7,9 @@ import { FaLongArrowAltRight } from "react-icons/fa"
 import SessionCardList from "@/components/pages/dashboard/session-card-list"
 import useSessionsQuery from "@/hooks/queries/sessions-query"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
-import Loader from "@/components/ui/loader"
 import Image from "next/image"
 import { Student } from "@/lib/types/user.type"
 import useMentorsQuery from "@/hooks/queries/mentors-query"
-
 import SessionsPendingConfirmation from "@/components/pages/dashboard/sessions-pending-confirmation"
 
 export default function DashboardPage() {
@@ -33,11 +31,7 @@ export default function DashboardPage() {
   return (
     <>
       {matchQueryStatus(sessionsQuery, {
-        Loading: (
-          <div className="min-h-screen flex justify-center items-center">
-            <Loader />
-          </div>
-        ),
+        Loading: <LoadingScreen />,
         Errored: <p>Something wrong happened</p>,
         Empty: <EmptyDashboard />,
         Success: ({ data: sessions }) => {
@@ -77,10 +71,10 @@ export default function DashboardPage() {
               </div>
               <div className="flex gap-4">
                 {!!pendingAcceptanceSessions.length && (
-                  <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit">
+                  <section className="glass z-[2] flex flex-col gap-2 p-4 rounded-md w-fit h-fit">
                     <div className="flex flex-col mb-2">
                       <h2 className="text-xl font-semibold">
-                        Session requests
+                        Sessions requests
                       </h2>
                       <p className="text-dim text-small">
                         Sessions waiting for mentor review and confirmation

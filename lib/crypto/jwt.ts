@@ -54,7 +54,9 @@ async function getRequestUser(
   const authCookie = request.cookies.get(
     process.env.NEXT_PUBLIC_TOKEN_COOKIE as string
   )
+
   const token = authCookie?.value
+  
   let decodedToken: JWTPayload | null = null
 
   if (token) {

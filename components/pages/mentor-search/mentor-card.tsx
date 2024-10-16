@@ -39,7 +39,7 @@ export default function MentorCard({ mentor }: { mentor: Mentor }) {
               <div className="flex items-center mt-1">
                 <FaStar className="w-4 h-4 text-primary fill-primary mr-1" />
                 <span className="text-sm font-medium">
-                  {getAverageRating(mentor)}
+                  {getAverageRating(mentor).toFixed(2)}
                 </span>
                 <span className="text-sm text-gray-300 ml-1">
                   ({sessionCount} sessions)

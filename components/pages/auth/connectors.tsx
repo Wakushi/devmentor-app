@@ -24,7 +24,15 @@ export default function Connectors() {
   const { pendingAuth, setPendingAuth } = useUser()
   const pathName = usePathname()
 
+  const [loading, setLoading] = useState<boolean>(false)
+
+  useEffect(() => {
+    setLoading(pendingAuth)
+  }, [pendingAuth])
+
   async function handleConnect(connector: Connector) {
+    setLoading(true)
+
     try {
       await connect(config, { connector })
     } catch (error) {
@@ -35,30 +43,38 @@ export default function Connectors() {
       })
 
       setPendingAuth(false)
+      setLoading(false)
     }
   }
 
   return (
     <>
       <div className="flex flex-col fade-in-bottom items-center justify-center gap-4 w-full max-w-[250px] min-h-[90px] my-2">
-        {connectors.map((connector) => {
-          const { id, icon, name } = connector
-          return (
-            <Button
-              className="w-full gap-2"
-              key={id}
-              onClick={() => {
-                handleConnect(connector)
-              }}
-            >
-              {connector.id === "web3auth" && (
-                <FaGoogle className="text-lg drop-shadow-lg" />
-              )}
-              {icon && <ConnectorIcon url={icon} name={name} />}
-              {pathName === "/auth/login" ? "Connect" : "Signup"} with {name}
-            </Button>
-          )
-        })}
+        {loading ? (
+          <Loader />
+        ) : (
+          <>
+            {connectors.map((connector) => {
+              const { id, icon, name } = connector
+              return (
+                <Button
+                  className="w-full gap-2"
+                  key={id}
+                  onClick={() => {
+                    handleConnect(connector)
+                  }}
+                >
+                  {connector.id === "web3auth" && (
+                    <FaGoogle className="text-lg drop-shadow-lg" />
+                  )}
+                  {icon && <ConnectorIcon url={icon} name={name} />}
+                  {pathName === "/auth/login" ? "Connect" : "Signup"} with{" "}
+                  {name}
+                </Button>
+              )
+            })}
+          </>
+        )}
       </div>
       <PendingSignatureDialog pendingAuth={pendingAuth} />
     </>

@@ -49,10 +49,7 @@ export function SessionCard({
         <div className="flex flex-col gap-2 ml-auto">
           {user.role === Role.MENTOR && (
             <>
-              <StudentGoalsDialog
-                sessionGoalHash={session.sessionGoalHash}
-                viewer={Role.MENTOR}
-              >
+              <StudentGoalsDialog sessionGoalHash={session.sessionGoalHash}>
                 <div className="flex items-center gap-2 text-dm-accent">
                   <GoGoal />
                   <span className="text-small hover:underline">Objectives</span>

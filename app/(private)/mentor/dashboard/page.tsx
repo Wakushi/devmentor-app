@@ -113,8 +113,8 @@ function IncomingSessions({
               You have some pending session requests
             </p>
           </div>
-          <NavLinkButton variant="outline" href="/mentor/session-requests">
-            Check pending requests {"->"}
+          <NavLinkButton variant="outline" href="/mentor/sessions">
+            Check pending requests <FaLongArrowAltRight />
           </NavLinkButton>
         </div>
       )}

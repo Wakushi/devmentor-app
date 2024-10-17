@@ -1,7 +1,6 @@
 "use client"
 
 import SessionsTable from "@/components/sessions-table"
-import { sessionRequestsColumns } from "@/components/pages/session-requests/session-requests-table-columns"
 import AnimatedBackground from "@/components/ui/animated-background"
 import ErrorState from "@/components/ui/error-state"
 import LoadingScreen from "@/components/ui/loading-screen"
@@ -12,8 +11,10 @@ import { Mentor } from "@/lib/types/user.type"
 import { useUser } from "@/stores/user.store"
 import Image from "next/image"
 import { FaLongArrowAltRight } from "react-icons/fa"
+import { Role } from "@/lib/types/role.type"
+import { mentorSessionsColumns } from "@/components/pages/sessions/session-columns/mentor-sessions-columns"
 
-export default function SessionRequestsPage() {
+export default function SessionsPage() {
   const { user, loadingUser } = useUser() as {
     user: Mentor
     loadingUser: boolean
@@ -34,22 +35,18 @@ export default function SessionRequestsPage() {
         Errored: <ErrorState onRetry={() => sessionsQuery.refetch()} />,
         Empty: <EmptyRequestsPage />,
         Success: ({ data: sessions }) => {
-          const filteredSessions = sessions.filter(
-            (session) => !session.accepted
-          )
-
           return (
             <div className="flex flex-col gap-4 pt-[8rem] min-h-screen m-auto w-[95%]">
               <div className="flex flex-col">
-                <h2 className="text-2xl">Session requests</h2>
+                <h2 className="text-2xl">Sessions</h2>
                 <p className="text-small font-normal font-sans text-dim">
-                  List of students waiting for your approval to schedule a
-                  mentoring session
+                  List of past and future sessions
                 </p>
               </div>
               <SessionsTable
-                data={filteredSessions}
-                columns={sessionRequestsColumns}
+                data={sessions}
+                columns={mentorSessionsColumns}
+                viewer={Role.MENTOR}
               />
             </div>
           )

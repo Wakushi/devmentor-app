@@ -34,15 +34,18 @@ import { SessionStatus } from "./pages/sessions/columns/status-column"
 import { Session } from "@/lib/types/session.type"
 import { Checkbox } from "./ui/checkbox"
 import { Label } from "./ui/label"
+import { Role } from "@/lib/types/role.type"
 
 interface SessionDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  viewer: Role
 }
 
 export default function SessionsTable<TData, TValue>({
   columns,
   data,
+  viewer,
 }: SessionDataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -76,6 +79,12 @@ export default function SessionsTable<TData, TValue>({
     },
   })
 
+  function isMentorView(): boolean {
+    return viewer === Role.MENTOR
+  }
+
+  const peer = isMentorView() ? "student" : "mentor"
+
   return (
     <div className="space-y-4 z-[2]">
       <div className="flex space-x-2">
@@ -88,10 +97,10 @@ export default function SessionsTable<TData, TValue>({
           className="max-w-[200px]"
         />
         <Input
-          placeholder="Filter mentors..."
-          value={(table.getColumn("mentor")?.getFilterValue() as string) ?? ""}
+          placeholder={`Filter ${peer}s...`}
+          value={(table.getColumn(peer)?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("mentor")?.setFilterValue(event.target.value)
+            table.getColumn(peer)?.setFilterValue(event.target.value)
           }
           className="max-w-[200px]"
         />

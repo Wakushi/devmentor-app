@@ -8,18 +8,20 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Role } from "@/lib/types/role.type"
+import { Mentor, Student } from "@/lib/types/user.type"
 import { getFileByHash } from "@/services/ipfs.service"
+import { useUser } from "@/stores/user.store"
 import { ReactNode, useEffect, useState } from "react"
 
 export default function StudentGoalsDialog({
   sessionGoalHash,
-  viewer,
   children,
 }: {
   sessionGoalHash: string
-  viewer: Role
+
   children: ReactNode
 }) {
+  const { user } = useUser() as { user: Mentor | Student }
   const [objectives, setObjectives] = useState<string>("")
   const [dialogOpen, setDialogOpen] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -49,7 +51,7 @@ export default function StudentGoalsDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {viewer === Role.STUDENT ? "My" : "Student"} objectives
+            {user.role === Role.STUDENT ? "My" : "Student"} objectives
           </DialogTitle>
           <DialogDescription>
             {isLoading ? "Loading..." : objectives}

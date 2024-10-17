@@ -22,6 +22,8 @@ import { Mentor, Student } from "@/lib/types/user.type"
 import { Role } from "@/lib/types/role.type"
 import { useState } from "react"
 import RatingDialog from "@/components/rating-dialog"
+import Link from "next/link"
+import { FaLongArrowAltRight } from "react-icons/fa"
 
 export default function SessionOptions({
   user,
@@ -42,6 +44,58 @@ export default function SessionOptions({
     return user.role === Role.MENTOR
       ? session.mentorConfirmed
       : session.studentConfirmed
+  }
+
+  async function handleAcceptSession(): Promise<void> {
+    if (!user || session.id === undefined) return
+
+    try {
+      toast({
+        title: "Pending confirmation...",
+        action: <Loader fill="white" color="primary" size="4" />,
+      })
+
+      await acceptSession({
+        account: user.account,
+        accepted: true,
+        sessionId: session.id,
+      })
+
+      toast({
+        title: "Accepting session...",
+        action: <Loader fill="white" color="primary" size="4" />,
+      })
+
+      watchForEvent({
+        event: ContractEvent.SESSION_VALIDATED,
+        args: { mentorAccount: user.account },
+        handler: () => {
+          queryClient.invalidateQueries({
+            queryKey: [QueryKeys.SESSIONS, user?.account],
+          })
+
+          toast({
+            title: "Success",
+            description: "Session accepted !",
+            action: (
+              <Link
+                href="/mentor/dashboard"
+                className="bg-transparent flex items-center gap-1 border border-white text-white rounded text-xs w-fit font-semibold px-2 py-1"
+              >
+                See on dashboard <FaLongArrowAltRight />
+              </Link>
+            ),
+          })
+        },
+      })
+    } catch (error: any) {
+      console.log("error: ", error)
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: "Something wrong happened !",
+      })
+    }
   }
 
   async function onRevokeSession(): Promise<void> {
@@ -147,13 +201,27 @@ export default function SessionOptions({
     const actions: any = []
 
     if (!isPastSession() && user.role === Role.MENTOR) {
+      if (session.accepted) {
+        actions.push(
+          <DropdownMenuItem
+            key="revoke"
+            className="flex drop-shadow-lg justify-center cursor-pointer"
+            onClick={onRevokeSession}
+          >
+            Revoke session
+          </DropdownMenuItem>
+        )
+
+        return actions
+      }
+
       actions.push(
         <DropdownMenuItem
           key="revoke"
           className="flex drop-shadow-lg justify-center cursor-pointer"
-          onClick={onRevokeSession}
+          onClick={handleAcceptSession}
         >
-          Revoke session
+          Accept session
         </DropdownMenuItem>
       )
 

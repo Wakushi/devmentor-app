@@ -1,6 +1,6 @@
 "use client"
 
-import { sessionsColumns } from "@/components/pages/sessions/sessions-table-columns"
+import { studentSessionsColumns } from "@/components/pages/sessions/session-columns/student-sessions-columns"
 import SessionsTable from "@/components/sessions-table"
 import AnimatedBackground from "@/components/ui/animated-background"
 import ErrorState from "@/components/ui/error-state"
@@ -9,6 +9,7 @@ import NavLinkButton from "@/components/ui/nav-link"
 import useMentorsQuery from "@/hooks/queries/mentors-query"
 import useSessionsQuery from "@/hooks/queries/sessions-query"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
+import { Role } from "@/lib/types/role.type"
 import { Student } from "@/lib/types/user.type"
 import { useUser } from "@/stores/user.store"
 import Image from "next/image"
@@ -39,12 +40,16 @@ export default function SessionsPage() {
           return (
             <div className="flex flex-col gap-4 pt-[8rem] min-h-screen m-auto w-[95%]">
               <div className="flex flex-col">
-                <h2 className="text-2xl">Sessions history</h2>
+                <h2 className="text-2xl">Sessions</h2>
                 <p className="text-small font-normal font-sans text-dim">
                   List of your past and future sessions
                 </p>
               </div>
-              <SessionsTable data={sessions} columns={sessionsColumns} />
+              <SessionsTable
+                data={sessions}
+                columns={studentSessionsColumns}
+                viewer={Role.STUDENT}
+              />
             </div>
           )
         },

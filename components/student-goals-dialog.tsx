@@ -7,14 +7,17 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Role } from "@/lib/types/role.type"
 import { getFileByHash } from "@/services/ipfs.service"
 import { ReactNode, useEffect, useState } from "react"
 
 export default function StudentGoalsDialog({
   sessionGoalHash,
+  viewer,
   children,
 }: {
   sessionGoalHash: string
+  viewer: Role
   children: ReactNode
 }) {
   const [objectives, setObjectives] = useState<string>("")
@@ -45,7 +48,9 @@ export default function StudentGoalsDialog({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Student objectives</DialogTitle>
+          <DialogTitle>
+            {viewer === Role.STUDENT ? "My" : "Student"} objectives
+          </DialogTitle>
           <DialogDescription>
             {isLoading ? "Loading..." : objectives}
           </DialogDescription>

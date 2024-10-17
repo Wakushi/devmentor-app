@@ -46,7 +46,10 @@ export default function Header() {
       ]
 
       if (user.role === Role.STUDENT) {
-        navLinks.push({ href: "/student/mentor-search", label: "Mentors" })
+        navLinks.push(
+          { href: "/student/mentor-search", label: "Mentors" },
+          { href: "/student/sessions", label: "Sessions" }
+        )
       }
 
       if (user.role === Role.MENTOR) {

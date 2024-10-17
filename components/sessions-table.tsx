@@ -28,7 +28,7 @@ interface SessionDataTableProps<TData, TValue> {
   data: TData[]
 }
 
-export default function SessionRequestsTable<TData, TValue>({
+export default function SessionsTable<TData, TValue>({
   columns,
   data,
 }: SessionDataTableProps<TData, TValue>) {

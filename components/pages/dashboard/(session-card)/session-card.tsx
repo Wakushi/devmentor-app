@@ -49,7 +49,10 @@ export function SessionCard({
         <div className="flex flex-col gap-2 ml-auto">
           {user.role === Role.MENTOR && (
             <>
-              <StudentGoalsDialog sessionGoalHash={session.sessionGoalHash}>
+              <StudentGoalsDialog
+                sessionGoalHash={session.sessionGoalHash}
+                viewer={Role.MENTOR}
+              >
                 <div className="flex items-center gap-2 text-dm-accent">
                   <GoGoal />
                   <span className="text-small hover:underline">Objectives</span>
@@ -75,8 +78,8 @@ export function SessionCard({
         )}
       </div>
       <SessionOptions session={session} user={user} />
-      <span className="absolute left-2 top-1 text-xs text-dim opacity-50">
-        #{session.id}
+      <span className="absolute left-1 top-1 text-xs opacity-40 border rounded-full h-4 w-4 flex items-center justify-center glass">
+        {session.id}
       </span>
     </div>
   )

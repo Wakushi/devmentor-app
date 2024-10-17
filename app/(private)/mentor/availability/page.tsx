@@ -119,30 +119,27 @@ export default function AvailabilityPage() {
   return (
     <div className="p-4 pt-[8rem] pb-8 min-h-screen m-auto w-[95%]">
       <div className="flex gap-8 w-full">
-        <div className="flex flex-col gap-4 w-full">
-          <div className="flex flex-col">
-            <h2 className="text-2xl">Events</h2>
-            <p className="text-small font-normal font-sans text-dim">
-              Manage your events
-            </p>
-          </div>
-          {matchQueryStatus(meetingEventsQuery, {
-            Loading: (
-              <div className="w-[300px] h-[100px] flex justify-center items-center">
-                <Loader />
+        {matchQueryStatus(meetingEventsQuery, {
+          Loading: <LoadingScreen />,
+          Errored: <p>Something wrong happened</p>,
+          Success: ({ data }) => (
+            <div className="flex flex-col gap-4 w-full">
+              <div className="flex flex-col">
+                <h2 className="text-2xl">Events</h2>
+                <p className="text-small font-normal font-sans text-dim">
+                  Manage your events
+                </p>
               </div>
-            ),
-            Errored: <p>Something wrong happened</p>,
-            Success: ({ data }) => (
               <MeetingEvents
                 mentor={user}
                 meetingEvents={data}
                 selectedEvent={selectedEvent}
                 handleSelectEvent={handleSelectEvent}
               />
-            ),
-          })}
-        </div>
+            </div>
+          ),
+        })}
+
         {!!selectedEvent && meetingEvents && (
           <div className="flex flex-col gap-4 w-full">
             <div className="flex flex-col">

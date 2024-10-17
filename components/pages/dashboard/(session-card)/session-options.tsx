@@ -6,19 +6,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import {
   acceptSession,
   confirmSession,
   ContractEvent,
   watchForEvent,
 } from "@/services/contract.service"
-
 import { toast } from "@/hooks/use-toast"
 import Loader from "@/components/ui/loader"
 import { QueryKeys } from "@/lib/types/query-keys.type"
@@ -29,8 +21,7 @@ import { Session } from "@/lib/types/session.type"
 import { Mentor, Student } from "@/lib/types/user.type"
 import { Role } from "@/lib/types/role.type"
 import { useState } from "react"
-import SessionRating from "./session-rating"
-import { Button } from "@/components/ui/button"
+import RatingDialog from "@/components/rating-dialog"
 
 export default function SessionOptions({
   user,
@@ -211,35 +202,5 @@ export default function SessionOptions({
         onRateMentor={onRateMentor}
       />
     </>
-  )
-}
-
-function RatingDialog({
-  dialogOpen,
-  setDialogOpen,
-  onRateMentor,
-}: {
-  dialogOpen: boolean
-  setDialogOpen: (open: boolean) => void
-  onRateMentor: (rating: number) => void
-}) {
-  const [rating, setRating] = useState<number>(3)
-
-  return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DialogContent>
-        <DialogHeader className="mb-4">
-          <DialogTitle>Evaluate Your Mentorship Session</DialogTitle>
-          <DialogDescription>
-            Your feedback helps us pair you with the ideal mentor for future
-            sessions.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="flex flex-col items-center gap-4">
-          <SessionRating rating={rating} setRating={setRating} />
-          <Button onClick={() => onRateMentor(rating)}>Confirm</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
   )
 }

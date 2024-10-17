@@ -1,30 +1,32 @@
 "use client"
 
+import { sessionsColumns } from "@/components/pages/sessions/sessions-table-columns"
 import SessionsTable from "@/components/sessions-table"
-import { sessionRequestsColumns } from "@/components/pages/session-requests/session-requests-table-columns"
 import AnimatedBackground from "@/components/ui/animated-background"
 import ErrorState from "@/components/ui/error-state"
 import LoadingScreen from "@/components/ui/loading-screen"
 import NavLinkButton from "@/components/ui/nav-link"
+import useMentorsQuery from "@/hooks/queries/mentors-query"
 import useSessionsQuery from "@/hooks/queries/sessions-query"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
-import { Mentor } from "@/lib/types/user.type"
+import { Student } from "@/lib/types/user.type"
 import { useUser } from "@/stores/user.store"
 import Image from "next/image"
 import { FaLongArrowAltRight } from "react-icons/fa"
 
-export default function SessionRequestsPage() {
+export default function SessionsPage() {
   const { user, loadingUser } = useUser() as {
-    user: Mentor
+    user: Student
     loadingUser: boolean
   }
 
-  const sessionsQuery = useSessionsQuery(user, "students")
+  const mentorsQuery = useMentorsQuery()
+  const { data: mentors, isLoading: loadingMentors } = mentorsQuery
+  const sessionsQuery = useSessionsQuery(user, "mentors", mentors)
 
-  if (loadingUser) {
+  if (loadingUser || loadingMentors) {
     return <LoadingScreen />
   }
-
   if (!user) return
 
   return (
@@ -34,23 +36,16 @@ export default function SessionRequestsPage() {
         Errored: <ErrorState onRetry={() => sessionsQuery.refetch()} />,
         Empty: <EmptyRequestsPage />,
         Success: ({ data: sessions }) => {
-          const filteredSessions = sessions.filter(
-            (session) => !session.accepted
-          )
-
+          console.log("sessions: ", sessions)
           return (
             <div className="flex flex-col gap-4 pt-[8rem] min-h-screen m-auto w-[95%]">
               <div className="flex flex-col">
-                <h2 className="text-2xl">Session requests</h2>
+                <h2 className="text-2xl">Sessions history</h2>
                 <p className="text-small font-normal font-sans text-dim">
-                  List of students waiting for your approval to schedule a
-                  mentoring session
+                  List of your past and future sessions
                 </p>
               </div>
-              <SessionsTable
-                data={filteredSessions}
-                columns={sessionRequestsColumns}
-              />
+              <SessionsTable data={sessions} columns={sessionsColumns} />
             </div>
           )
         },

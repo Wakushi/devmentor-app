@@ -1,6 +1,6 @@
 "use client"
 
-import { Column, ColumnDef, Row } from "@tanstack/react-table"
+import { Column, ColumnDef } from "@tanstack/react-table"
 import { Session } from "@/lib/types/session.type"
 import { formatDate, formatTime } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -11,16 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
 import { useQueryClient } from "@tanstack/react-query"
-import { useEffect, useState } from "react"
 import { Student } from "@/lib/types/user.type"
 import { PiStudent } from "react-icons/pi"
 import { GoGoal } from "react-icons/go"
@@ -32,24 +23,18 @@ import {
   weiToUsd,
 } from "@/services/contract.service"
 import { CiDollar } from "react-icons/ci"
-import { FaEye, FaLongArrowAltRight } from "react-icons/fa"
+import { FaLongArrowAltRight } from "react-icons/fa"
 import { RiContactsBook3Fill } from "react-icons/ri"
-import { useSignMessage } from "wagmi"
-import { decryptWithSignature } from "@/lib/crypto/crypto"
 import { useUser } from "@/stores/user.store"
-import Copy from "@/components/ui/copy"
-import { ContactType } from "@/lib/types/profile-form.type"
-import CopyWrapper from "@/components/ui/copy-wrapper"
-import { getFileByHash } from "@/services/ipfs.service"
 import { toast } from "@/hooks/use-toast"
 import Loader from "@/components/ui/loader"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import Link from "next/link"
-import ContactIcon from "@/components/contact-icon"
 import StudentContactDialog from "@/components/student-contact-dialog"
 import StudentGoalsDialog from "@/components/student-goals-dialog"
+import { Role } from "@/lib/types/role.type"
 
-export const columns: ColumnDef<Session>[] = [
+export const sessionRequestsColumns: ColumnDef<Session>[] = [
   {
     accessorKey: "startTime",
     header: ({ column }) => {
@@ -125,7 +110,7 @@ export const columns: ColumnDef<Session>[] = [
       const sessionGoalHash: string = row.getValue("sessionGoalHash")
 
       return (
-        <StudentGoalsDialog sessionGoalHash={sessionGoalHash}>
+        <StudentGoalsDialog sessionGoalHash={sessionGoalHash} viewer={Role.MENTOR}>
           <GoGoal className="w-6 h-6 text-dm-accent hover:-translate-y-1 transition-all duration-200 opacity-70 hover:opacity-100 cursor-pointer" />
         </StudentGoalsDialog>
       )

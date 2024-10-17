@@ -68,7 +68,10 @@ export default function UserContextProvider(props: UserContextProviderProps) {
   }, [web3AuthInstance.connected, isConnected])
 
   async function fetchUser(): Promise<Visitor | Student | Mentor | null> {
-    if (!isConnected && !web3AuthInstance.connected) return null
+    if (!isConnected && !web3AuthInstance.connected) {
+      await clearToken()
+      return null
+    }
 
     try {
       let user: Visitor | Student | Mentor | null = null
@@ -77,10 +80,6 @@ export default function UserContextProvider(props: UserContextProviderProps) {
 
       if (!user) {
         user = await login()
-      }
-
-      if (user) {
-        routeUser(user)
       }
 
       return user
@@ -115,6 +114,10 @@ export default function UserContextProvider(props: UserContextProviderProps) {
 
       const { data: user } = await response.json()
 
+      if (user) {
+        routeUser(user)
+      }
+
       return user
     } catch (error: any) {
       toast({
@@ -144,17 +147,7 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     router.push("/")
 
     try {
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to log out")
-      }
+      await clearToken()
 
       disconnectAsync().then(() => {
         queryClient.resetQueries({
@@ -163,6 +156,20 @@ export default function UserContextProvider(props: UserContextProviderProps) {
       })
     } catch (error) {
       console.error(error)
+    }
+  }
+
+  async function clearToken(): Promise<void> {
+    const response = await fetch("/api/auth/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+    })
+
+    if (!response.ok) {
+      throw new Error("Failed to log out")
     }
   }
 

@@ -12,8 +12,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
     const user = await getUserByAddress(userPayload.address)
 
-    console.log("login with token user: ", user)
-
     return NextResponse.json({ success: true, data: user })
   } catch (error) {
     return NextResponse.json(

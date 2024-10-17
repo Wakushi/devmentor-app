@@ -12,36 +12,7 @@ import { useUser } from "@/stores/user.store"
 import StudentGoalsDialog from "@/components/student-goals-dialog"
 import { Role } from "@/lib/types/role.type"
 import SessionOptions from "../dashboard/(session-card)/session-options"
-import TooltipWrapper from "@/components/ui/custom-tooltip"
-
-enum SessionStatus {
-  PENDING_VALIDATION = "Awaiting Approval",
-  SCHEDULED = "Scheduled",
-  EXPIRED = "Expired",
-  COMPLETED = "Completed",
-  PENDING_CONFIRMATION = "Pending Confirmation",
-}
-
-const statusColors: Record<SessionStatus, string> = {
-  [SessionStatus.PENDING_VALIDATION]: "bg-yellow-400",
-  [SessionStatus.SCHEDULED]: "bg-blue-400",
-  [SessionStatus.EXPIRED]: "bg-red-400",
-  [SessionStatus.COMPLETED]: "bg-green-400",
-  [SessionStatus.PENDING_CONFIRMATION]: "bg-purple-400",
-}
-
-const statusTooltips: Record<SessionStatus, string> = {
-  [SessionStatus.PENDING_VALIDATION]:
-    "This session is waiting for approval. Once approved, it will be scheduled.",
-  [SessionStatus.SCHEDULED]:
-    "This session has been approved and is scheduled to take place in the future.",
-  [SessionStatus.EXPIRED]:
-    "This session was not approved before its scheduled time and can no longer take place.",
-  [SessionStatus.COMPLETED]:
-    "This session has taken place and been confirmed by both the mentor and student.",
-  [SessionStatus.PENDING_CONFIRMATION]:
-    "This session has taken place but is waiting for confirmation from either the mentor or the student.",
-}
+import { statusColumn } from "./columns/status-column"
 
 export const sessionsColumns: ColumnDef<Session>[] = [
   {
@@ -98,6 +69,16 @@ export const sessionsColumns: ColumnDef<Session>[] = [
         </div>
       )
     },
+    accessorFn: (row) => row.mentor,
+    filterFn: (row, id, value) => {
+      if (!value) return true
+
+      const mentor: Mentor = row.getValue(id)
+
+      return mentor.baseUser.userName
+        .toLowerCase()
+        .includes(value.toLowerCase())
+    },
   },
   {
     accessorKey: "sessionGoalHash",
@@ -115,45 +96,7 @@ export const sessionsColumns: ColumnDef<Session>[] = [
       )
     },
   },
-  {
-    id: "status",
-    header: "Status",
-    cell: ({ row }: { row: { original: Session } }) => {
-      const status = getSessionStatus(row.original)
-      const colorClass = statusColors[status]
-      const tooltip = statusTooltips[status]
-
-      function getSessionStatus(session: Session): SessionStatus {
-        const { endTime, accepted, mentorConfirmed, studentConfirmed } = session
-        const isPast = endTime < Date.now()
-
-        if (!isPast) {
-          return accepted
-            ? SessionStatus.SCHEDULED
-            : SessionStatus.PENDING_VALIDATION
-        }
-
-        if (!accepted) {
-          return SessionStatus.EXPIRED
-        }
-
-        if (mentorConfirmed && studentConfirmed) {
-          return SessionStatus.COMPLETED
-        }
-
-        return SessionStatus.PENDING_CONFIRMATION
-      }
-
-      return (
-        <TooltipWrapper message={tooltip}>
-          <div className="flex items-center gap-2 text-small">
-            <span className={`w-3 h-3 ${colorClass} rounded-full`}></span>
-            <span className="text-dim">{status}</span>
-          </div>
-        </TooltipWrapper>
-      )
-    },
-  },
+  statusColumn,
   {
     id: "actions",
     cell: ({ row }) => {

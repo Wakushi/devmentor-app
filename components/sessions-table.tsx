@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -21,7 +21,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import clsx from "clsx"
+import { SessionStatus } from "./pages/sessions/columns/status-column"
+import { Session } from "@/lib/types/session.type"
+import { Checkbox } from "./ui/checkbox"
+import { Label } from "./ui/label"
 
 interface SessionDataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -36,9 +48,17 @@ export default function SessionsTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
+  const [showPast, setShowPast] = useState<boolean>(false)
+
+  const filteredSessions = useMemo(() => {
+    return data.filter((session) => {
+      const isPastSession = (session as Session).endTime < Date.now()
+      return showPast ? true : !isPastSession
+    })
+  }, [data, showPast])
 
   const table = useReactTable({
-    data,
+    data: filteredSessions,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -58,6 +78,52 @@ export default function SessionsTable<TData, TValue>({
 
   return (
     <div className="space-y-4 z-[2]">
+      <div className="flex space-x-2">
+        <Input
+          placeholder="Filter topics..."
+          value={(table.getColumn("topic")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("topic")?.setFilterValue(event.target.value)
+          }
+          className="max-w-[200px]"
+        />
+        <Input
+          placeholder="Filter mentors..."
+          value={(table.getColumn("mentor")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("mentor")?.setFilterValue(event.target.value)
+          }
+          className="max-w-[200px]"
+        />
+        <Select
+          value={(table.getColumn("status")?.getFilterValue() as string) ?? ""}
+          onValueChange={(value) =>
+            table.getColumn("status")?.setFilterValue(value)
+          }
+        >
+          <SelectTrigger className="max-w-[200px]">
+            <SelectValue placeholder="Filter status..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            {Object.values(SessionStatus).map((status) => (
+              <SelectItem key={status} value={status}>
+                {status}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="showPast"
+            checked={showPast}
+            onCheckedChange={(checked) => setShowPast(checked as boolean)}
+          />
+          <Label className="cursor-pointer" htmlFor="showPast">
+            Show past sessions
+          </Label>
+        </div>
+      </div>
       <div className="glass rounded-md">
         <Table>
           <TableHeader>

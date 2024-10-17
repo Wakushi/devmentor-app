@@ -36,7 +36,6 @@ export default function SessionsPage() {
         Errored: <ErrorState onRetry={() => sessionsQuery.refetch()} />,
         Empty: <EmptyRequestsPage />,
         Success: ({ data: sessions }) => {
-          console.log("sessions: ", sessions)
           return (
             <div className="flex flex-col gap-4 pt-[8rem] min-h-screen m-auto w-[95%]">
               <div className="flex flex-col">

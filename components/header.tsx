@@ -88,7 +88,6 @@ export default function Header() {
     }
 
     const authLinks: NavLink[] = [
-      { href: "/", label: "Home" },
       { href: "/auth/signup", label: "Signup", variant: "outline" },
       { href: "/auth/login", label: "Login", variant: "filled" },
     ]

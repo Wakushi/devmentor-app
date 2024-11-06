@@ -23,7 +23,6 @@ import { FaCircleCheck } from "react-icons/fa6"
 import { MdError } from "react-icons/md"
 import { useQueryClient } from "@tanstack/react-query"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
-import Loader from "@/components/ui/loader"
 import { MeetingEvents } from "@/components/pages/dashboard/mentor/meeting-events"
 
 export default function AvailabilityPage() {
@@ -40,7 +39,7 @@ export default function AvailabilityPage() {
   const [selectedEvent, setSelectedEvent] = useState<MeetingEvent | null>(null)
 
   useEffect(() => {
-    if (selectedEvent || !meetingEvents || !meetingEvents.length) return
+    if (!meetingEvents || !meetingEvents.length) return
 
     setSelectedEvent(meetingEvents[0])
   }, [meetingEvents])
@@ -122,22 +121,24 @@ export default function AvailabilityPage() {
         {matchQueryStatus(meetingEventsQuery, {
           Loading: <LoadingScreen />,
           Errored: <p>Something wrong happened</p>,
-          Success: ({ data }) => (
-            <div className="flex flex-col gap-4 w-full">
-              <div className="flex flex-col">
-                <h2 className="text-2xl">Events</h2>
-                <p className="text-small font-normal font-sans text-dim">
-                  Manage your events
-                </p>
+          Success: ({ data: meetingEvents }) => {
+            return (
+              <div className="flex flex-col gap-4 w-full">
+                <div className="flex flex-col">
+                  <h2 className="text-2xl">Events</h2>
+                  <p className="text-small font-normal font-sans text-dim">
+                    Manage your events
+                  </p>
+                </div>
+                <MeetingEvents
+                  mentor={user}
+                  meetingEvents={meetingEvents}
+                  selectedEvent={selectedEvent}
+                  handleSelectEvent={handleSelectEvent}
+                />
               </div>
-              <MeetingEvents
-                mentor={user}
-                meetingEvents={data}
-                selectedEvent={selectedEvent}
-                handleSelectEvent={handleSelectEvent}
-              />
-            </div>
-          ),
+            )
+          },
         })}
 
         {!!selectedEvent && meetingEvents && (

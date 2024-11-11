@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Address } from "viem"
-import { Timeslot } from "./types/timeslot.type"
+import { DaySlot, Timeslot } from "./types/timeslot.type"
 import { Matcher } from "react-day-picker"
 import {
   allLanguages,
@@ -85,6 +85,36 @@ export const formatTime = (timestamp: number) => {
     hour: "2-digit",
     minute: "2-digit",
   })
+}
+
+export function timeValueToTimestamp(timeValue: TimeValue): number {
+  if (!timeValue) return 0
+
+  const { hour, minute } = timeValue
+  const date = new Date()
+
+  date.setHours(hour)
+  date.setMinutes(minute)
+
+  return date.getTime()
+}
+
+export function getDefaultSlot(): DaySlot {
+  const date = new Date()
+  date.setMinutes(0)
+
+  date.setHours(9)
+  const timeStart = date.getTime()
+
+  date.setHours(17)
+  const timeEnd = date.getTime()
+
+  const defaultSlot: DaySlot = {
+    timeStart,
+    timeEnd,
+  }
+
+  return defaultSlot
 }
 
 export function computeTimeAndDateTimestamps(time: number, date: Date): Date {

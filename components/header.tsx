@@ -76,7 +76,7 @@ export default function Header() {
             <p className="text-mid">
               {(user as Student | Mentor).baseUser.userName}
             </p>
-            <TooltipWrapper message="Disconnect wallet">
+            <TooltipWrapper message="Disconnect">
               <IoMdLogOut
                 className="text-2xl text-brand cursor-pointer hover:opacity-80"
                 onClick={logOut}
@@ -96,7 +96,7 @@ export default function Header() {
       <nav className="flex items-center gap-2">
         {renderNavLinks(authLinks)}
         {isConnected && (
-          <TooltipWrapper message="Disconnect wallet">
+          <TooltipWrapper message="Disconnect">
             <IoMdLogOut
               className="text-2xl text-brand cursor-pointer hover:opacity-80"
               onClick={logOut}

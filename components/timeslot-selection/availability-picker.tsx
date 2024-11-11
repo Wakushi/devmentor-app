@@ -1,72 +1,37 @@
 "use client"
 
-import {
-  DayOfWeek,
-  DaySlot,
-  MeetingEvent,
-  Timeslot,
-} from "@/lib/types/timeslot.type"
-import { getWeekdayName } from "@/lib/utils"
-import { useEffect, useState } from "react"
+import { DayOfWeek, MeetingEvent, Timeslot } from "@/lib/types/timeslot.type"
+import { getDefaultSlot, timeValueToTimestamp } from "@/lib/utils"
+import { Dispatch, SetStateAction, useState } from "react"
 import { TimeValue } from "react-aria"
 import DayOfWeekCard from "./day-of-week-card"
 import { Button } from "../ui/button"
 import { Mentor } from "@/lib/types/user.type"
-import { DAYS_OF_WEEK } from "@/lib/constants"
 import { Address } from "viem"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { RiEditLine } from "react-icons/ri"
+import { toast } from "@/hooks/use-toast"
+import { MdError } from "react-icons/md"
 
-export default function AvailabilityPicker({
-  mentor,
-  selectedEvent,
-  handleSaveTimeslots,
-}: {
+interface AvailabilityPickerProps {
   mentor: Mentor
   selectedEvent: MeetingEvent
+  daysOfWeek: DayOfWeek[]
+  setDaysOfWeek: Dispatch<SetStateAction<DayOfWeek[]>>
   handleSaveTimeslots: (
     meetingEvent: MeetingEvent,
     timeslots: Timeslot[]
   ) => Promise<void>
-}) {
-  const [daysOfWeek, setDaysOfWeek] = useState<DayOfWeek[]>([])
+}
+
+export default function AvailabilityPicker({
+  mentor,
+  selectedEvent,
+  daysOfWeek,
+  setDaysOfWeek,
+  handleSaveTimeslots,
+}: AvailabilityPickerProps) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false)
-
-  useEffect(() => {
-    function initialDaysOfWeek(): DayOfWeek[] {
-      const baseDays = Array.from({ length: DAYS_OF_WEEK }, (_, i) => ({
-        index: i,
-        name: getWeekdayName(i),
-        slots: [],
-        active: false,
-      }))
-
-      if (selectedEvent.timeslots && selectedEvent.timeslots.length) {
-        return computeDaysOfWeek(baseDays, selectedEvent.timeslots)
-      }
-
-      return baseDays.map((day) => ({
-        ...day,
-        slots: [getDefaultSlot()],
-        active: false,
-      }))
-    }
-
-    setDaysOfWeek(initialDaysOfWeek())
-    setHasUnsavedChanges(false)
-  }, [selectedEvent])
-
-  function timeValueToTimestamp(timeValue: TimeValue): number {
-    if (!timeValue) return 0
-
-    const { hour, minute } = timeValue
-    const date = new Date()
-
-    date.setHours(hour)
-    date.setMinutes(minute)
-
-    return date.getTime()
-  }
 
   function handleTimeslotValueChange({
     dayIndex,
@@ -134,7 +99,14 @@ export default function AvailabilityPicker({
       mentor.account
     )
 
-    if (!availabilityRanges.length) return
+    if (!availabilityRanges.length) {
+      toast({
+        title: "Error",
+        description: "Please select at least one time slot for this event.",
+        action: <MdError className="text-white" />,
+      })
+      return
+    }
 
     await handleSaveTimeslots(selectedEvent, availabilityRanges)
 
@@ -162,42 +134,6 @@ export default function AvailabilityPicker({
       })
 
     return availabilities
-  }
-
-  function computeDaysOfWeek(
-    baseDays: DayOfWeek[],
-    timeslots: Timeslot[]
-  ): DayOfWeek[] {
-    timeslots.forEach(({ timeStart, timeEnd, day }) => {
-      baseDays[day].active = true
-      baseDays[day].slots.push({
-        timeStart,
-        timeEnd,
-      })
-    })
-
-    return baseDays.map((day) => ({
-      ...day,
-      slots: day.active ? day.slots : [getDefaultSlot()],
-    }))
-  }
-
-  function getDefaultSlot(): DaySlot {
-    const date = new Date()
-    date.setMinutes(0)
-
-    date.setHours(9)
-    const timeStart = date.getTime()
-
-    date.setHours(17)
-    const timeEnd = date.getTime()
-
-    const defaultSlot: DaySlot = {
-      timeStart,
-      timeEnd,
-    }
-
-    return defaultSlot
   }
 
   return (

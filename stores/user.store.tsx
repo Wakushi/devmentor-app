@@ -74,15 +74,9 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     }
 
     try {
-      let user: Visitor | Student | Mentor | null = null
+      const user: Visitor | Student | Mentor | null = await loginWithToken()
 
-      user = await loginWithToken()
-
-      if (!user) {
-        user = await login()
-      }
-
-      return user
+      return user || (await login())
     } catch (error) {
       console.log("Error while connecting user: ", error)
       return null
@@ -178,15 +172,12 @@ export default function UserContextProvider(props: UserContextProviderProps) {
     const pathname = url.pathname
     const role = url.searchParams.get("role")
 
-    switch (pathname) {
-      case "/auth/signup":
-      case "/auth/login":
-        router.push(
-          user.role !== Role.VISITOR
-            ? `/${user.role?.toLowerCase()}/dashboard`
-            : `/auth/signup/${role || "choice"}`
-        )
-        break
+    if (["/auth/signup", "/auth/login"].includes(pathname)) {
+      router.push(
+        user.role !== Role.VISITOR
+          ? `/${user.role?.toLowerCase()}/dashboard`
+          : `/auth/signup/${role || "choice"}`
+      )
     }
   }
 

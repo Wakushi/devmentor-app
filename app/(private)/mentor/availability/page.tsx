@@ -5,7 +5,7 @@ import { useUser } from "@/stores/user.store"
 import LoadingScreen from "@/components/ui/loading-screen"
 import AvailabilityPicker from "@/components/timeslot-selection/availability-picker"
 import { Mentor } from "@/lib/types/user.type"
-import { MeetingEvent, Timeslot } from "@/lib/types/timeslot.type"
+import { DayOfWeek, MeetingEvent, Timeslot } from "@/lib/types/timeslot.type"
 import { useEffect, useState } from "react"
 import {
   Select,
@@ -24,6 +24,8 @@ import { MdError } from "react-icons/md"
 import { useQueryClient } from "@tanstack/react-query"
 import { matchQueryStatus } from "@/lib/matchQueryStatus"
 import { MeetingEvents } from "@/components/pages/dashboard/mentor/meeting-events"
+import { DAYS_OF_WEEK } from "@/lib/constants"
+import { getDefaultSlot, getWeekdayName } from "@/lib/utils"
 
 export default function AvailabilityPage() {
   const queryClient = useQueryClient()
@@ -37,15 +39,20 @@ export default function AvailabilityPage() {
   const { data: meetingEvents } = meetingEventsQuery
 
   const [selectedEvent, setSelectedEvent] = useState<MeetingEvent | null>(null)
+  const [daysOfWeek, setDaysOfWeek] = useState<DayOfWeek[]>([])
 
   useEffect(() => {
-    if (!meetingEvents || !meetingEvents.length) return
+    if (!meetingEvents || !meetingEvents.length || selectedEvent) return
 
-    setSelectedEvent(meetingEvents[0])
+    const initialMeetingEvent = meetingEvents[0]
+
+    setSelectedEvent(initialMeetingEvent)
+    setDaysOfWeek(getInitialDaysOfWeek(initialMeetingEvent))
   }, [meetingEvents])
 
   function handleSelectEvent(meetingEvent: MeetingEvent | null): void {
     setSelectedEvent(meetingEvent)
+    setDaysOfWeek(getInitialDaysOfWeek(meetingEvent))
   }
 
   function handleCopyEventTimeslots(meetingEventId: string): void {
@@ -109,6 +116,45 @@ export default function AvailabilityPage() {
     }
   }
 
+  function computeDaysOfWeek(
+    baseDays: DayOfWeek[],
+    timeslots: Timeslot[]
+  ): DayOfWeek[] {
+    timeslots.forEach(({ timeStart, timeEnd, day }) => {
+      baseDays[day].active = true
+      baseDays[day].slots.push({
+        timeStart,
+        timeEnd,
+      })
+    })
+
+    return baseDays.map((day) => ({
+      ...day,
+      slots: day.active ? day.slots : [getDefaultSlot()],
+    }))
+  }
+
+  function getInitialDaysOfWeek(
+    meetingEvent: MeetingEvent | null
+  ): DayOfWeek[] {
+    const baseDays = Array.from({ length: DAYS_OF_WEEK }, (_, i) => ({
+      index: i,
+      name: getWeekdayName(i),
+      slots: [],
+      active: false,
+    }))
+
+    if (meetingEvent?.timeslots && meetingEvent.timeslots.length) {
+      return computeDaysOfWeek(baseDays, meetingEvent.timeslots)
+    }
+
+    return baseDays.map((day) => ({
+      ...day,
+      slots: [getDefaultSlot()],
+      active: false,
+    }))
+  }
+
   if (loadingUser) {
     return <LoadingScreen />
   }
@@ -159,6 +205,8 @@ export default function AvailabilityPage() {
             <AvailabilityPicker
               mentor={user}
               selectedEvent={selectedEvent}
+              daysOfWeek={daysOfWeek}
+              setDaysOfWeek={setDaysOfWeek}
               handleSaveTimeslots={handleSaveTimeslots}
             />
           </div>

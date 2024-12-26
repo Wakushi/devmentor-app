@@ -9,10 +9,10 @@ export default function SessionTime({
   endTime: number
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-2 flex-col gap-2">
       <div className="flex items-center gap-2 text-small">
         <FaCalendar />
-        <span className="text-dim">{formatDate(startTime)}</span>
+        <span className="text-dim text-nowrap">{formatDate(startTime)}</span>
       </div>
       <div className="flex items-center gap-2 text-small">
         <FaClock />

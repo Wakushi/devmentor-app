@@ -42,7 +42,7 @@ export function SessionCard({
           }
         />
         <SessionTime startTime={startTime} endTime={endTime} />
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-2 flex-col gap-2">
           <SessionTopic topic={topic} />
           <SessionPrice sessionPriceWei={valueLocked} />
         </div>

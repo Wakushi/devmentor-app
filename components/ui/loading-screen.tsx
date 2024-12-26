@@ -60,14 +60,16 @@ const funFacts = [
 export default function LoadingScreen({
   message = "",
   disappears = false,
+  showMessage = true,
 }: {
   message?: string
   disappears?: boolean
+  showMessage?: boolean
 }) {
   const [displayMessage, setDisplayMessage] = useState<string>(message)
 
   useEffect(() => {
-    if (!message) {
+    if (showMessage && !message) {
       const randomFact = funFacts[Math.floor(Math.random() * funFacts.length)]
       setDisplayMessage(randomFact)
     }

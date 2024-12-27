@@ -202,7 +202,7 @@ export function MeetingEvents({
 
   function refreshList() {
     queryClient.invalidateQueries({
-      queryKey: [QueryKeys.MEETING_EVENTS, mentor.account],
+      queryKey: [QueryKeys.MEETING_EVENTS],
     })
   }
 
@@ -239,7 +239,7 @@ export function MeetingEvents({
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingEvent ? "Edit Meeting Event" : "Create Meeting Event"}
+              {editingEvent ? "Edit meeting event" : "Create meeting event"}
             </DialogTitle>
             <DialogDescription>
               Fill in the details for your meeting event.
@@ -251,7 +251,7 @@ export function MeetingEvents({
                 name="name"
                 control={form.control}
                 render={({ field }) => (
-                  <Input placeholder="Event Name" {...field} />
+                  <Input placeholder="Event name" {...field} />
                 )}
               />
               <div className="flex space-x-2">
@@ -292,7 +292,11 @@ export function MeetingEvents({
                 name="description"
                 control={form.control}
                 render={({ field }) => (
-                  <Textarea placeholder="Description" {...field} />
+                  <Textarea
+                    className="resize-none"
+                    placeholder="Description"
+                    {...field}
+                  />
                 )}
               />
             </div>

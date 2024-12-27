@@ -33,19 +33,21 @@ export default function AvailabilityPage() {
   const meetingEventsQuery = useMeetingEventsQuery(user?.account)
   const userTimezoneQuery = useUserTimezoneQuery(user?.account)
 
-  const { data: meetingEvents } = meetingEventsQuery
+  const { data: meetingEvents, isLoading: loadingEvents } = meetingEventsQuery
   const { data: timezone } = userTimezoneQuery
 
   const [selectedEvent, setSelectedEvent] = useState<MeetingEvent | null>(null)
   const [daysOfWeek, setDaysOfWeek] = useState<DayOfWeek[]>([])
 
   useEffect(() => {
-    if (!meetingEvents || !meetingEvents.length || selectedEvent) return
+    if (!meetingEvents || !meetingEvents.length) return
 
-    const initialMeetingEvent = meetingEvents[0]
+    if (!selectedEvent) {
+      setSelectedEvent(meetingEvents[0])
+    }
 
-    setSelectedEvent(initialMeetingEvent)
-    setDaysOfWeek(getInitialDaysOfWeek(initialMeetingEvent))
+    const displayedEvent = selectedEvent ? selectedEvent : meetingEvents[0]
+    setDaysOfWeek(getInitialDaysOfWeek(displayedEvent))
   }, [meetingEvents])
 
   useEffect(() => {
@@ -104,7 +106,7 @@ export default function AvailabilityPage() {
         })
 
         queryClient.invalidateQueries({
-          queryKey: [QueryKeys.MEETING_EVENTS, user.account],
+          queryKey: [QueryKeys.MEETING_EVENTS],
         })
       } else {
         throw new Error(error)
@@ -171,7 +173,7 @@ export default function AvailabilityPage() {
     queryClient.refetchQueries({ queryKey: [QueryKeys.TIMEZONE] })
   }
 
-  if (loadingUser) {
+  if (loadingUser || loadingEvents) {
     return <LoadingScreen />
   }
 

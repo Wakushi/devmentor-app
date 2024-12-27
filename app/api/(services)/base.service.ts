@@ -53,15 +53,15 @@ export async function addSubDocument<T>({
   }
 }
 
-export async function getDocument(
+export async function getDocument<T>(
   collectionPath: string,
   docId: string
-): Promise<DocData | null> {
+): Promise<T | null> {
   try {
     const docRef = adminDb.collection(collectionPath).doc(docId)
     const doc = await docRef.get()
     if (doc.exists) {
-      return { id: doc.id, ...doc.data() } as DocData
+      return { id: doc.id, ...doc.data() } as T
     } else {
       return null
     }

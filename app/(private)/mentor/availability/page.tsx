@@ -7,16 +7,8 @@ import AvailabilityPicker from "@/components/timeslot-selection/availability-pic
 import { Mentor } from "@/lib/types/user.type"
 import { DayOfWeek, MeetingEvent, Timeslot } from "@/lib/types/timeslot.type"
 import { useEffect, useState } from "react"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import useMeetingEventsQuery from "@/hooks/queries/meeting-event-query"
-import { Label } from "@/components/ui/label"
-import { updateMeetingEvent } from "@/services/user.service"
+import { updateMeetingEvent, updateUserTimezone } from "@/services/user.service"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { toast } from "@/hooks/use-toast"
 import { FaCircleCheck } from "react-icons/fa6"
@@ -26,6 +18,9 @@ import { matchQueryStatus } from "@/lib/matchQueryStatus"
 import { MeetingEvents } from "@/components/pages/dashboard/mentor/meeting-events"
 import { DAYS_OF_WEEK } from "@/lib/constants"
 import { getDefaultSlot, getWeekdayName } from "@/lib/utils"
+import useUserTimezoneQuery from "@/hooks/queries/user-timezone-query"
+import CopyMeetingHourSelector from "@/components/timeslot-selection/copy-meeting-hour-selector"
+import TimezoneSelector from "@/components/timeslot-selection/timezone-selector"
 
 export default function AvailabilityPage() {
   const queryClient = useQueryClient()
@@ -36,7 +31,10 @@ export default function AvailabilityPage() {
   }
 
   const meetingEventsQuery = useMeetingEventsQuery(user?.account)
+  const userTimezoneQuery = useUserTimezoneQuery(user?.account)
+
   const { data: meetingEvents } = meetingEventsQuery
+  const { data: timezone } = userTimezoneQuery
 
   const [selectedEvent, setSelectedEvent] = useState<MeetingEvent | null>(null)
   const [daysOfWeek, setDaysOfWeek] = useState<DayOfWeek[]>([])
@@ -49,6 +47,12 @@ export default function AvailabilityPage() {
     setSelectedEvent(initialMeetingEvent)
     setDaysOfWeek(getInitialDaysOfWeek(initialMeetingEvent))
   }, [meetingEvents])
+
+  useEffect(() => {
+    if (!user) return
+
+    queryClient.refetchQueries({ queryKey: [QueryKeys.TIMEZONE] })
+  }, [user])
 
   function handleSelectEvent(meetingEvent: MeetingEvent | null): void {
     setSelectedEvent(meetingEvent)
@@ -155,6 +159,18 @@ export default function AvailabilityPage() {
     }))
   }
 
+  async function handleSelectTimezone(timezone: string): Promise<void> {
+    toast({
+      title: "Timezone updated",
+      description: "Timezone set to " + timezone,
+      action: <FaCircleCheck className="text-white" />,
+    })
+
+    await updateUserTimezone(timezone)
+
+    queryClient.refetchQueries({ queryKey: [QueryKeys.TIMEZONE] })
+  }
+
   if (loadingUser) {
     return <LoadingScreen />
   }
@@ -170,11 +186,22 @@ export default function AvailabilityPage() {
           Success: ({ data: meetingEvents }) => {
             return (
               <div className="flex flex-col gap-4 w-full">
-                <div className="flex flex-col">
-                  <h2 className="text-2xl">Events</h2>
-                  <p className="text-small font-normal font-sans text-dim">
-                    Manage your events
-                  </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <h2 className="text-2xl">Events</h2>
+                    <p className="text-small font-normal font-sans text-dim">
+                      Manage your events
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-small font-normal font-sans text-dim">
+                      Timezone
+                    </p>
+                    <TimezoneSelector
+                      timezone={timezone}
+                      handleSelectTimezone={handleSelectTimezone}
+                    />
+                  </div>
                 </div>
                 <MeetingEvents
                   mentor={user}
@@ -213,40 +240,6 @@ export default function AvailabilityPage() {
         )}
       </div>
       <AnimatedBackground shader={false} />
-    </div>
-  )
-}
-
-function CopyMeetingHourSelector({
-  selectedEvent,
-  meetingEvents,
-  handleCopyEventTimeslots,
-}: {
-  selectedEvent: MeetingEvent
-  meetingEvents: MeetingEvent[]
-  handleCopyEventTimeslots: (meetingId: string) => void
-}) {
-  return (
-    <div className="flex gap-2 items-center">
-      <Label>Apply hours from </Label>
-      <Select
-        onValueChange={(meetingEventId) =>
-          handleCopyEventTimeslots(meetingEventId)
-        }
-      >
-        <SelectTrigger className="w-1/3">
-          <SelectValue placeholder="Select another event to copy" />
-        </SelectTrigger>
-        <SelectContent>
-          {meetingEvents
-            .filter((event) => event.id !== selectedEvent.id)
-            .map(({ name, id }) => (
-              <SelectItem key={id} value={id ?? ""}>
-                {name}
-              </SelectItem>
-            ))}
-        </SelectContent>
-      </Select>
     </div>
   )
 }

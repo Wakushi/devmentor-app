@@ -1,6 +1,6 @@
 const PINATA_GATEWAY_BASE_URL = "https://tan-key-moth-8.mypinata.cloud/ipfs"
 
-const DEVMENTOR_CONTRACT_ADDRESS = "0x12D0077c071d05B26c0bA343a7A04e9d3003C541"
+const DEVMENTOR_CONTRACT_ADDRESS = "0xf27D76f7ee812057875CdA2E8755cC38ae10547c"
 const DEVMENTOR_CONTRACT_ABI = [
   {
     inputs: [
@@ -1489,6 +1489,7 @@ const ETH_DECIMALS = 18
 
 const BASE_USER_PATH = "/api/user"
 const MEETING_EVENTS_PATH = "/meeting-events"
+const TIMEZONE_PATH = "/timezone"
 const BASE_CONTRACT_PATH = "/api/contract"
 
 export {
@@ -1506,4 +1507,5 @@ export {
   BASE_CONTRACT_PATH,
   BASE_USER_PATH,
   MEETING_EVENTS_PATH,
+  TIMEZONE_PATH,
 }

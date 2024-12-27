@@ -1,6 +1,11 @@
 import { Role } from "./role.type"
 import { Address } from "viem"
 
+export type FirebaseUser = {
+  address: Address
+  timezone: string
+}
+
 export type BaseUser = {
   account: Address
   userName: string

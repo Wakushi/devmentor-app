@@ -1,16 +1,26 @@
 import { MeetingEvent } from "@/lib/types/timeslot.type"
 import { Address } from "viem"
 import {
+  addDocument,
   addSubDocument,
   deleteSubDocument,
+  getDocument,
   getSubCollection,
+  updateDocument,
   updateSubDocument,
 } from "./base.service"
-import { Mentor, Student, Visitor } from "@/lib/types/user.type"
+import { FirebaseUser, Mentor, Student, Visitor } from "@/lib/types/user.type"
 import { Role } from "@/lib/types/role.type"
 
 const USER_COLLECTION = "users"
 const MEETING_EVENTS_COLLECTION = "meeting-events"
+
+export async function getFirebaseUserByAddress(
+  address: Address
+): Promise<FirebaseUser | null> {
+  const firebaseUser = await getDocument<FirebaseUser>(USER_COLLECTION, address)
+  return firebaseUser
+}
 
 export async function getUserByAddress(
   address: Address
@@ -99,5 +109,43 @@ export async function deleteMeetingEvent(
     childCollectionPath: MEETING_EVENTS_COLLECTION,
     parentDocId: address,
     childDocId: meetingEvent.id,
+  })
+}
+
+////////////////
+//  TIMEZONE  //
+////////////////
+
+export async function getUserTimezone(
+  address: Address
+): Promise<string | null> {
+  const user = await getDocument<FirebaseUser>(USER_COLLECTION, address)
+
+  if (!user) return null
+
+  return user.timezone
+}
+
+export async function updateUserTimezone(
+  timezone: string,
+  address: Address
+): Promise<void> {
+  const firebaseUser = await getFirebaseUserByAddress(address)
+
+  if (!firebaseUser) {
+    await addDocument({
+      collectionPath: USER_COLLECTION,
+      customId: address,
+      data: { address, timezone },
+    })
+    return
+  }
+
+  const updatedUser = { ...firebaseUser, timezone }
+
+  await updateDocument({
+    collectionPath: USER_COLLECTION,
+    docId: firebaseUser.address,
+    data: updatedUser,
   })
 }

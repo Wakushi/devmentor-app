@@ -105,7 +105,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 }
 
-// When we make a call using ethers, we need to properly format the received data
 async function buildUser(
   rawUser: ContractStudent | ContractMentor,
   role: Role

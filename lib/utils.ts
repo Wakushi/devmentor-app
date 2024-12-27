@@ -11,6 +11,7 @@ import {
 } from "./types/profile-form.type"
 import { TimeValue } from "react-aria"
 import { Mentor } from "./types/user.type"
+import { getTimezoneByLabel, Timezone } from "./timezones"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -201,4 +202,17 @@ export function timeStampToTimeValue(timestamp: number): TimeValue {
     hour,
     minute,
   } as TimeValue
+}
+
+export function getTimeZone(): Timezone {
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const timezone = getTimezoneByLabel(userTimezone)
+
+  return timezone
+    ? timezone
+    : {
+        label: "Europe/London",
+        value: "UTC+00:00",
+        description: "London, Dublin, Lisbon",
+      }
 }

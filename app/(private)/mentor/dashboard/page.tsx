@@ -135,7 +135,7 @@ function EmptyDashboard() {
       />
       <div className="flex flex-col text-center mb-8">
         <h3>No upcoming sessions</h3>
-        <p className="text-dim">Let's fine tune our availabilities !</p>
+        <p className="text-dim">Let's fine tune your availabilities !</p>
       </div>
       <div>
         <NavLinkButton variant="filled" href="/mentor/availability">

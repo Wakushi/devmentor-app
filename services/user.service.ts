@@ -1,5 +1,10 @@
-import { BASE_USER_PATH, MEETING_EVENTS_PATH } from "@/lib/constants"
+import {
+  BASE_USER_PATH,
+  MEETING_EVENTS_PATH,
+  TIMEZONE_PATH,
+} from "@/lib/constants"
 import { MeetingEvent } from "@/lib/types/timeslot.type"
+import { getTimeZone } from "@/lib/utils"
 import { Address } from "viem"
 
 //////////////////////
@@ -67,6 +72,48 @@ export async function deleteMeetingEvent(
 
   if (!response.ok) {
     return { success: false, error: result.error || "An error occurred" }
+  }
+
+  return { success: true }
+}
+
+////////////////
+//  TIMEZONE  //
+////////////////
+
+export async function getUserTimezone(userAddress: Address): Promise<string> {
+  if (!userAddress) return getTimeZone().value
+
+  const response = await fetch(
+    `${BASE_USER_PATH}${TIMEZONE_PATH}?address=${userAddress}`
+  )
+  const result = await response.json()
+
+  if (!response.ok || !result?.timezone) {
+    return getTimeZone().value
+  }
+
+  return result.timezone
+}
+
+export async function updateUserTimezone(timezone: string): Promise<{
+  success: boolean
+  data?: string
+  error?: string
+}> {
+  const response = await fetch(`${BASE_USER_PATH}${TIMEZONE_PATH}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ timezone }),
+  })
+
+  const result = await response.json()
+
+  if (!response.ok) {
+    return {
+      success: false,
+      error: result.error || "An error occurred",
+    }
   }
 
   return { success: true }

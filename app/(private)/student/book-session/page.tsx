@@ -125,7 +125,11 @@ export default function BookSessionPage({
   }
 
   function isCurrentStepValid(): boolean {
-    switch (bookStep) {
+    return isStepValid(bookStep)
+  }
+
+  function isStepValid(step: BookStep): boolean {
+    switch (step) {
       case BookStep.SESSION:
         return !!selectedMeetingEvent
       case BookStep.SCHEDULE:
@@ -172,6 +176,12 @@ export default function BookSessionPage({
       setBookStep(step)
       return
     }
+
+    const previousSteps = steps.filter(
+      (s) => getStepIndex(s) < getStepIndex(step)
+    )
+
+    if (previousSteps.some((s) => !isStepValid(s))) return
 
     if (!isCurrentStepValid()) return
 

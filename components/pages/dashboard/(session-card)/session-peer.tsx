@@ -11,7 +11,7 @@ export default function SessionPeer({ name = "Anon" }: { name?: string }) {
         />
         <AvatarFallback>{getInitials(name || "")}</AvatarFallback>
       </Avatar>
-      <span className="text-small text-center">{name}</span>
+      <span className="text-xs text-center">{name}</span>
     </div>
   )
 }

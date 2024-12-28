@@ -32,8 +32,8 @@ export function SessionCard({
   }
 
   return (
-    <div className="relative flex items-center justify-between gap-8 glass rounded-md px-4 py-2">
-      <div className="flex items-center gap-6 w-full">
+    <div className="relative flex items-center justify-between gap-2 glass rounded-md px-4 py-2">
+      <div className="flex items-center gap-4 w-full">
         <SessionPeer
           name={
             isMentorView()
@@ -42,7 +42,7 @@ export function SessionCard({
           }
         />
         <SessionTime startTime={startTime} endTime={endTime} />
-        <div className="flex flex-2 flex-col gap-2">
+        <div className="flex flex-3 flex-col gap-2">
           <SessionTopic topic={topic} />
           <SessionPrice sessionPriceWei={valueLocked} />
         </div>

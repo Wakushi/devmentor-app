@@ -73,14 +73,12 @@ function EmptyRequestsPage() {
           priority
         />
         <div className="flex flex-col text-center mb-8">
-          <h3>No pending approvals</h3>
-          <p className="text-dim">
-            There are currently no sessions waiting for approval.
-          </p>
+          <h3>No session history</h3>
+          <p className="text-dim">Let's book a session with a mentor !</p>
         </div>
         <div>
           <NavLinkButton variant="filled" href="/mentor/availability">
-            Update my availabilities <FaLongArrowAltRight />
+            Find a Mentor <FaLongArrowAltRight />
           </NavLinkButton>
         </div>
       </div>

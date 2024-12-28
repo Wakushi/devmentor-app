@@ -11,7 +11,7 @@ import { Session } from "@/lib/types/session.type"
 import { Mentor, Student } from "@/lib/types/user.type"
 import { useUser } from "@/stores/user.store"
 import Image from "next/image"
-import { FaLongArrowAltRight } from "react-icons/fa"
+import { FaClock, FaLongArrowAltRight } from "react-icons/fa"
 
 export default function DashboardPage() {
   const { user, loadingUser } = useUser() as {
@@ -114,7 +114,7 @@ function IncomingSessions({
             </p>
           </div>
           <NavLinkButton variant="outline" href="/mentor/sessions">
-            Check pending requests <FaLongArrowAltRight />
+            <FaClock /> Check pending requests
           </NavLinkButton>
         </div>
       )}

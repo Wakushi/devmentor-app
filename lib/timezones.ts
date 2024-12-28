@@ -4,7 +4,7 @@ export type Timezone = {
   description: string
 }
 
-export function getTimezoneByLabel(label: string): Timezone {
+export function getTimeZoneByLabel(label: string): Timezone {
   const timezone = timezones.find((t) => t.label === label)
 
   if (!timezone) throw new Error(`Timezone not found for label ${label}`)
@@ -12,7 +12,7 @@ export function getTimezoneByLabel(label: string): Timezone {
   return timezone
 }
 
-export function getTimezoneByValue(value: string): Timezone {
+export function getTimeZoneByValue(value: string): Timezone {
   const timezone = timezones.find((t) => t.value === value)
 
   if (!timezone) throw new Error(`Timezone not found for value ${value}`)
@@ -20,9 +20,13 @@ export function getTimezoneByValue(value: string): Timezone {
   return timezone
 }
 
+export function formatTimeZoneLabel(label: string): string {
+  return label ? label.replace(/_/g, " ") : ""
+}
+
 export const timezones: Timezone[] = [
   {
-    label: "Pacific/Baker Island",
+    label: "Pacific/Baker_Island",
     value: "UTC-12:00",
     description: "Baker Island",
   },
@@ -42,7 +46,7 @@ export const timezones: Timezone[] = [
     description: "Alaska",
   },
   {
-    label: "America/Los Angeles",
+    label: "America/Los_Angeles",
     value: "UTC-08:00",
     description: "Pacific Time (US & Canada)",
   },
@@ -57,7 +61,7 @@ export const timezones: Timezone[] = [
     description: "Central Time (US & Canada)",
   },
   {
-    label: "America/New York",
+    label: "America/New_York",
     value: "UTC-05:00",
     description: "Eastern Time (US & Canada)",
   },
@@ -67,7 +71,7 @@ export const timezones: Timezone[] = [
     description: "Atlantic Time (Canada)",
   },
   {
-    label: "America/Sao Paulo",
+    label: "America/Sao_Paulo",
     value: "UTC-03:00",
     description: "São Paulo, Buenos Aires",
   },
@@ -77,7 +81,7 @@ export const timezones: Timezone[] = [
     description: "Fernando de Noronha",
   },
   {
-    label: "Atlantic/Cape Verde",
+    label: "Atlantic/Cape_Verde",
     value: "UTC-01:00",
     description: "Cape Verde Islands",
   },

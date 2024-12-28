@@ -3,13 +3,19 @@ import { useState } from "react"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { MeetingEvent, Timeslot } from "@/lib/types/timeslot.type"
-import { getTimeslotMatcher } from "@/lib/utils"
+import { getTimeslotMatcher, getTimeZone } from "@/lib/utils"
 import TimeslotCardList from "./timeslot-card-list"
 import { CalendarDays } from "lucide-react"
 import useSessionsQuery from "@/hooks/queries/sessions-query"
 import { Mentor } from "@/lib/types/user.type"
 import { Session } from "@/lib/types/session.type"
 import CalendarSkeleton from "@/components/ui/calendar-skeleton"
+import TimezoneSelector from "@/components/timeslot-selection/timezone-selector"
+import { toast } from "@/hooks/use-toast"
+import { FaCircleCheck } from "react-icons/fa6"
+import { updateUserTimezone } from "@/services/user.service"
+import { QueryKeys } from "@/lib/types/query-keys.type"
+import { useQueryClient } from "@tanstack/react-query"
 
 export default function SessionCalendar({
   mentor,
@@ -24,6 +30,8 @@ export default function SessionCalendar({
   selectedDate: Date | undefined
   handleSelectDate: (date: Date | undefined) => void
 }) {
+  const queryClient = useQueryClient()
+
   const { data: sessions, isLoading: loadingSessions } =
     useSessionsQuery(mentor)
 
@@ -32,6 +40,8 @@ export default function SessionCalendar({
   const [selectedDateAvailableSlots, setSelectedDateAvailableSlots] = useState<
     number[]
   >(selectedDate ? computeDividedSlots(selectedDate) : [])
+
+  const [timezone, setTimezone] = useState<string>(getTimeZone().value)
 
   function handleDateSelect(date: Date | undefined) {
     if (date) {
@@ -123,19 +133,45 @@ export default function SessionCalendar({
     setSelectedSlot(slot)
   }
 
+  async function handleSelectTimezone(timezone: string): Promise<void> {
+    toast({
+      title: "Timezone updated",
+      description: "Timezone set to " + timezone,
+      action: <FaCircleCheck className="text-white" />,
+    })
+
+    setTimezone(timezone)
+
+    await updateUserTimezone(timezone)
+
+    queryClient.refetchQueries({ queryKey: [QueryKeys.TIMEZONE] })
+  }
+
   if (!selectedMeetingEvent) return null
 
   return (
     <Card className="glass border-stone-800 text-white w-full fade-in-bottom">
       <CardHeader>
-        <div className="flex items-center gap-2">
-          <CalendarDays className="w-5 h-5" />
-          <h3 className="text-2xl">Schedule your session</h3>
+        <div className="flex justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <CalendarDays className="w-5 h-5" />
+              <h3 className="text-2xl">Schedule your session</h3>
+            </div>
+            <p className="text-dim text-base">
+              Choose the right time to grow your skills!
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <p className="text-small font-normal font-sans text-dim">
+              Select your timezone
+            </p>
+            <TimezoneSelector
+              timezone={timezone}
+              handleSelectTimezone={handleSelectTimezone}
+            />
+          </div>
         </div>
-        <p className="text-dim text-base">
-          Choose a time to tap into your mentor's expertise and grow your
-          skills!
-        </p>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         {loadingSessions ? (

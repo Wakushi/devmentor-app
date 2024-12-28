@@ -11,7 +11,7 @@ import {
 } from "./types/profile-form.type"
 import { TimeValue } from "react-aria"
 import { Mentor } from "./types/user.type"
-import { getTimezoneByLabel, Timezone } from "./timezones"
+import { getTimeZoneByLabel, Timezone } from "./timezones"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -193,20 +193,27 @@ export function msToReadableDuration(durationInMs: number): string {
   return duration
 }
 
-export function timeStampToTimeValue(timestamp: number): TimeValue {
-  const date = new Date(timestamp)
-  const hour = date.getHours()
-  const minute = date.getMinutes()
+export function timeStampToTimeValue(
+  timestamp: number,
+  timeZone: string = getTimeZone().label
+): TimeValue {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour: "numeric",
+    minute: "numeric",
+    hour12: false,
+  })
 
+  const parts = formatter.formatToParts(new Date(timestamp))
   return {
-    hour,
-    minute,
+    hour: parseInt(parts.find((p) => p.type === "hour")?.value || "0"),
+    minute: parseInt(parts.find((p) => p.type === "minute")?.value || "0"),
   } as TimeValue
 }
 
 export function getTimeZone(): Timezone {
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
-  const timezone = getTimezoneByLabel(userTimezone)
+  const timezone = getTimeZoneByLabel(userTimezone)
 
   return timezone
     ? timezone

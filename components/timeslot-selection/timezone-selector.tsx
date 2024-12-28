@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { timezones } from "@/lib/timezones"
+import { formatTimeZoneLabel, timezones } from "@/lib/timezones"
 
 export default function TimezoneSelector({
   timezone = "UTC+00:00",
@@ -26,7 +26,7 @@ export default function TimezoneSelector({
         <SelectContent>
           {timezones.map(({ label, value }) => (
             <SelectItem key={value} value={value}>
-              {label}
+              {formatTimeZoneLabel(label)}
             </SelectItem>
           ))}
         </SelectContent>

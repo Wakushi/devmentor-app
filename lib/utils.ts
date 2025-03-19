@@ -223,3 +223,22 @@ export function getTimeZone(): Timezone {
         description: "London, Dublin, Lisbon",
       }
 }
+
+export function timezoneDiff(currentTZ: string, observedTZ: string): number {
+  const timezoneValue = (t: string) => {
+    if (!t) return 0
+
+    const rawTime = t.slice(3, 6)
+    const negative = rawTime.slice(0, 1) === "-"
+    const hour = Number(rawTime.slice(1, 3))
+
+    return negative ? -Math.abs(hour) : hour
+  }
+
+  const currentHour = timezoneValue(currentTZ)
+  const observedHour = timezoneValue(observedTZ)
+
+  return currentHour > observedHour
+    ? -Math.abs(currentHour - observedHour)
+    : Math.abs(currentHour - observedHour)
+}

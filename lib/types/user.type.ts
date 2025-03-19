@@ -35,6 +35,7 @@ export type Mentor = {
   totalRating: number
   hourlyRate: number
   role: Role
+  timezone?: string
 }
 
 // Raw structs received from the contract

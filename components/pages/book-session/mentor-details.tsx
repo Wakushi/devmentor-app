@@ -13,6 +13,7 @@ import { Mentor } from "@/lib/types/user.type"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import HourlyRate from "@/components/hourly-rate"
+import { RiTimeZoneFill } from "react-icons/ri"
 
 export default function MentorDetails({ mentor }: { mentor: Mentor }) {
   const { baseUser, yearsOfExperience, hourlyRate, account, sessionCount } =
@@ -70,6 +71,13 @@ export default function MentorDetails({ mentor }: { mentor: Mentor }) {
               )
             })}
           </div>
+
+          {mentor.timezone && (
+            <div className="flex flex-1 items-center text-sm text-gray-300">
+              <RiTimeZoneFill className="w-4 h-4 mr-2" />
+              <span>Timezone {mentor.timezone}</span>
+            </div>
+          )}
 
           <div className="flex flex-1 items-center text-sm text-gray-300">
             <ClockIcon className="w-4 h-4 mr-2" />

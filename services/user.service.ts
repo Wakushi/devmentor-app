@@ -98,7 +98,6 @@ export async function getUserTimezone(userAddress: Address): Promise<string> {
 
 export async function updateUserTimezone(timezone: string): Promise<{
   success: boolean
-  data?: string
   error?: string
 }> {
   const response = await fetch(`${BASE_USER_PATH}${TIMEZONE_PATH}`, {

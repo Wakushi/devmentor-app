@@ -162,13 +162,24 @@ export default function AvailabilityPage() {
   }
 
   async function handleSelectTimezone(timezone: string): Promise<void> {
+    const { success, error } = await updateUserTimezone(timezone)
+
+    if (!success) {
+      toast({
+        title: "Error",
+        description: "Failed to update timezone, please try again",
+        action: <MdError className="text-white" />,
+      })
+
+      console.error(error)
+      return
+    }
+
     toast({
       title: "Timezone updated",
       description: "Timezone set to " + timezone,
       action: <FaCircleCheck className="text-white" />,
     })
-
-    await updateUserTimezone(timezone)
 
     queryClient.refetchQueries({ queryKey: [QueryKeys.TIMEZONE] })
   }
@@ -195,7 +206,7 @@ export default function AvailabilityPage() {
                       Manage your events
                     </p>
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 w-[170px]">
                     <p className="text-small font-normal font-sans text-dim">
                       Timezone
                     </p>

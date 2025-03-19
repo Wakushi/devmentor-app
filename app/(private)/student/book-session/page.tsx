@@ -395,6 +395,7 @@ export default function BookSessionPage({
 
               {bookStep === BookStep.SCHEDULE && (
                 <SessionCalendar
+                  user={user}
                   mentor={mentor}
                   selectedMeetingEvent={selectedMeetingEvent}
                   handleConfirmTimeslot={handleConfirmTimeslot}

@@ -1,6 +1,7 @@
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { Mentor } from "@/lib/types/user.type"
 import { getAllMentors, getMentor } from "@/services/contract.service"
+import { getUserTimezone } from "@/services/user.service"
 import { useQuery } from "@tanstack/react-query"
 
 export default function useMentorsQuery() {
@@ -13,7 +14,9 @@ export default function useMentorsQuery() {
 
       for (let mentorAddress of mentorsAddresses) {
         const mentor = await getMentor(mentorAddress)
-        mentors.push(mentor)
+        const timezone = await getUserTimezone(mentorAddress)
+
+        mentors.push({ ...mentor, timezone })
       }
 
       return mentors

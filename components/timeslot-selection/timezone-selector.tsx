@@ -15,22 +15,20 @@ export default function TimezoneSelector({
   handleSelectTimezone: (timezone: string) => void
 }) {
   return (
-    <div>
-      <Select
-        value={timezone}
-        onValueChange={(value) => handleSelectTimezone(value)}
-      >
-        <SelectTrigger className="max-w-[200px]">
-          <SelectValue placeholder="Select timezone..." />
-        </SelectTrigger>
-        <SelectContent>
-          {timezones.map(({ label, value }) => (
-            <SelectItem key={value} value={value}>
-              {formatTimeZoneLabel(label)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <Select
+      value={timezone}
+      onValueChange={(value) => handleSelectTimezone(value)}
+    >
+      <SelectTrigger className="max-w-[200px]">
+        <SelectValue placeholder="Select timezone..." />
+      </SelectTrigger>
+      <SelectContent>
+        {timezones.map(({ label, value }) => (
+          <SelectItem key={value} value={value}>
+            {formatTimeZoneLabel(label)} ({value})
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }

@@ -3,11 +3,11 @@ import { useState } from "react"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { MeetingEvent, Timeslot } from "@/lib/types/timeslot.type"
-import { getTimeslotMatcher, getTimeZone } from "@/lib/utils"
+import { getTimeslotMatcher, timezoneDiff } from "@/lib/utils"
 import TimeslotCardList from "./timeslot-card-list"
 import { CalendarDays } from "lucide-react"
 import useSessionsQuery from "@/hooks/queries/sessions-query"
-import { Mentor } from "@/lib/types/user.type"
+import { Mentor, Student } from "@/lib/types/user.type"
 import { Session } from "@/lib/types/session.type"
 import CalendarSkeleton from "@/components/ui/calendar-skeleton"
 import TimezoneSelector from "@/components/timeslot-selection/timezone-selector"
@@ -16,14 +16,18 @@ import { FaCircleCheck } from "react-icons/fa6"
 import { updateUserTimezone } from "@/services/user.service"
 import { QueryKeys } from "@/lib/types/query-keys.type"
 import { useQueryClient } from "@tanstack/react-query"
+import { MdError } from "react-icons/md"
+import useUserTimezoneQuery from "@/hooks/queries/user-timezone-query"
 
 export default function SessionCalendar({
+  user,
   mentor,
   handleConfirmTimeslot,
   selectedMeetingEvent,
   selectedDate,
   handleSelectDate,
 }: {
+  user: Student
   mentor: Mentor
   handleConfirmTimeslot: (slot: number) => void
   selectedMeetingEvent: MeetingEvent | null
@@ -35,24 +39,19 @@ export default function SessionCalendar({
   const { data: sessions, isLoading: loadingSessions } =
     useSessionsQuery(mentor)
 
+  const { data: timezone, isLoading: loadingTimeZone } = useUserTimezoneQuery(
+    user?.account
+  )
+
   const [selectedSlot, setSelectedSlot] = useState<number | undefined>()
 
-  const [selectedDateAvailableSlots, setSelectedDateAvailableSlots] = useState<
-    number[]
-  >(selectedDate ? computeDividedSlots(selectedDate) : [])
+  const timezonedTimeslots = computeTimezonedTimeslots()
 
-  const [timezone, setTimezone] = useState<string>(getTimeZone().value)
+  const selectedDateAvailableSlots = selectedDate
+    ? computeDividedSlots(selectedDate)
+    : []
 
   function handleDateSelect(date: Date | undefined) {
-    if (date) {
-      if (selectedMeetingEvent) {
-        const timeDividedSlots = computeDividedSlots(date)
-        setSelectedDateAvailableSlots(timeDividedSlots)
-      }
-    } else {
-      setSelectedDateAvailableSlots([])
-    }
-
     handleSelectDate(date)
   }
 
@@ -81,9 +80,7 @@ export default function SessionCalendar({
     timeslots.forEach(({ timeStart, timeEnd }) => {
       let sessionStartTime = timeStart
 
-      while (sessionStartTime < timeEnd - eventDurationInMs) {
-        sessionStartTime += eventDurationInMs
-
+      while (sessionStartTime < timeEnd + eventDurationInMs) {
         const sessionStart = new Date(sessionStartTime)
         const sessionStartHour = sessionStart.getHours()
         const sessionStartMinutes = sessionStart.getMinutes()
@@ -115,6 +112,8 @@ export default function SessionCalendar({
         ) {
           timeDividedSlots.push(sessionStartTime)
         }
+
+        sessionStartTime += eventDurationInMs
       }
     })
 
@@ -122,9 +121,9 @@ export default function SessionCalendar({
   }
 
   function getTimeslotsByDate(date: Date): Timeslot[] {
-    if (!selectedMeetingEvent) return []
+    if (!timezonedTimeslots) return []
 
-    return selectedMeetingEvent.timeslots.filter(
+    return timezonedTimeslots.filter(
       (timeslot) => timeslot.day === date.getDay()
     )
   }
@@ -134,17 +133,100 @@ export default function SessionCalendar({
   }
 
   async function handleSelectTimezone(timezone: string): Promise<void> {
+    const { success, error } = await updateUserTimezone(timezone)
+
+    if (!success) {
+      toast({
+        title: "Error",
+        description: "Failed to update timezone, please try again",
+        action: <MdError className="text-white" />,
+      })
+
+      console.error(error)
+      return
+    }
+
     toast({
       title: "Timezone updated",
       description: "Timezone set to " + timezone,
       action: <FaCircleCheck className="text-white" />,
     })
 
-    setTimezone(timezone)
-
-    await updateUserTimezone(timezone)
-
     queryClient.refetchQueries({ queryKey: [QueryKeys.TIMEZONE] })
+  }
+
+  function computeTimezonedTimeslots(): Timeslot[] {
+    if (!selectedMeetingEvent || !mentor.timezone || !timezone) return []
+
+    const hoursDiffInMs: number =
+      timezoneDiff(mentor.timezone, timezone) * 60 * 60 * 1000
+
+    const timezonedTimeslots: Timeslot[] = []
+
+    const extractTime = (timestamp: number): number => {
+      const date = new Date(timestamp)
+      return (
+        date.getHours() * 3600 * 1000 +
+        date.getMinutes() * 60 * 1000 +
+        date.getSeconds() * 1000 +
+        date.getMilliseconds()
+      )
+    }
+
+    const createAdjustedTimestamp = (
+      baseTimestamp: number,
+      timeInMs: number
+    ): number => {
+      const date = new Date(baseTimestamp)
+      date.setHours(0, 0, 0, 0)
+      return date.getTime() + timeInMs
+    }
+
+    selectedMeetingEvent.timeslots.forEach((timeslot) => {
+      const { day, timeStart, timeEnd } = timeslot
+
+      const startTime = extractTime(timeStart)
+      const endTime = extractTime(timeEnd)
+
+      const adjustedStartTime = startTime + hoursDiffInMs
+      const adjustedEndTime = endTime + hoursDiffInMs
+
+      const startDayOffset = Math.floor(adjustedStartTime / (24 * 3600 * 1000))
+      let normalizedStartTime = adjustedStartTime % (24 * 3600 * 1000)
+      if (normalizedStartTime < 0) {
+        normalizedStartTime += 24 * 3600 * 1000
+      }
+
+      const endDayOffset = Math.floor(adjustedEndTime / (24 * 3600 * 1000))
+      let normalizedEndTime = adjustedEndTime % (24 * 3600 * 1000)
+      if (normalizedEndTime < 0) {
+        normalizedEndTime += 24 * 3600 * 1000
+      }
+
+      const newStartDay = (day + startDayOffset + 7) % 7
+      const newEndDay = (day + endDayOffset + 7) % 7
+
+      if (newStartDay === newEndDay) {
+        timezonedTimeslots.push({
+          day: newStartDay,
+          timeStart: createAdjustedTimestamp(timeStart, normalizedStartTime),
+          timeEnd: createAdjustedTimestamp(timeEnd, normalizedEndTime),
+        })
+      } else {
+        timezonedTimeslots.push({
+          day: newStartDay,
+          timeStart: createAdjustedTimestamp(timeStart, normalizedStartTime),
+          timeEnd: createAdjustedTimestamp(timeStart, 24 * 3600 * 1000 - 1),
+        })
+        timezonedTimeslots.push({
+          day: newEndDay,
+          timeStart: createAdjustedTimestamp(timeEnd, 0),
+          timeEnd: createAdjustedTimestamp(timeEnd, normalizedEndTime),
+        })
+      }
+    })
+
+    return timezonedTimeslots
   }
 
   if (!selectedMeetingEvent) return null
@@ -174,7 +256,7 @@ export default function SessionCalendar({
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        {loadingSessions ? (
+        {loadingSessions || loadingTimeZone ? (
           <div className="flex justify-center items-center">
             <CalendarSkeleton />
           </div>
@@ -184,7 +266,7 @@ export default function SessionCalendar({
               mode="single"
               selected={selectedDate || undefined}
               onSelect={handleDateSelect}
-              disabled={getTimeslotMatcher(selectedMeetingEvent?.timeslots)}
+              disabled={getTimeslotMatcher(timezonedTimeslots)}
               className="calendar rounded-md p-0 mb-4 mx-auto"
             />
             <TimeslotCardList
